@@ -4,11 +4,16 @@
   "private": true,
   "type": "module",
   "scripts": {
+    "dev": "vp run -r --parallel dev",
+    "build": "vp run -r build",
+    "start": "vp run -r --parallel start",
     "check": "vp check",
-    "ready": "vp check && vp run -r build",
-    "dev": "vp run -r dev --parallel"
+    "format": "vp fmt",
+    "ready": "vp check && vp run -r build"
   },
   "devDependencies": {
+    "@types/node": "catalog:",
+    "typescript": "catalog:",
     "vite": "catalog:",
     "vite-plus": "catalog:"
   },
@@ -17,9 +22,14 @@
       "name": "pnpm",
       "version": "12.4.1",
       "onFail": "download"
+    },
+    "runtime": {
+      "name": "node",
+      "version": ">=26",
+      "onFail": "download"
     }
   },
   "engines": {
-    "node": ">=22.18.0"
+    "node": ">=26"
   }
 }

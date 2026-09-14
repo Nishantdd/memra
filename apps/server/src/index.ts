@@ -1,12 +1,15 @@
-import { createServer } from "node:http";
+import Fastify from "fastify";
 
-const port = process.env.PORT ?? 3000;
+const port = Number(process.env.PORT ?? 3000);
+const host = process.env.HOST ?? "0.0.0.0";
 
-const server = createServer((_req, res) => {
-  res.writeHead(200, { "Content-Type": "application/json" });
-  res.end(JSON.stringify({ status: "ok" }));
-});
+const app = Fastify({ logger: true });
 
-server.listen(port, () => {
-  console.log(`Server listening on http://localhost:${port}`);
-});
+app.get("/health", async () => ({ status: "ok" }));
+
+try {
+  await app.listen({ port, host });
+} catch (err) {
+  app.log.error(err);
+  process.exit(1);
+}
