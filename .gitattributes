@@ -1,0 +1,3 @@
+* text=auto eol=lf
+*.sh text eol=lf      # force LF always, e.g. for shell scripts (CRLF breaks shebangs)
+*.bat text eol=crlf    # force CRLF always, e.g. for Windows batch files
