@@ -21,7 +21,7 @@ import { INLINE_FOLDER_TABS } from "../constants/index.ts";
 import { useFolders } from "../data/queries.ts";
 import { useLogout } from "../features/auth/useLogout.ts";
 import { CreateFolderModal } from "../features/folders/FolderDialogs.tsx";
-import { IconMenu, MenuItem, MenuItemDivider } from "../lib/carbon.ts";
+import { IconMenu, MenuItem } from "../lib/carbon.ts";
 import { isDarkTheme, setTheme, useTheme } from "../lib/theme.ts";
 import { StatusTag } from "./StatusTag.tsx";
 
@@ -114,7 +114,6 @@ export function AppHeader() {
                   onClick={() => void navigate("/settings")}
                 />
 
-                <MenuItemDivider />
                 <MenuItem label="Sign out" renderIcon={Logout} onClick={() => void logout()} />
               </IconMenu>
             </HeaderGlobalBar>
