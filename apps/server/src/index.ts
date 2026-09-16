@@ -2,10 +2,15 @@ import { existsSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { bootstrap } from "./bootstrap.ts";
-import { SESSION_PURGE_INTERVAL_MS } from "./constants/index.ts";
+import {
+  MAINTENANCE_INITIAL_DELAY_MS,
+  MAINTENANCE_INTERVAL_MS,
+  SESSION_PURGE_INTERVAL_MS,
+} from "./constants/index.ts";
+import { backupDatabase, optimize, purgeTombstones } from "./maintenance.ts";
 import { buildApp } from "./http/app.ts";
 
-const services = bootstrap();
+const services = await bootstrap();
 const { config } = services;
 
 if (!services.auth.hasPassword()) {
@@ -30,6 +35,23 @@ services.index.start();
 
 const purge = setInterval(() => services.auth.purge(), SESSION_PURGE_INTERVAL_MS);
 purge.unref();
+
+const runMaintenance = async () => {
+  try {
+    const dest = await backupDatabase(services.db, config.dataDir);
+    const removed = purgeTombstones(services.db);
+    optimize(services.db);
+    app.log.info({ backup: dest, tombstonesRemoved: removed }, "maintenance complete");
+  } catch (error) {
+    app.log.error(error, "maintenance failed");
+  }
+};
+const maintenanceStart = setTimeout(() => {
+  void runMaintenance();
+  const maintenance = setInterval(() => void runMaintenance(), MAINTENANCE_INTERVAL_MS);
+  maintenance.unref();
+}, MAINTENANCE_INITIAL_DELAY_MS);
+maintenanceStart.unref();
 
 const shutdown = async () => {
   clearInterval(purge);
