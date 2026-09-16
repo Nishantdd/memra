@@ -383,6 +383,75 @@
 
 // Composer ----------------------------------------------------------------
 
+.memra-composer-row {
+  display: flex;
+  align-items: stretch;
+  gap: $spacing-03;
+}
+
+.memra-composer-row > .memra-composer {
+  flex: 1;
+}
+
+.memra-composer-row--dragging > .memra-composer,
+.memra-composer--expanded:has(.memra-upload-dragging) {
+  outline: 2px dashed $border-interactive;
+  outline-offset: -2px;
+}
+
+// Upload preview ----------------------------------------------------------
+
+.memra-upload__preview {
+  max-block-size: 24rem;
+  overflow: auto;
+  padding: $spacing-05;
+  background: $layer-01;
+  border: 1px solid $border-subtle-01;
+}
+
+.memra-upload__fields {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-05;
+}
+
+.memra-upload__warning {
+  max-inline-size: none;
+}
+
+.memra-upload__pending {
+  @include type-style("body-compact-01");
+  color: $text-secondary;
+}
+
+// Settings ----------------------------------------------------------------
+
+.memra-settings__section {
+  margin-block-end: $spacing-08;
+}
+
+.memra-settings__heading {
+  @include type-style("heading-compact-02");
+  margin-block-end: $spacing-03;
+}
+
+.memra-settings__help {
+  @include type-style("body-compact-01");
+  color: $text-secondary;
+  margin-block-end: $spacing-05;
+}
+
+.memra-settings__row {
+  display: flex;
+  align-items: flex-end;
+  gap: $spacing-05;
+  flex-wrap: wrap;
+}
+
+.memra-settings__warnings {
+  margin-block-start: $spacing-05;
+}
+
 .memra-composer--collapsed {
   min-block-size: $spacing-09;
   display: flex;
