@@ -9,13 +9,29 @@
   background: $background;
 }
 
-// Product name padded evenly, folder tabs flush against the divider.
+// Product name padded evenly with the divider on its edge; folder tabs sit flush after it.
 a.cds--header__name {
+  position: relative;
   padding-inline: $spacing-05;
+
+  &::after {
+    content: "";
+    position: absolute;
+    inset-inline-end: 0;
+    inset-block-start: 50%;
+    transform: translateY(-50%);
+    inline-size: 1px;
+    block-size: $spacing-06;
+    background: $border-subtle-01;
+  }
 }
 
 .cds--header__nav {
   padding-inline-start: 0;
+
+  &::before {
+    display: none;
+  }
 }
 
 .memra-header__icon-item .cds--text-truncate--end {
