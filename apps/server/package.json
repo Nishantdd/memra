@@ -9,7 +9,11 @@
     "auth:set-password": "pnpm run cli auth:set-password",
     "build": "vp pack",
     "start": "node --env-file-if-exists=.env dist/index.mjs",
-    "check": "vp check"
+    "check": "vp check",
+    "db:backup": "pnpm run cli db:backup",
+    "db:maintain": "pnpm run cli db:maintain",
+    "db:doctor": "pnpm run cli db:doctor",
+    "db:migrate": "pnpm run cli db:migrate"
   },
   "dependencies": {
     "@fastify/cookie": "catalog:",

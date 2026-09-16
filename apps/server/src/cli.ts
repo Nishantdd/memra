@@ -1,6 +1,7 @@
 import { createInterface } from "node:readline/promises";
 import { Writable } from "node:stream";
 import { bootstrap } from "./bootstrap.ts";
+import { backupDatabase, optimize, purgeTombstones } from "./maintenance.ts";
 import { WeakPassword } from "./modules/auth/auth.service.ts";
 
 async function prompt(question: string): Promise<string> {
@@ -14,7 +15,7 @@ async function prompt(question: string): Promise<string> {
 }
 
 const [command] = process.argv.slice(2);
-const services = bootstrap();
+const services = await bootstrap();
 
 try {
   switch (command) {
@@ -33,11 +34,14 @@ try {
       console.log("Database is up to date.");
       break;
     case "db:backup": {
-      const dest = `${services.config.dataDir}/backups/memra-${new Date().toISOString().slice(0, 10)}.sqlite`;
-      const { mkdirSync } = await import("node:fs");
-      mkdirSync(`${services.config.dataDir}/backups`, { recursive: true, mode: 0o700 });
-      await services.db.backup(dest);
+      const dest = await backupDatabase(services.db, services.config.dataDir);
       console.log(`Backup written to ${dest}`);
+      break;
+    }
+    case "db:maintain": {
+      const removed = purgeTombstones(services.db);
+      optimize(services.db);
+      console.log(`Removed ${removed} expired tombstones; database optimized.`);
       break;
     }
     case "db:doctor": {
@@ -61,7 +65,7 @@ try {
       break;
     }
     default:
-      console.error("Usage: cli <auth:set-password|db:migrate|db:backup|db:doctor>");
+      console.error("Usage: cli <auth:set-password|db:migrate|db:backup|db:maintain|db:doctor>");
       process.exit(1);
   }
 } catch (e) {
