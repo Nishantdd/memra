@@ -2,6 +2,10 @@ import { EventPublisher } from "@orpc/server";
 import type { ServerEvent } from "shared";
 import type { Config } from "../config.ts";
 import type { Database } from "../db/database.ts";
+import { ASK_RATE_LIMIT } from "../constants/index.ts";
+import { AskService } from "../modules/ask/ask.service.ts";
+import { createLlmProvider } from "../modules/ask/providers/factory.ts";
+import { AskRetriever } from "../modules/ask/retrieval.ts";
 import { AuthService, type Session } from "../modules/auth/auth.service.ts";
 import { FoldersRepo } from "../modules/folders/folders.repo.ts";
 import { NotesRepo } from "../modules/notes/notes.repo.ts";
@@ -10,6 +14,7 @@ import { SyncRepo } from "../modules/sync/sync.repo.ts";
 import { TagsRepo } from "../modules/tags/tags.repo.ts";
 import { openRagDatabase } from "../rag/rag-db.ts";
 import { IndexSupervisor } from "../rag/supervisor.ts";
+import { WindowRateLimiter } from "./rate-limit.ts";
 
 export interface Services {
   config: Config;
@@ -24,6 +29,8 @@ export interface Services {
   sync: SyncRepo;
   search: SearchService;
   index: IndexSupervisor;
+  ask: AskService;
+  askLimiter: WindowRateLimiter;
   events: EventPublisher<{ event: ServerEvent }>;
 }
 
@@ -55,6 +62,8 @@ export function createServices(
     sync: new SyncRepo(db),
     search: new SearchService(db, rag, index, config.embedding.minSimilarity),
     index,
+    ask: new AskService(new AskRetriever(db, rag, index), createLlmProvider(config)),
+    askLimiter: new WindowRateLimiter(ASK_RATE_LIMIT.max, ASK_RATE_LIMIT.windowMs),
     events,
   };
 }

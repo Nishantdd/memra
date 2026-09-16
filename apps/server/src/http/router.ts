@@ -1,5 +1,6 @@
 import { implement, ORPCError } from "@orpc/server";
 import { contract } from "shared";
+import { AskUnavailable } from "../modules/ask/ask.service.ts";
 import { LockedOut, WeakPassword } from "../modules/auth/auth.service.ts";
 import {
   DuplicateFolderName,
@@ -314,6 +315,19 @@ export const router = base.router({
     query: authed.search.query.handler(({ input, context }) =>
       context.services.search.search(input),
     ),
+  },
+
+  ask: {
+    answer: authed.ask.answer.handler(async function* ({ input, context, errors, signal }) {
+      const retryAfterSec = context.services.askLimiter.hit(context.session.id);
+      if (retryAfterSec > 0) throw errors.TOO_MANY_REQUESTS({ data: { retryAfterSec } });
+      try {
+        yield* context.services.ask.answer(input, signal ?? new AbortController().signal);
+      } catch (e) {
+        if (e instanceof AskUnavailable) throw errors.SERVICE_UNAVAILABLE();
+        throw e;
+      }
+    }),
   },
 
   sync: {
