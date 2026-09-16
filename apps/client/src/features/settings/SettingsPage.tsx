@@ -1,6 +1,7 @@
 import { Column, Grid } from "@carbon/react";
 import { useConnectivity } from "../../data/sync/connectivity.ts";
 import { ImportExportSection } from "./ImportExportSection.tsx";
+import { OfflineStorageSection } from "./OfflineStorageSection.tsx";
 
 export function SettingsPage() {
   const { connectivity } = useConnectivity();
@@ -17,6 +18,12 @@ export function SettingsPage() {
             Import and export
           </h2>
           <ImportExportSection readOnly={readOnly} />
+        </section>
+        <section className="memra-settings__section" aria-labelledby="settings-offline">
+          <h2 id="settings-offline" className="memra-section__heading">
+            Offline storage
+          </h2>
+          <OfflineStorageSection />
         </section>
       </Column>
     </Grid>
