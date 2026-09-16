@@ -11,6 +11,7 @@ import {
   Tag,
   TagName,
 } from "../schemas/entities.ts";
+import { askContract } from "./ask.ts";
 import { searchContract } from "./search.ts";
 
 const Ok = z.object({ ok: z.literal(true) });
@@ -210,6 +211,7 @@ export const contract = {
   sync: syncContract,
   search: searchContract,
   index: indexContract,
+  ask: askContract,
 };
 
 export type Contract = typeof contract;
