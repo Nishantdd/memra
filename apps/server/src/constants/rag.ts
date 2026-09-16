@@ -1,0 +1,16 @@
+export const RAG_DB_FILE = "memra-rag.sqlite";
+export const MODELS_DIR = "models";
+export const VEC_CANDIDATES = 60;
+export const VEC_OVERFETCH_SCOPED = 200;
+export const SEMANTIC_EXTRA_CHUNK_BONUS = 0.05;
+export const SEMANTIC_EXTRA_CHUNK_CAP = 3;
+export const INDEX_QUIET_MS = 1500;
+export const INDEX_POLL_MS = 5000;
+export const INDEX_MAX_ATTEMPTS = 8;
+export const INDEX_BACKOFF_BASE_MS = 1000;
+export const INDEX_BACKOFF_MAX_MS = 5 * 60_000;
+export const QUERY_EMBED_TIMEOUT_MS = 2000;
+export const QUERY_EMBED_CACHE_SIZE = 500;
+export const BGE_QUERY_PREFIX = "Represent this sentence for searching relevant passages: ";
+export const REMOTE_EMBED_TIMEOUT_MS = 30_000;
+export const REMOTE_EMBED_RETRIES = 3;
