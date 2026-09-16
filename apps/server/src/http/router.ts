@@ -26,6 +26,7 @@ function publishChange(ctx: RequestContext): void {
     "SELECT value FROM meta WHERE key = 'server_seq'",
   )!.value;
   ctx.services.events.publish("event", { type: "changed", seq: Number(seq) });
+  ctx.services.index.wake();
 }
 
 export const router = base.router({
@@ -277,6 +278,35 @@ export const router = base.router({
         if (e instanceof TagNotFound) throw errors.NOT_FOUND();
         throw e;
       }
+    }),
+  },
+
+  index: {
+    status: authed.index.status.handler(({ context }) => {
+      const s = context.services;
+      const jobs = s.db.get<{ pending: number; failed: number | null }>(
+        "SELECT count(*) AS pending, sum(CASE WHEN attempts >= 8 THEN 1 ELSE 0 END) AS failed FROM index_jobs",
+      )!;
+      const notes = s.db.get<{ total: number; indexed: number | null }>(
+        "SELECT count(*) AS total, sum(CASE WHEN indexed_version = version THEN 1 ELSE 0 END) AS indexed FROM notes WHERE deleted_at IS NULL",
+      )!;
+      return {
+        ready: s.index.ready,
+        pending: jobs.pending,
+        failed: jobs.failed ?? 0,
+        indexedRatio: notes.total ? (notes.indexed ?? 0) / notes.total : 1,
+        progress: s.index.progress,
+        embedding: {
+          provider: s.config.embedding.provider,
+          model: s.config.embedding.model,
+          dims: s.index.dims,
+          local: s.config.embedding.provider === "local",
+        },
+      };
+    }),
+    rebuild: authed.index.rebuild.handler(({ context }) => {
+      context.services.index.rebuild();
+      return { ok: true as const };
     }),
   },
 

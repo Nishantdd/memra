@@ -25,11 +25,15 @@ const clientDist =
 
 const app = buildApp(services, clientDist);
 
+services.index.on("log", ({ level, message }) => app.log[level]({ worker: "index" }, message));
+services.index.start();
+
 const purge = setInterval(() => services.auth.purge(), SESSION_PURGE_INTERVAL_MS);
 purge.unref();
 
 const shutdown = async () => {
   clearInterval(purge);
+  await services.index.stop();
   await app.close();
   services.db.close();
   process.exit(0);
