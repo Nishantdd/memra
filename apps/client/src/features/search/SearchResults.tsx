@@ -14,12 +14,20 @@ interface SearchResultsProps {
   q: string;
   mode: SearchMode;
   folderId: string | null;
+  onNavigate?: () => void;
 }
 
 const LIST_ID = "search-results";
 
-export function SearchResults({ q, mode, folderId }: SearchResultsProps) {
+export function SearchResults({ q, mode, folderId, onNavigate }: SearchResultsProps) {
   const navigate = useNavigate();
+  const open = useCallback(
+    (noteId: string) => {
+      void navigate(`/n/${noteId}`);
+      onNavigate?.();
+    },
+    [navigate, onNavigate],
+  );
   const [limit, setLimit] = useState<number>(SEARCH.pageResults);
   const [activeIndex, setActiveIndex] = useState(-1);
   const search = useSearchResults({ q, mode, folderId, limit });
@@ -38,10 +46,10 @@ export function SearchResults({ q, mode, folderId }: SearchResultsProps) {
           .getElementById(resultOptionId(LIST_ID, index))
           ?.scrollIntoView({ block: "nearest" });
       } else if (source) {
-        void navigate(`/n/${source.noteId}`);
+        open(source.noteId);
       }
     },
-    [ask.sources, results, navigate],
+    [ask.sources, results, open],
   );
 
   if (q.trim().length < minQueryLength(mode)) {
@@ -69,7 +77,7 @@ export function SearchResults({ q, mode, folderId }: SearchResultsProps) {
               result={r}
               index={i}
               active={i === activeIndex}
-              onSelect={(res) => void navigate(`/n/${res.noteId}`)}
+              onSelect={(res) => open(res.noteId)}
               onHover={setActiveIndex}
             />
           ))}

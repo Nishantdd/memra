@@ -38,11 +38,17 @@
   margin-block-end: $spacing-05;
 }
 
-.memra-search {
-  margin-block-end: $spacing-07;
+.memra-search-row {
+  display: flex;
+  gap: $spacing-05;
+  margin-block-end: $spacing-06;
 }
 
-.memra-search__mode {
+.memra-search-row__mode {
+  flex: 0 0 16rem;
+}
+
+.memra-editor-mode {
   margin-block-start: $spacing-05;
   inline-size: 20rem;
 }

@@ -235,7 +235,7 @@ function EditorForm({ draft, onChange, folderId, title, onSave, children }: Edit
           size="sm"
           selectedIndex={mode === "write" ? 0 : 1}
           onChange={({ index }) => setMode(index === 0 ? "write" : "preview")}
-          className="memra-search__mode"
+          className="memra-editor-mode"
         >
           <Switch name="write" text="Write" />
           <Switch name="preview" text="Preview" />

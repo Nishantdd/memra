@@ -1,15 +1,13 @@
-import { Add, Edit, TrashCan, Upload } from "@carbon/icons-react";
-import { Column, Grid, MenuButton, MenuItem, SkeletonPlaceholder, Tag } from "@carbon/react";
-import { useRef, useState } from "react";
+import { Add, Edit, Search, TrashCan, Upload } from "@carbon/icons-react";
+import { Column, Grid, IconButton, SkeletonPlaceholder, Tag } from "@carbon/react";
+import { useEffect, useRef, useState } from "react";
 import { Navigate, useNavigate, useParams } from "react-router";
 import type { Note } from "shared";
 import { useUpdateNote } from "../../data/mutations.ts";
 import { useFolders, useNotes } from "../../data/queries.ts";
 import { IconMenu, MenuItem as IconMenuItem } from "../../lib/carbon.ts";
 import { DeleteFolderModal, RenameFolderModal } from "../folders/FolderDialogs.tsx";
-import { SearchBar } from "../search/SearchBar.tsx";
-import { SearchResults } from "../search/SearchResults.tsx";
-import { useSearchState } from "../search/useSearch.ts";
+import { SearchModal } from "../search/SearchModal.tsx";
 import { NoteCard } from "./NoteCard.tsx";
 import { MoveNoteModal, RecolorNoteModal } from "./NoteDialogs.tsx";
 import { UploadPreviewModal } from "./UploadPreviewModal.tsx";
@@ -20,15 +18,26 @@ export function NotesPage() {
   const navigate = useNavigate();
   const folders = useFolders();
   const notes = useNotes(folderId);
-  const { q, mode } = useSearchState();
   const update = useUpdateNote();
   const [moving, setMoving] = useState<Note | null>(null);
   const [recoloring, setRecoloring] = useState<Note | null>(null);
   const [renaming, setRenaming] = useState(false);
   const [deletingFolder, setDeletingFolder] = useState(false);
   const [upload, setUpload] = useState<File | null>(null);
+  const [searching, setSearching] = useState(false);
   const fileInput = useRef<HTMLInputElement>(null);
   const { requestDelete, confirmModal, undoToast } = useDeleteWithUndo();
+
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "k") {
+        e.preventDefault();
+        setSearching(true);
+      }
+    };
+    document.addEventListener("keydown", onKey);
+    return () => document.removeEventListener("keydown", onKey);
+  }, []);
 
   const folder = folderId ? folders?.find((f) => f.id === folderId) : undefined;
   if (folderId && folders && !folder) return <Navigate to="/" replace />;
@@ -38,7 +47,6 @@ export function NotesPage() {
   const others = items.filter((n) => !n.pinned);
   const togglePin = (note: Note) =>
     update.mutate({ id: note.id, expectedVersion: note.version, pinned: !note.pinned });
-  const searching = q.trim().length > 0;
 
   const grid = (list: Note[]) => (
     <Grid className="memra-notes-grid" condensed={false}>
@@ -67,18 +75,27 @@ export function NotesPage() {
             </Tag>
           )}
           <span className="memra-page-title__actions">
-            <MenuButton label="New" kind="primary" size="md" menuAlignment="bottom-end">
-              <MenuItem
+            <IconButton
+              label="Search (Ctrl+K)"
+              kind="ghost"
+              size="md"
+              align="bottom-end"
+              onClick={() => setSearching(true)}
+            >
+              <Search />
+            </IconButton>
+            <IconMenu label="New" renderIcon={Add} size="md" menuAlignment="bottom-end">
+              <IconMenuItem
                 label="Note"
                 renderIcon={Add}
                 onClick={() => void navigate(folder ? `/n/new?folder=${folder.id}` : "/n/new")}
               />
-              <MenuItem
+              <IconMenuItem
                 label="Upload Markdown file"
                 renderIcon={Upload}
                 onClick={() => fileInput.current?.click()}
               />
-            </MenuButton>
+            </IconMenu>
             {folder && (
               <IconMenu label="Folder actions" size="md" menuAlignment="bottom-end">
                 <IconMenuItem
@@ -98,14 +115,8 @@ export function NotesPage() {
         </h1>
       </Column>
 
-      <Column sm={4} md={8} lg={{ span: 10, offset: 0 }}>
-        <SearchBar />
-      </Column>
-
       <Column sm={4} md={8} lg={16}>
-        {searching ? (
-          <SearchResults q={q} mode={mode} folderId={folder?.id ?? null} />
-        ) : notes.isPending ? (
+        {notes.isPending ? (
           <Grid className="memra-notes-grid">
             {Array.from({ length: 4 }, (_, i) => (
               <Column key={i} sm={4} md={4} lg={4}>
@@ -153,6 +164,11 @@ export function NotesPage() {
           setUpload(null);
           void navigate(`/n/${id}`);
         }}
+      />
+      <SearchModal
+        open={searching}
+        folderId={folder?.id ?? null}
+        onClose={() => setSearching(false)}
       />
       <MoveNoteModal note={moving} onClose={() => setMoving(null)} />
       <RecolorNoteModal note={recoloring} onClose={() => setRecoloring(null)} />
