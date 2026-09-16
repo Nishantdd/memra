@@ -1,0 +1,399 @@
+@use "@carbon/react/scss/spacing" as *;
+@use "@carbon/react/scss/theme" as *;
+@use "@carbon/react/scss/type" as *;
+@use "@carbon/react/scss/motion" as *;
+@use "@carbon/react/scss/breakpoint" as *;
+
+// Layout -----------------------------------------------------------------
+
+.memra-content {
+  padding-block: $spacing-07;
+  background: $background;
+  min-block-size: 100vh;
+}
+
+.memra-offline-banner {
+  margin-block-end: $spacing-06;
+  max-inline-size: none;
+}
+
+.memra-page__title-row {
+  display: flex;
+  align-items: center;
+  gap: $spacing-03;
+  margin-block-end: $spacing-06;
+}
+
+.memra-page-title {
+  @include type-style("heading-03");
+}
+
+.memra-page__composer {
+  margin-block-end: $spacing-07;
+}
+
+.memra-section {
+  margin-block-end: $spacing-07;
+}
+
+.memra-section__heading {
+  @include type-style("heading-compact-01");
+  color: $text-secondary;
+  margin-block-end: $spacing-05;
+}
+
+.memra-notes-grid {
+  row-gap: $spacing-05;
+}
+
+.memra-empty {
+  padding-block: $spacing-07;
+}
+
+.memra-empty__heading {
+  @include type-style("heading-compact-02");
+  margin-block-end: $spacing-03;
+}
+
+.memra-empty__body {
+  @include type-style("body-compact-01");
+  color: $text-secondary;
+  margin-block-end: $spacing-05;
+}
+
+.memra-toasts {
+  position: fixed;
+  inset-block-end: $spacing-05;
+  inset-inline-end: $spacing-05;
+  z-index: 9000;
+}
+
+// Header ------------------------------------------------------------------
+
+.memra-header__add {
+  white-space: nowrap;
+}
+
+.memra-header__add svg {
+  margin-inline-end: $spacing-02;
+  vertical-align: text-bottom;
+}
+
+.cds--header__menu-bar .cds--header__menu-item {
+  max-inline-size: 10rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.memra-status {
+  align-self: center;
+  margin-inline-end: $spacing-03;
+}
+
+.memra-status--busy svg {
+  animation: memra-spin 1s linear infinite;
+}
+
+@keyframes memra-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .memra-status--busy svg {
+    animation: none;
+  }
+}
+
+// Login -------------------------------------------------------------------
+
+.memra-login {
+  min-block-size: 100vh;
+  display: flex;
+  align-items: center;
+  background: $background;
+}
+
+.memra-login__heading {
+  @include type-style("heading-04");
+}
+
+// Composer ----------------------------------------------------------------
+
+.memra-composer--collapsed {
+  min-block-size: $spacing-09;
+  display: flex;
+  align-items: center;
+}
+
+.memra-composer__placeholder {
+  @include type-style("body-01");
+  color: $text-placeholder;
+}
+
+.memra-composer--expanded {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-05;
+}
+
+.memra-composer__meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: $spacing-03;
+  align-items: flex-start;
+}
+
+.memra-composer__meta > * {
+  flex: 1 1 10rem;
+}
+
+.memra-composer__switcher {
+  max-inline-size: 16rem;
+}
+
+.memra-composer__preview {
+  min-block-size: 8rem;
+  padding: $spacing-05;
+  border: 1px solid $border-subtle-01;
+}
+
+.memra-composer__footer {
+  justify-content: flex-end;
+}
+
+.memra-toolbar {
+  display: flex;
+  gap: $spacing-01;
+  border-block-start: 1px solid $border-subtle-01;
+  padding-block-start: $spacing-02;
+}
+
+.memra-tags-field__list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: $spacing-02;
+  margin-block-start: $spacing-03;
+}
+
+// Note card ---------------------------------------------------------------
+
+.memra-note {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-04;
+  block-size: 100%;
+  transition: background-color $duration-fast-02 motion(standard, productive);
+}
+
+.memra-note:hover {
+  background: $layer-hover-01;
+}
+
+.memra-note__head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: $spacing-03;
+}
+
+.memra-note__title {
+  @include type-style("heading-compact-02");
+  min-inline-size: 0;
+  overflow-wrap: anywhere;
+}
+
+.memra-note__title--derived a {
+  color: $text-secondary;
+}
+
+.memra-note__actions {
+  display: flex;
+  flex-shrink: 0;
+  opacity: 0;
+  transition: opacity $duration-fast-02 motion(standard, productive);
+}
+
+.memra-note:hover .memra-note__actions,
+.memra-note:focus-within .memra-note__actions,
+.memra-note__actions:has([aria-expanded="true"]) {
+  opacity: 1;
+}
+
+@media (hover: none) {
+  .memra-note__actions {
+    opacity: 1;
+  }
+}
+
+.memra-note__body {
+  @include type-style("body-compact-01");
+  max-block-size: 7.5rem;
+  overflow: hidden;
+  position: relative;
+  flex: 1;
+}
+
+.memra-note__body::after {
+  content: "";
+  position: absolute;
+  inset-block-end: 0;
+  inset-inline: 0;
+  block-size: $spacing-06;
+  background: linear-gradient(transparent, $layer-01);
+}
+
+.memra-note:hover .memra-note__body::after {
+  background: linear-gradient(transparent, $layer-hover-01);
+}
+
+.memra-note__foot {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: $spacing-03;
+}
+
+.memra-note__tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: $spacing-02;
+}
+
+.memra-note__meta {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  flex-shrink: 0;
+}
+
+.memra-note__folder,
+.memra-note__time {
+  @include type-style("helper-text-01");
+  color: $text-helper;
+}
+
+.memra-note-skeleton {
+  inline-size: 100%;
+  block-size: 12rem;
+}
+
+// Markdown ----------------------------------------------------------------
+
+.memra-markdown > * + * {
+  margin-block-start: $spacing-03;
+}
+
+.memra-markdown h1,
+.memra-markdown h2,
+.memra-markdown h3,
+.memra-markdown h4 {
+  @include type-style("heading-compact-02");
+}
+
+.memra-note__body .memra-markdown h1,
+.memra-note__body .memra-markdown h2,
+.memra-note__body .memra-markdown h3,
+.memra-note__body .memra-markdown h4 {
+  @include type-style("body-compact-01");
+  font-weight: 600;
+}
+
+.memra-markdown ul,
+.memra-markdown ol {
+  padding-inline-start: $spacing-06;
+}
+
+.memra-markdown ul {
+  list-style: disc;
+}
+
+.memra-markdown ol {
+  list-style: decimal;
+}
+
+.memra-markdown li + li {
+  margin-block-start: $spacing-02;
+}
+
+.memra-markdown li:has(> input[type="checkbox"]) {
+  list-style: none;
+  margin-inline-start: -$spacing-06;
+}
+
+.memra-markdown input[type="checkbox"] {
+  margin-inline-end: $spacing-03;
+  accent-color: $interactive;
+}
+
+.memra-markdown blockquote {
+  border-inline-start: 3px solid $border-strong-01;
+  padding-inline-start: $spacing-04;
+  color: $text-secondary;
+}
+
+.memra-markdown code {
+  @include type-style("code-01");
+  background: $layer-accent-01;
+  padding-inline: $spacing-02;
+}
+
+.memra-markdown table {
+  border-collapse: collapse;
+  inline-size: 100%;
+}
+
+.memra-markdown th,
+.memra-markdown td {
+  text-align: start;
+  padding: $spacing-03;
+  border-block-end: 1px solid $border-subtle-01;
+}
+
+.memra-markdown th {
+  @include type-style("heading-compact-01");
+}
+
+.memra-markdown hr {
+  border: 0;
+  border-block-start: 1px solid $border-subtle-01;
+}
+
+// Editor page -------------------------------------------------------------
+
+.memra-editor-page__meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: $spacing-03;
+  align-items: flex-start;
+  margin-block: $spacing-05;
+}
+
+.memra-editor-page__meta > * {
+  flex: 1 1 12rem;
+}
+
+.memra-editor-page__status {
+  margin-block-start: $spacing-05;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: $spacing-05;
+}
+
+.memra-editor-page__preview {
+  min-block-size: 16rem;
+  padding: $spacing-05;
+  border: 1px solid $border-subtle-01;
+  background: $layer-01;
+}
+
+.memra-editor textarea {
+  @include type-style("body-01");
+}
+
+.memra-editor-page .memra-editor textarea {
+  min-block-size: 16rem;
+}
