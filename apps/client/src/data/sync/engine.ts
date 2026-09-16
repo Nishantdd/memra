@@ -1,4 +1,5 @@
-import { isDefinedError, ORPCError } from "@orpc/client";
+import { ORPCError } from "@orpc/client";
+import type { EntityTable } from "dexie";
 import type { Folder, Note, SyncPage, Tag } from "shared";
 import { api } from "../api/orpc.ts";
 import { db, getMeta, setMeta, wipeLocalData } from "../db.ts";
@@ -22,14 +23,15 @@ async function applyPage(page: SyncPage): Promise<void> {
   });
 }
 
-async function upsertOrDelete<T extends Folder | Tag | Note>(
-  table: { bulkPut(items: T[]): Promise<unknown>; bulkDelete(keys: string[]): Promise<void> },
+async function upsertOrDelete<T extends { id: string; deletedAt: number | null }>(
+  table: EntityTable<T, "id">,
   rows: T[],
 ): Promise<void> {
   const live = rows.filter((r) => r.deletedAt === null);
   const dead = rows.filter((r) => r.deletedAt !== null).map((r) => r.id);
   if (live.length) await table.bulkPut(live);
-  if (dead.length) await table.bulkDelete(dead);
+  if (dead.length)
+    await (table as unknown as { bulkDelete(keys: string[]): Promise<void> }).bulkDelete(dead);
 }
 
 async function pullAll(): Promise<number> {
@@ -40,7 +42,7 @@ async function pullAll(): Promise<number> {
     try {
       page = await api.sync.pull({ cursor });
     } catch (error) {
-      if (isDefinedError(error) && error.code === "GONE") {
+      if (error instanceof ORPCError && error.code === "GONE") {
         await wipeLocalData();
         cursor = 0;
         continue;
@@ -127,7 +129,11 @@ export function startSyncEngine(): () => void {
 
   const unsubscribeConnectivity = connectivityStore.subscribe(() => {
     const { connectivity } = connectivityStore.get();
-    if (connectivity === "online" && sessionStore.get().status === "authenticated" && !eventsAbort) {
+    if (
+      connectivity === "online" &&
+      sessionStore.get().status === "authenticated" &&
+      !eventsAbort
+    ) {
       void listenForEvents();
     }
   });
@@ -144,7 +150,10 @@ export function startSyncEngine(): () => void {
 export async function applyServerRow(kind: "note", row: Note): Promise<void>;
 export async function applyServerRow(kind: "folder", row: Folder): Promise<void>;
 export async function applyServerRow(kind: "tag", row: Tag): Promise<void>;
-export async function applyServerRow(kind: "note" | "folder" | "tag", row: Note | Folder | Tag): Promise<void> {
+export async function applyServerRow(
+  kind: "note" | "folder" | "tag",
+  row: Note | Folder | Tag,
+): Promise<void> {
   const table = kind === "note" ? db.notes : kind === "folder" ? db.folders : db.tags;
   if (row.deletedAt !== null) await table.delete(row.id);
   else await (table as { put(r: typeof row): Promise<unknown> }).put(row);
