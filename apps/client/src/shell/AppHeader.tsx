@@ -1,4 +1,4 @@
-import { Asleep, Light, Logout, Settings, UserAvatar } from "@carbon/icons-react";
+import { Asleep, FolderAdd, Light, Logout, Settings, UserAvatar } from "@carbon/icons-react";
 import {
   Header,
   HeaderContainer,
@@ -51,13 +51,16 @@ export function AppHeader() {
   const newFolderItem = (onClick?: () => void) => (
     <HeaderMenuItem
       href="#"
+      className="memra-header__icon-item"
+      aria-label="New folder"
+      title="New folder"
       onClick={(e: MouseEvent) => {
         e.preventDefault();
         onClick?.();
         setCreating(true);
       }}
     >
-      New folder
+      <FolderAdd size={20} />
     </HeaderMenuItem>
   );
 
