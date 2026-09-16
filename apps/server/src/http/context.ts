@@ -22,7 +22,12 @@ export interface Services {
   events: EventPublisher<{ event: ServerEvent }>;
 }
 
-export function createServices(config: Config, db: Database, instanceId: string, version: string): Services {
+export function createServices(
+  config: Config,
+  db: Database,
+  instanceId: string,
+  version: string,
+): Services {
   return {
     config,
     db,
