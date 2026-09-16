@@ -4,5 +4,3 @@ export const UNDO_MS = 10_000;
 export const COMPOSER_ROWS = 6;
 export const EDITOR_ROWS = 16;
 export const COUNTER_VISIBLE_RATIO = 0.9;
-export const OFFLINE_SNIPPET_CHARS = 160;
-export const RECONNECT_TOAST_MS = 6000;

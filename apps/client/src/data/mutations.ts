@@ -1,45 +1,57 @@
-import { useMutation } from "@tanstack/react-query";
-import type { Folder, Note, Tag } from "shared";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import type { Note } from "shared";
 import { orpc } from "./api/orpc.ts";
-import { applyServerRow, syncNow } from "./sync/engine.ts";
+import { noteKeys } from "./queries.ts";
 
-const afterNote = async (note: Note) => {
-  await applyServerRow("note", note);
-  void syncNow();
-};
-const afterFolder = async (folder: Folder) => {
-  await applyServerRow("folder", folder);
-  void syncNow();
-};
-const afterTag = async (tag: Tag) => {
-  await applyServerRow("tag", tag);
-  void syncNow();
-};
+function useInvalidate() {
+  const qc = useQueryClient();
+  return {
+    notes: (note?: Note) => {
+      void qc.invalidateQueries({ queryKey: noteKeys.all() });
+      if (note) qc.setQueryData(noteKeys.note(note.id), note);
+    },
+    folders: () => {
+      void qc.invalidateQueries({ queryKey: noteKeys.folders() });
+      void qc.invalidateQueries({ queryKey: noteKeys.all() });
+    },
+    tags: () => {
+      void qc.invalidateQueries({ queryKey: noteKeys.tags() });
+      void qc.invalidateQueries({ queryKey: noteKeys.all() });
+    },
+  };
+}
 
-export const useCreateNote = () =>
-  useMutation(orpc.notes.create.mutationOptions({ onSuccess: afterNote }));
-export const useUpdateNote = () =>
-  useMutation(orpc.notes.update.mutationOptions({ onSuccess: afterNote }));
-export const useDeleteNote = () =>
-  useMutation(orpc.notes.delete.mutationOptions({ onSuccess: afterNote }));
-export const useRestoreNote = () =>
-  useMutation(orpc.notes.restore.mutationOptions({ onSuccess: afterNote }));
+export function useCreateNote() {
+  const inv = useInvalidate();
+  return useMutation(orpc.notes.create.mutationOptions({ onSuccess: (n) => inv.notes(n) }));
+}
+export function useUpdateNote() {
+  const inv = useInvalidate();
+  return useMutation(orpc.notes.update.mutationOptions({ onSuccess: (n) => inv.notes(n) }));
+}
+export function useDeleteNote() {
+  const inv = useInvalidate();
+  return useMutation(orpc.notes.delete.mutationOptions({ onSuccess: () => inv.notes() }));
+}
+export function useRestoreNote() {
+  const inv = useInvalidate();
+  return useMutation(orpc.notes.restore.mutationOptions({ onSuccess: (n) => inv.notes(n) }));
+}
 
-export const useCreateFolder = () =>
-  useMutation(orpc.folders.create.mutationOptions({ onSuccess: afterFolder }));
-export const useRenameFolder = () =>
-  useMutation(orpc.folders.rename.mutationOptions({ onSuccess: afterFolder }));
-export const useDeleteFolder = () =>
-  useMutation(orpc.folders.delete.mutationOptions({ onSuccess: afterFolder }));
-export const useReorderFolders = () =>
-  useMutation(
-    orpc.folders.reorder.mutationOptions({
-      onSuccess: async (folders) => {
-        for (const f of folders) await applyServerRow("folder", f);
-        void syncNow();
-      },
-    }),
-  );
+export function useCreateFolder() {
+  const inv = useInvalidate();
+  return useMutation(orpc.folders.create.mutationOptions({ onSuccess: inv.folders }));
+}
+export function useRenameFolder() {
+  const inv = useInvalidate();
+  return useMutation(orpc.folders.rename.mutationOptions({ onSuccess: inv.folders }));
+}
+export function useDeleteFolder() {
+  const inv = useInvalidate();
+  return useMutation(orpc.folders.delete.mutationOptions({ onSuccess: inv.folders }));
+}
 
-export const useCreateTag = () =>
-  useMutation(orpc.tags.create.mutationOptions({ onSuccess: afterTag }));
+export function useCreateTag() {
+  const inv = useInvalidate();
+  return useMutation(orpc.tags.create.mutationOptions({ onSuccess: inv.tags }));
+}
