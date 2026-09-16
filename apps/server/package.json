@@ -23,6 +23,7 @@
     "@orpc/server": "catalog:",
     "@orpc/zod": "catalog:",
     "fastify": "^5.7.2",
+    "fflate": "catalog:",
     "shared": "workspace:*",
     "sqlite-vec": "catalog:",
     "uuid": "catalog:",
