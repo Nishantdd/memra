@@ -1,7 +1,8 @@
 import type { Database } from "./database.ts";
 import { sql as m0001 } from "./migrations/0001_init.ts";
+import { sql as m0002 } from "./migrations/0002_settings.ts";
 
-const MIGRATIONS: readonly string[] = [m0001];
+const MIGRATIONS: readonly string[] = [m0001, m0002];
 
 export function currentSchemaVersion(db: Database): number {
   const hasMeta = db.get("SELECT 1 AS x FROM sqlite_master WHERE type = 'table' AND name = 'meta'");
