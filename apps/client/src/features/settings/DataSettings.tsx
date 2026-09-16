@@ -9,20 +9,28 @@ import {
   ListItem,
 } from "@carbon/react";
 import { isDefinedError } from "@orpc/client";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { api, orpc } from "../../data/api/orpc.ts";
-import { useFolders } from "../../data/queries.ts";
-import { syncNow } from "../../data/sync/engine.ts";
+import { noteKeys, useFolders } from "../../data/queries.ts";
 import { FolderField } from "../notes/NoteMetaFields.tsx";
 
-export function ImportExportSection({ readOnly }: { readOnly: boolean }) {
+export function DataSettings() {
+  const qc = useQueryClient();
   const folders = useFolders() ?? [];
+  const status = useQuery(orpc.status.queryOptions({ staleTime: 60_000 }));
   const [exportFolder, setExportFolder] = useState<string | null>(null);
   const [exporting, setExporting] = useState(false);
   const [exportError, setExportError] = useState<string | null>(null);
-
-  const bulk = useMutation(orpc.import.bulk.mutationOptions({ onSuccess: () => void syncNow() }));
+  const bulk = useMutation(
+    orpc.import.bulk.mutationOptions({
+      onSuccess: () => {
+        void qc.invalidateQueries({ queryKey: noteKeys.all() });
+        void qc.invalidateQueries({ queryKey: noteKeys.folders() });
+        void qc.invalidateQueries({ queryKey: noteKeys.tags() });
+      },
+    }),
+  );
 
   const runExport = async () => {
     setExporting(true);
@@ -49,18 +57,17 @@ export function ImportExportSection({ readOnly }: { readOnly: boolean }) {
     : null;
 
   return (
-    <Stack gap={6}>
-      <section>
-        <h3 className="memra-settings__heading">Import notes</h3>
-        <p className="memra-settings__help">
-          Upload a .zip of Markdown files. Top-level folders in the archive become note folders;
-          YAML front matter (title, tags, colour, folder, pinned) is honoured. Identical notes are
-          skipped.
+    <Stack gap={8}>
+      <Stack gap={5} className="memra-form">
+        <h3 className="memra-section__heading">Import</h3>
+        <p>
+          A .zip of Markdown files. Top-level folders in the archive become note folders; front
+          matter is honoured; duplicates are skipped.
         </p>
         <FileUploaderDropContainer
           labelText="Drag and drop a .zip here or click to upload"
           accept={[".zip", "application/zip"]}
-          disabled={readOnly || bulk.isPending}
+          disabled={bulk.isPending}
           onAddFiles={(_e, { addedFiles }) => {
             const file = addedFiles[0];
             if (file) bulk.mutate({ file });
@@ -86,9 +93,6 @@ export function ImportExportSection({ readOnly }: { readOnly: boolean }) {
               bulk.data.foldersCreated.length
                 ? `folders created: ${bulk.data.foldersCreated.join(", ")}`
                 : null,
-              bulk.data.tagsCreated.length
-                ? `tags created: ${bulk.data.tagsCreated.join(", ")}`
-                : null,
             ]
               .filter(Boolean)
               .join(" · ")}
@@ -96,35 +100,33 @@ export function ImportExportSection({ readOnly }: { readOnly: boolean }) {
           />
         )}
         {bulk.data && bulk.data.warnings.length > 0 && (
-          <UnorderedList className="memra-settings__warnings">
+          <UnorderedList>
             {bulk.data.warnings.slice(0, 20).map((w, i) => (
               <ListItem key={i}>
-                <strong>{w.file}</strong>: {w.message}
+                {w.file}: {w.message}
               </ListItem>
             ))}
           </UnorderedList>
         )}
-      </section>
+      </Stack>
 
-      <section>
-        <h3 className="memra-settings__heading">Export notes</h3>
-        <p className="memra-settings__help">
-          Download your notes as Markdown files with front matter, grouped by folder.
-        </p>
-        <div className="memra-settings__row">
-          {folders.length > 0 && (
-            <FolderField
-              id="export-folder"
-              value={exportFolder}
-              onChange={setExportFolder}
-              size="md"
-            />
-          )}
+      <Stack gap={5} className="memra-form">
+        <h3 className="memra-section__heading">Export</h3>
+        {folders.length > 0 && (
+          <FolderField
+            id="export-folder"
+            value={exportFolder}
+            onChange={setExportFolder}
+            size="md"
+          />
+        )}
+        <div className="memra-form__actions">
           <Button
             kind="tertiary"
+            size="md"
             renderIcon={Download}
             onClick={() => void runExport()}
-            disabled={exporting || readOnly}
+            disabled={exporting}
           >
             {exporting ? "Preparing…" : "Export .zip"}
           </Button>
@@ -132,7 +134,12 @@ export function ImportExportSection({ readOnly }: { readOnly: boolean }) {
         {exportError && (
           <InlineNotification kind="error" lowContrast hideCloseButton title={exportError} />
         )}
-      </section>
+      </Stack>
+
+      <Stack gap={3} className="memra-form">
+        <h3 className="memra-section__heading">About</h3>
+        <p>Memra {status.data?.version ?? ""}</p>
+      </Stack>
     </Stack>
   );
 }
