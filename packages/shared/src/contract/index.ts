@@ -11,6 +11,7 @@ import {
   Tag,
   TagName,
 } from "../schemas/entities.ts";
+import { searchContract } from "./search.ts";
 
 const Ok = z.object({ ok: z.literal(true) });
 const ById = z.object({ id: Uuid });
@@ -187,6 +188,7 @@ export const contract = {
   folders: foldersContract,
   tags: tagsContract,
   sync: syncContract,
+  search: searchContract,
 };
 
 export type Contract = typeof contract;
