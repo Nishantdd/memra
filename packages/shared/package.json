@@ -16,9 +16,20 @@
     "check": "vp check"
   },
   "devDependencies": {
+    "@types/mdast": "catalog:",
     "@types/node": "catalog:",
     "typescript": "catalog:",
     "vite": "catalog:",
     "vite-plus": "catalog:"
+  },
+  "dependencies": {
+    "@orpc/contract": "catalog:",
+    "gray-matter": "catalog:",
+    "js-tiktoken": "catalog:",
+    "mdast-util-to-string": "catalog:",
+    "remark-gfm": "catalog:",
+    "remark-parse": "catalog:",
+    "unified": "catalog:",
+    "zod": "catalog:"
   }
 }
