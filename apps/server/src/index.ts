@@ -13,10 +13,6 @@ import { buildApp } from "./http/app.ts";
 const services = await bootstrap();
 const { config } = services;
 
-if (!services.auth.hasPassword()) {
-  console.error("No password is set. Run: pnpm --filter server auth:set-password");
-  process.exit(1);
-}
 if (config.host !== "127.0.0.1" && config.host !== "localhost" && !config.secureCookies) {
   console.error("Refusing to bind to a non-loopback host with MEMRA_INSECURE_DEV=1.");
   process.exit(1);
