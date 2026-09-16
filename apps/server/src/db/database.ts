@@ -3,10 +3,15 @@ import { DatabaseSync, backup as sqliteBackup } from "node:sqlite";
 export type SqlValue = string | number | bigint | null | Uint8Array;
 export type Row = Record<string, SqlValue>;
 
+export interface RunResult {
+  changes: number | bigint;
+  lastInsertRowid: number | bigint;
+}
+
 export interface Database {
-  get<T extends Row = Row>(sql: string, ...params: SqlValue[]): T | undefined;
-  all<T extends Row = Row>(sql: string, ...params: SqlValue[]): T[];
-  run(sql: string, ...params: SqlValue[]): { changes: number; lastInsertRowid: number | bigint };
+  get<T extends object = Row>(sql: string, ...params: SqlValue[]): T | undefined;
+  all<T extends object = Row>(sql: string, ...params: SqlValue[]): T[];
+  run(sql: string, ...params: SqlValue[]): RunResult;
   exec(sql: string): void;
   transaction<T>(fn: () => T): T;
   loadExtension(path: string): void;
@@ -39,15 +44,15 @@ export class NodeSqliteDatabase implements Database {
     `);
   }
 
-  get<T extends Row = Row>(sql: string, ...params: SqlValue[]): T | undefined {
+  get<T extends object = Row>(sql: string, ...params: SqlValue[]): T | undefined {
     return this.#db.prepare(sql).get(...params) as T | undefined;
   }
 
-  all<T extends Row = Row>(sql: string, ...params: SqlValue[]): T[] {
+  all<T extends object = Row>(sql: string, ...params: SqlValue[]): T[] {
     return this.#db.prepare(sql).all(...params) as T[];
   }
 
-  run(sql: string, ...params: SqlValue[]) {
+  run(sql: string, ...params: SqlValue[]): RunResult {
     return this.#db.prepare(sql).run(...params);
   }
 
