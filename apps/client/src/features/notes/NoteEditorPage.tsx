@@ -1,5 +1,15 @@
 import { ArrowLeft } from "@carbon/icons-react";
-import { ActionableNotification, Button, Column, ContentSwitcher, Grid, InlineLoading, Loading, Switch, TextInput } from "@carbon/react";
+import {
+  ActionableNotification,
+  Button,
+  Column,
+  ContentSwitcher,
+  Grid,
+  InlineLoading,
+  Loading,
+  Switch,
+  TextInput,
+} from "@carbon/react";
 import { isDefinedError } from "@orpc/client";
 import { useEffect, useRef, useState } from "react";
 import { Link, Navigate, useParams } from "react-router";
@@ -22,9 +32,19 @@ interface Draft {
   tagIds: string[];
 }
 
-const toDraft = (n: Note): Draft => ({ title: n.title, bodyMd: n.bodyMd, color: n.color, folderId: n.folderId, tagIds: n.tagIds });
+const toDraft = (n: Note): Draft => ({
+  title: n.title,
+  bodyMd: n.bodyMd,
+  color: n.color,
+  folderId: n.folderId,
+  tagIds: n.tagIds,
+});
 const isDirty = (d: Draft, n: Note) =>
-  d.title !== n.title || d.bodyMd !== n.bodyMd || d.color !== n.color || d.folderId !== n.folderId || d.tagIds.join() !== n.tagIds.join();
+  d.title !== n.title ||
+  d.bodyMd !== n.bodyMd ||
+  d.color !== n.color ||
+  d.folderId !== n.folderId ||
+  d.tagIds.join() !== n.tagIds.join();
 
 export function NoteEditorPage() {
   const { noteId } = useParams();
@@ -83,7 +103,13 @@ function NoteEditor({ note }: { note: Note }) {
   return (
     <Grid className="memra-page memra-editor-page">
       <Column sm={4} md={8} lg={10}>
-        <Button as={Link} to={note.folderId ? `/f/${note.folderId}` : "/"} kind="ghost" size="sm" renderIcon={ArrowLeft}>
+        <Button
+          as={Link}
+          to={note.folderId ? `/f/${note.folderId}` : "/"}
+          kind="ghost"
+          size="sm"
+          renderIcon={ArrowLeft}
+        >
           Back
         </Button>
         {conflict && (
@@ -94,8 +120,15 @@ function NoteEditor({ note }: { note: Note }) {
             title="This note changed elsewhere."
             subtitle="Reload to see the latest version, or overwrite it with your changes."
             actionButtonLabel="Overwrite"
-            onActionButtonClick={() => { setConflict(null); save(conflict.version); }}
-            onClose={() => { setDraft(toDraft(conflict)); setBaseVersion(conflict.version); setConflict(null); }}
+            onActionButtonClick={() => {
+              setConflict(null);
+              save(conflict.version);
+            }}
+            onClose={() => {
+              setDraft(toDraft(conflict));
+              setBaseVersion(conflict.version);
+              setConflict(null);
+            }}
             closeOnEscape={false}
             statusIconDescription="Conflict"
           />
@@ -112,11 +145,32 @@ function NoteEditor({ note }: { note: Note }) {
           onChange={(e) => patch({ title: e.target.value })}
         />
         <div className="memra-editor-page__meta">
-          <FolderField id="note-folder" value={draft.folderId} onChange={(folderId) => patch({ folderId })} disabled={readOnly} />
-          <ColorField id="note-color" value={draft.color} onChange={(color) => patch({ color })} disabled={readOnly} />
-          <TagsField id="note-tags" value={draft.tagIds} onChange={(tagIds) => patch({ tagIds })} disabled={readOnly} color={draft.color} />
+          <FolderField
+            id="note-folder"
+            value={draft.folderId}
+            onChange={(folderId) => patch({ folderId })}
+            disabled={readOnly}
+          />
+          <ColorField
+            id="note-color"
+            value={draft.color}
+            onChange={(color) => patch({ color })}
+            disabled={readOnly}
+          />
+          <TagsField
+            id="note-tags"
+            value={draft.tagIds}
+            onChange={(tagIds) => patch({ tagIds })}
+            disabled={readOnly}
+            color={draft.color}
+          />
         </div>
-        <ContentSwitcher size="sm" selectedIndex={mode === "write" ? 0 : 1} onChange={({ index }) => setMode(index === 0 ? "write" : "preview")} className="memra-composer__switcher">
+        <ContentSwitcher
+          size="sm"
+          selectedIndex={mode === "write" ? 0 : 1}
+          onChange={({ index }) => setMode(index === 0 ? "write" : "preview")}
+          className="memra-composer__switcher"
+        >
           <Switch name="write" text="Write" />
           <Switch name="preview" text="Preview" />
         </ContentSwitcher>
@@ -136,10 +190,17 @@ function NoteEditor({ note }: { note: Note }) {
             <EditorToolbar apiRef={editorApi} disabled={readOnly} />
           </>
         ) : (
-          <MarkdownPreview markdown={draft.bodyMd || "*Nothing to preview yet*"} className="memra-editor-page__preview" />
+          <MarkdownPreview
+            markdown={draft.bodyMd || "*Nothing to preview yet*"}
+            className="memra-editor-page__preview"
+          />
         )}
         <div className="memra-editor-page__status">
-          {readOnly ? <span className="memra-note__time">Read-only while offline</span> : <InlineLoading {...status} />}
+          {readOnly ? (
+            <span className="memra-note__time">Read-only while offline</span>
+          ) : (
+            <InlineLoading {...status} />
+          )}
         </div>
       </Column>
     </Grid>

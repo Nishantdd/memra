@@ -73,12 +73,21 @@ export function AppHeader() {
               </HeaderMenuItem>
               {folderItems(inline)}
               {overflow.length > 0 && (
-                <HeaderMenu aria-label="More folders" menuLinkName="More" isActive={overflow.some((f) => f.id === activeFolderId)}>
+                <HeaderMenu
+                  aria-label="More folders"
+                  menuLinkName="More"
+                  isActive={overflow.some((f) => f.id === activeFolderId)}
+                >
                   {folderItems(overflow)}
                 </HeaderMenu>
               )}
               {!readOnly && (
-                <HeaderMenuItem as="button" type="button" onClick={() => setCreating(true)} className="memra-header__add">
+                <HeaderMenuItem
+                  as="button"
+                  type="button"
+                  onClick={() => setCreating(true)}
+                  className="memra-header__add"
+                >
                   <Add size={16} aria-hidden /> New folder
                 </HeaderMenuItem>
               )}
@@ -103,23 +112,49 @@ export function AppHeader() {
             </HeaderGlobalBar>
             <HeaderPanel aria-label="Account" expanded={accountOpen} onHeaderPanelFocus={() => {}}>
               <Switcher aria-label="Account actions">
-                <SwitcherItem aria-label="Settings" as={Link} to="/settings" onClick={() => setAccountOpen(false)}>
+                <SwitcherItem
+                  aria-label="Settings"
+                  onClick={() => {
+                    setAccountOpen(false);
+                    void navigate("/settings");
+                  }}
+                >
                   Settings
                 </SwitcherItem>
-                <SwitcherDivider />
-                <SwitcherItem aria-label="Sign out" onClick={() => logout()} disabled={readOnly}>
-                  <Logout size={16} aria-hidden /> Sign out
-                </SwitcherItem>
+                {!readOnly && (
+                  <>
+                    <SwitcherDivider />
+                    <SwitcherItem aria-label="Sign out" onClick={() => logout()}>
+                      <Logout size={16} aria-hidden /> Sign out
+                    </SwitcherItem>
+                  </>
+                )}
               </Switcher>
             </HeaderPanel>
-            <SideNav aria-label="Folders" expanded={isSideNavExpanded} isPersistent={false} onOverlayClick={onClickSideNavExpand}>
+            <SideNav
+              aria-label="Folders"
+              expanded={isSideNavExpanded}
+              isPersistent={false}
+              onOverlayClick={onClickSideNavExpand}
+            >
               <SideNavItems>
                 <HeaderSideNavItems>
-                  <HeaderMenuItem as={Link} to="/" isActive={location.pathname === "/"} onClick={onClickSideNavExpand}>
+                  <HeaderMenuItem
+                    as={Link}
+                    to="/"
+                    isActive={location.pathname === "/"}
+                    onClick={onClickSideNavExpand}
+                  >
                     All notes
                   </HeaderMenuItem>
                   {folders.map((f) => (
-                    <HeaderMenuItem key={f.id} as={Link} to={`/f/${f.id}`} isActive={activeFolderId === f.id} onClick={onClickSideNavExpand}>
+                    <HeaderMenuItem
+                      key={f.id}
+                      as={Link}
+                      to={`/f/${f.id}`}
+                      isActive={activeFolderId === f.id}
+                      onClick={onClickSideNavExpand}
+                    >
                       {f.name}
                     </HeaderMenuItem>
                   ))}
@@ -127,7 +162,11 @@ export function AppHeader() {
               </SideNavItems>
             </SideNav>
           </Header>
-          <CreateFolderModal open={creating} onClose={() => setCreating(false)} onCreated={(f) => navigate(`/f/${f.id}`)} />
+          <CreateFolderModal
+            open={creating}
+            onClose={() => setCreating(false)}
+            onCreated={(f) => void navigate(`/f/${f.id}`)}
+          />
         </Theme>
       )}
     />

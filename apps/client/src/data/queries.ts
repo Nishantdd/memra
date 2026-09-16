@@ -7,12 +7,18 @@ export function useFolders(): Folder[] | undefined {
 }
 
 export function useTags(): Tag[] | undefined {
-  return useLiveQuery(() => db.tags.toArray().then((t) => t.sort((a, b) => a.name.localeCompare(b.name))), []);
+  return useLiveQuery(
+    () => db.tags.toArray().then((t) => t.sort((a, b) => a.name.localeCompare(b.name))),
+    [],
+  );
 }
 
 export function useNotes(folderId: string | undefined): Note[] | undefined {
   return useLiveQuery(async () => {
-    const notes = folderId === undefined ? await db.notes.toArray() : await db.notes.where("folderId").equals(folderId).toArray();
+    const notes =
+      folderId === undefined
+        ? await db.notes.toArray()
+        : await db.notes.where("folderId").equals(folderId).toArray();
     return notes.sort((a, b) => Number(b.pinned) - Number(a.pinned) || b.updatedAt - a.updatedAt);
   }, [folderId]);
 }

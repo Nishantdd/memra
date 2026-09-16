@@ -9,11 +9,12 @@ const link = new RPCLink({
   url: `${window.location.origin}/api/rpc`,
   fetch: (request, init) => globalThis.fetch(request, { ...init, credentials: "same-origin" }),
   interceptors: [
-    async ({ next }) => {
+    async (options) => {
       try {
-        return await next();
+        return await options.next();
       } catch (error) {
-        if (error instanceof ORPCError && error.status === 401) sessionStore.set({ status: "anonymous" });
+        if (error instanceof ORPCError && error.status === 401)
+          sessionStore.set({ status: "anonymous" });
         throw error;
       }
     },

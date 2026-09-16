@@ -16,7 +16,11 @@ const queryClient = new QueryClient({
 async function resolveSession(): Promise<void> {
   try {
     const s = await api.auth.session();
-    sessionStore.set(s.authenticated ? { status: "authenticated", expiresAt: s.expiresAt! } : { status: "anonymous" });
+    sessionStore.set(
+      s.authenticated
+        ? { status: "authenticated", expiresAt: s.expiresAt! }
+        : { status: "anonymous" },
+    );
   } catch {
     // Offline: keep "unknown" so protected routes render read-only from the local mirror.
   }
@@ -28,7 +32,9 @@ export function App() {
   useEffect(() => {
     const stopSync = startSyncEngine();
     const stopConnectivity = startConnectivityMonitor(() => {
-      void resolveSession().then(() => sessionStore.get().status === "authenticated" && syncNow());
+      void resolveSession().then(() => {
+        if (sessionStore.get().status === "authenticated") void syncNow();
+      });
     });
     const stopTheme = followSystemTheme();
     void resolveSession();

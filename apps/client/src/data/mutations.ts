@@ -16,15 +16,30 @@ const afterTag = async (tag: Tag) => {
   void syncNow();
 };
 
-export const useCreateNote = () => useMutation(orpc.notes.create.mutationOptions({ onSuccess: afterNote }));
-export const useUpdateNote = () => useMutation(orpc.notes.update.mutationOptions({ onSuccess: afterNote }));
-export const useDeleteNote = () => useMutation(orpc.notes.delete.mutationOptions({ onSuccess: afterNote }));
-export const useRestoreNote = () => useMutation(orpc.notes.restore.mutationOptions({ onSuccess: afterNote }));
+export const useCreateNote = () =>
+  useMutation(orpc.notes.create.mutationOptions({ onSuccess: afterNote }));
+export const useUpdateNote = () =>
+  useMutation(orpc.notes.update.mutationOptions({ onSuccess: afterNote }));
+export const useDeleteNote = () =>
+  useMutation(orpc.notes.delete.mutationOptions({ onSuccess: afterNote }));
+export const useRestoreNote = () =>
+  useMutation(orpc.notes.restore.mutationOptions({ onSuccess: afterNote }));
 
-export const useCreateFolder = () => useMutation(orpc.folders.create.mutationOptions({ onSuccess: afterFolder }));
-export const useRenameFolder = () => useMutation(orpc.folders.rename.mutationOptions({ onSuccess: afterFolder }));
-export const useDeleteFolder = () => useMutation(orpc.folders.delete.mutationOptions({ onSuccess: afterFolder }));
+export const useCreateFolder = () =>
+  useMutation(orpc.folders.create.mutationOptions({ onSuccess: afterFolder }));
+export const useRenameFolder = () =>
+  useMutation(orpc.folders.rename.mutationOptions({ onSuccess: afterFolder }));
+export const useDeleteFolder = () =>
+  useMutation(orpc.folders.delete.mutationOptions({ onSuccess: afterFolder }));
 export const useReorderFolders = () =>
-  useMutation(orpc.folders.reorder.mutationOptions({ onSuccess: async (folders) => { for (const f of folders) await applyServerRow("folder", f); void syncNow(); } }));
+  useMutation(
+    orpc.folders.reorder.mutationOptions({
+      onSuccess: async (folders) => {
+        for (const f of folders) await applyServerRow("folder", f);
+        void syncNow();
+      },
+    }),
+  );
 
-export const useCreateTag = () => useMutation(orpc.tags.create.mutationOptions({ onSuccess: afterTag }));
+export const useCreateTag = () =>
+  useMutation(orpc.tags.create.mutationOptions({ onSuccess: afterTag }));

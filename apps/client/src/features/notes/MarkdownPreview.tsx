@@ -8,7 +8,12 @@ const schema = {
   ...defaultSchema,
   attributes: {
     ...defaultSchema.attributes,
-    input: [...(defaultSchema.attributes?.input ?? []), ["type", "checkbox"], "checked", "disabled"],
+    input: [
+      ...(defaultSchema.attributes?.input ?? []),
+      ["type", "checkbox"],
+      "checked",
+      "disabled",
+    ],
     code: [...(defaultSchema.attributes?.code ?? []), ["className", /^language-./]],
   },
 };
@@ -17,14 +22,23 @@ const components: Components = {
   a: ({ href, children }) => {
     const external = !!href && /^https?:/i.test(href);
     return (
-      <Link href={href} target={external ? "_blank" : undefined} rel={external ? "noopener noreferrer" : undefined}>
+      <Link
+        href={href}
+        target={external ? "_blank" : undefined}
+        rel={external ? "noopener noreferrer" : undefined}
+      >
         {children}
       </Link>
     );
   },
   pre: ({ children }) => <>{children}</>,
   code: ({ className, children }) => {
-    const text = String(children).replace(/\n$/, "");
+    const raw = Array.isArray(children)
+      ? children.join("")
+      : typeof children === "string"
+        ? children
+        : "";
+    const text = raw.replace(/\n$/, "");
     if (className?.startsWith("language-") || text.includes("\n")) {
       return (
         <CodeSnippet type="multi" feedback="Copied" hideCopyButton wrapText>
@@ -34,13 +48,31 @@ const components: Components = {
     }
     return <code>{children}</code>;
   },
-  input: ({ checked }) => <input type="checkbox" checked={!!checked} disabled readOnly aria-label={checked ? "Done" : "To do"} />,
+  input: ({ checked }) => (
+    <input
+      type="checkbox"
+      checked={!!checked}
+      disabled
+      readOnly
+      aria-label={checked ? "Done" : "To do"}
+    />
+  ),
 };
 
-export const MarkdownPreview = memo(function MarkdownPreview({ markdown, className }: { markdown: string; className?: string }) {
+export const MarkdownPreview = memo(function MarkdownPreview({
+  markdown,
+  className,
+}: {
+  markdown: string;
+  className?: string;
+}) {
   return (
     <div className={`memra-markdown${className ? ` ${className}` : ""}`}>
-      <ReactMarkdown remarkPlugins={[remarkGfm]} rehypePlugins={[[rehypeSanitize, schema]]} components={components}>
+      <ReactMarkdown
+        remarkPlugins={[remarkGfm]}
+        rehypePlugins={[[rehypeSanitize, schema]]}
+        components={components}
+      >
         {markdown}
       </ReactMarkdown>
     </div>

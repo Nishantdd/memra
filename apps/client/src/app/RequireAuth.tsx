@@ -9,7 +9,11 @@ export function RequireAuth() {
   const session = useSession();
   const { connectivity } = useConnectivity();
   const location = useLocation();
-  const hasMirror = useLiveQuery(async () => (await getMeta<number>("cursor")) !== undefined, [], null);
+  const hasMirror = useLiveQuery(
+    async () => (await getMeta<number>("cursor")) !== undefined,
+    [],
+    null,
+  );
 
   if (session.status === "authenticated") return <Outlet />;
   if (session.status === "anonymous" && connectivity !== "offline") {

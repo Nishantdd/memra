@@ -7,12 +7,26 @@ const ACTIONS = [
   { label: "Bold", icon: TextBold, run: (api: EditorApi) => api.wrapSelection("**", "**") },
   { label: "Italic", icon: TextItalic, run: (api: EditorApi) => api.wrapSelection("*", "*") },
   { label: "Code", icon: Code, run: (api: EditorApi) => api.wrapSelection("`", "`") },
-  { label: "Bulleted list", icon: ListBulleted, run: (api: EditorApi) => api.insertAtLineStart("- ") },
-  { label: "Checklist", icon: ListChecked, run: (api: EditorApi) => api.insertAtLineStart("- [ ] ") },
+  {
+    label: "Bulleted list",
+    icon: ListBulleted,
+    run: (api: EditorApi) => api.insertAtLineStart("- "),
+  },
+  {
+    label: "Checklist",
+    icon: ListChecked,
+    run: (api: EditorApi) => api.insertAtLineStart("- [ ] "),
+  },
   { label: "Link", icon: Link, run: (api: EditorApi) => api.wrapSelection("[", "](https://)") },
 ] as const;
 
-export function EditorToolbar({ apiRef, disabled }: { apiRef: RefObject<EditorApi | null>; disabled?: boolean }) {
+export function EditorToolbar({
+  apiRef,
+  disabled,
+}: {
+  apiRef: RefObject<EditorApi | null>;
+  disabled?: boolean;
+}) {
   return (
     <div className="memra-toolbar" role="toolbar" aria-label="Formatting">
       {ACTIONS.map(({ label, icon: Icon, run }) => (

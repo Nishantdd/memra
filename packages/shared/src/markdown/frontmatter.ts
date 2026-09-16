@@ -58,7 +58,7 @@ export function parseMarkdownFile(raw: string, filename?: string): ParsedMarkdow
     else warnings.push(`Colour "${meta.color}" is not a Carbon colour; it was dropped.`);
   }
 
-  const tags = (Array.isArray(meta.tags) ? meta.tags : meta.tags?.split(",") ?? [])
+  const tags = (Array.isArray(meta.tags) ? meta.tags : (meta.tags?.split(",") ?? []))
     .map((t) => normalizeText(t))
     .filter(Boolean);
 

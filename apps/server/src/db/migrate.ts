@@ -13,7 +13,9 @@ export function currentSchemaVersion(db: Database): number {
 export function migrate(db: Database): { from: number; to: number } {
   const from = currentSchemaVersion(db);
   if (from > MIGRATIONS.length) {
-    throw new Error(`Database schema version ${from} is newer than this build supports (${MIGRATIONS.length}).`);
+    throw new Error(
+      `Database schema version ${from} is newer than this build supports (${MIGRATIONS.length}).`,
+    );
   }
   for (let v = from; v < MIGRATIONS.length; v++) {
     db.transaction(() => {

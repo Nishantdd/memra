@@ -10,11 +10,11 @@ const listeners = new Set<() => void>();
 
 export const sessionStore = {
   get: () => state,
-  set(next: SessionState) {
+  set: (next: SessionState) => {
     state = next;
     for (const l of listeners) l();
   },
-  subscribe(listener: () => void) {
+  subscribe: (listener: () => void) => {
     listeners.add(listener);
     return () => listeners.delete(listener);
   },

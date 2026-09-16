@@ -2,17 +2,17 @@ import { TextArea } from "@carbon/react";
 import { type KeyboardEvent, type Ref, useImperativeHandle, useRef } from "react";
 
 export interface EditorApi {
-  wrapSelection(before: string, after: string): void;
-  insertAtLineStart(prefix: string): void;
-  focus(): void;
-  getSelection(): { start: number; end: number; text: string };
+  wrapSelection: (before: string, after: string) => void;
+  insertAtLineStart: (prefix: string) => void;
+  focus: () => void;
+  getSelection: () => { start: number; end: number; text: string };
 }
 
 export interface EditorProps {
   id: string;
   value: string;
-  onChange(next: string): void;
-  onSave?(): void;
+  onChange: (next: string) => void;
+  onSave?: () => void;
   readOnly?: boolean;
   placeholder?: string;
   ariaLabel: string;
@@ -21,7 +21,18 @@ export interface EditorProps {
   apiRef?: Ref<EditorApi>;
 }
 
-export function Editor({ id, value, onChange, onSave, readOnly, placeholder, ariaLabel, maxLength, rows = 8, apiRef }: EditorProps) {
+export function Editor({
+  id,
+  value,
+  onChange,
+  onSave,
+  readOnly,
+  placeholder,
+  ariaLabel,
+  maxLength,
+  rows = 8,
+  apiRef,
+}: EditorProps) {
   const ref = useRef<HTMLTextAreaElement>(null);
 
   const replaceRange = (start: number, end: number, text: string, cursor: [number, number]) => {
@@ -45,12 +56,18 @@ export function Editor({ id, value, onChange, onSave, readOnly, placeholder, ari
     },
     wrapSelection(before, after) {
       const { start, end, text } = api.getSelection();
-      const wrapped = text.startsWith(before) && text.endsWith(after) && text.length >= before.length + after.length;
+      const wrapped =
+        text.startsWith(before) &&
+        text.endsWith(after) &&
+        text.length >= before.length + after.length;
       if (wrapped) {
         const inner = text.slice(before.length, text.length - after.length);
         replaceRange(start, end, inner, [start, start + inner.length]);
       } else {
-        replaceRange(start, end, `${before}${text}${after}`, [start + before.length, start + before.length + text.length]);
+        replaceRange(start, end, `${before}${text}${after}`, [
+          start + before.length,
+          start + before.length + text.length,
+        ]);
       }
     },
     insertAtLineStart(prefix) {

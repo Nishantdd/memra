@@ -17,9 +17,10 @@ if (config.host !== "127.0.0.1" && config.host !== "localhost" && !config.secure
 }
 
 const here = path.dirname(fileURLToPath(import.meta.url));
-const clientDist = [path.resolve(here, "../../client/dist"), path.resolve(here, "../client")].find((p) =>
-  existsSync(path.join(p, "index.html")),
-) ?? null;
+const clientDist =
+  [path.resolve(here, "../../client/dist"), path.resolve(here, "../client")].find((p) =>
+    existsSync(path.join(p, "index.html")),
+  ) ?? null;
 
 const app = buildApp(services, clientDist);
 

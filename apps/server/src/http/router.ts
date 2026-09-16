@@ -22,7 +22,9 @@ const requireSession = base.middleware(({ context, next }) => {
 const authed = base.use(requireSession);
 
 function publishChange(ctx: RequestContext): void {
-  const seq = ctx.services.db.get<{ value: string }>("SELECT value FROM meta WHERE key = 'server_seq'")!.value;
+  const seq = ctx.services.db.get<{ value: string }>(
+    "SELECT value FROM meta WHERE key = 'server_seq'",
+  )!.value;
   ctx.services.events.publish("event", { type: "changed", seq: Number(seq) });
 }
 
@@ -42,20 +44,37 @@ export const router = base.router({
       instanceId: s.instanceId,
       version: s.version,
       uptimeSec: Math.floor((Date.now() - s.startedAt) / 1000),
-      index: { pending: jobs.pending, failed: jobs.failed ?? 0, indexedRatio: notes.total ? (notes.indexed ?? 0) / notes.total : 1 },
-      embedding: { provider: s.config.embedding.provider, model: s.config.embedding.model, local: s.config.embedding.provider === "local" },
-      llm: { provider: s.config.llm.provider, model: s.config.llm.model, local: s.config.llm.provider === "none" },
+      index: {
+        pending: jobs.pending,
+        failed: jobs.failed ?? 0,
+        indexedRatio: notes.total ? (notes.indexed ?? 0) / notes.total : 1,
+      },
+      embedding: {
+        provider: s.config.embedding.provider,
+        model: s.config.embedding.model,
+        local: s.config.embedding.provider === "local",
+      },
+      llm: {
+        provider: s.config.llm.provider,
+        model: s.config.llm.model,
+        local: s.config.llm.provider === "none",
+      },
     };
   }),
 
   auth: {
     login: base.auth.login.handler(async ({ input, context, errors }) => {
       try {
-        const { token, session } = await context.services.auth.login(input.password, context.ip, context.userAgent);
+        const { token, session } = await context.services.auth.login(
+          input.password,
+          context.ip,
+          context.userAgent,
+        );
         context.setSessionCookie(token);
         return { expiresAt: session.expiresAt };
       } catch (e) {
-        if (e instanceof LockedOut) throw errors.TOO_MANY_REQUESTS({ data: { retryAfterSec: e.retryAfterSec } });
+        if (e instanceof LockedOut)
+          throw errors.TOO_MANY_REQUESTS({ data: { retryAfterSec: e.retryAfterSec } });
         throw errors.UNAUTHORIZED();
       }
     }),
@@ -105,7 +124,8 @@ export const router = base.router({
     }),
     create: authed.notes.create.handler(({ input, context, errors }) => {
       const s = context.services;
-      if (input.folderId && !s.folders.get(input.folderId)) throw errors.NOT_FOUND({ data: { entity: "folder" } });
+      if (input.folderId && !s.folders.get(input.folderId))
+        throw errors.NOT_FOUND({ data: { entity: "folder" } });
       if (!s.tags.allExist(input.tagIds)) throw errors.NOT_FOUND({ data: { entity: "tag" } });
       const note = s.notes.create(input);
       publishChange(context);
@@ -113,8 +133,10 @@ export const router = base.router({
     }),
     update: authed.notes.update.handler(({ input, context, errors }) => {
       const s = context.services;
-      if (input.folderId && !s.folders.get(input.folderId)) throw errors.NOT_FOUND({ data: { entity: "folder" } });
-      if (input.tagIds && !s.tags.allExist(input.tagIds)) throw errors.NOT_FOUND({ data: { entity: "tag" } });
+      if (input.folderId && !s.folders.get(input.folderId))
+        throw errors.NOT_FOUND({ data: { entity: "folder" } });
+      if (input.tagIds && !s.tags.allExist(input.tagIds))
+        throw errors.NOT_FOUND({ data: { entity: "tag" } });
       try {
         const note = s.notes.update(input);
         publishChange(context);
@@ -155,8 +177,10 @@ export const router = base.router({
         publishChange(context);
         return folder;
       } catch (e) {
-        if (e instanceof DuplicateFolderName) throw errors.CONFLICT({ data: { reason: "duplicate_name" } });
-        if (e instanceof FolderLimitReached) throw errors.FORBIDDEN({ data: { reason: "folder_limit", limit: 20 } });
+        if (e instanceof DuplicateFolderName)
+          throw errors.CONFLICT({ data: { reason: "duplicate_name" } });
+        if (e instanceof FolderLimitReached)
+          throw errors.FORBIDDEN({ data: { reason: "folder_limit", limit: 20 } });
         throw e;
       }
     }),
@@ -173,7 +197,8 @@ export const router = base.router({
         return folder;
       } catch (e) {
         if (e instanceof FolderNotFound) throw errors.NOT_FOUND();
-        if (e instanceof DuplicateFolderName) throw errors.CONFLICT({ data: { reason: "duplicate_name" } });
+        if (e instanceof DuplicateFolderName)
+          throw errors.CONFLICT({ data: { reason: "duplicate_name" } });
         throw e;
       }
     }),
@@ -199,7 +224,8 @@ export const router = base.router({
         publishChange(context);
         return folders;
       } catch (e) {
-        if (e instanceof FolderOrderMismatch) throw errors.BAD_REQUEST({ data: { reason: "ids_mismatch" } });
+        if (e instanceof FolderOrderMismatch)
+          throw errors.BAD_REQUEST({ data: { reason: "ids_mismatch" } });
         throw e;
       }
     }),
@@ -213,7 +239,8 @@ export const router = base.router({
         publishChange(context);
         return tag;
       } catch (e) {
-        if (e instanceof DuplicateTagName) throw errors.CONFLICT({ data: { existing: e.existing } });
+        if (e instanceof DuplicateTagName)
+          throw errors.CONFLICT({ data: { existing: e.existing } });
         throw e;
       }
     }),
@@ -230,7 +257,8 @@ export const router = base.router({
         return tag;
       } catch (e) {
         if (e instanceof TagNotFound) throw errors.NOT_FOUND();
-        if (e instanceof DuplicateTagName) throw errors.CONFLICT({ data: { existing: e.existing } });
+        if (e instanceof DuplicateTagName)
+          throw errors.CONFLICT({ data: { existing: e.existing } });
         throw e;
       }
     }),

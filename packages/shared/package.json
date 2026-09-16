@@ -15,13 +15,6 @@
     "build": "vp pack",
     "check": "vp check"
   },
-  "devDependencies": {
-    "@types/mdast": "catalog:",
-    "@types/node": "catalog:",
-    "typescript": "catalog:",
-    "vite": "catalog:",
-    "vite-plus": "catalog:"
-  },
   "dependencies": {
     "@orpc/contract": "catalog:",
     "gray-matter": "catalog:",
@@ -31,5 +24,12 @@
     "remark-parse": "catalog:",
     "unified": "catalog:",
     "zod": "catalog:"
+  },
+  "devDependencies": {
+    "@types/mdast": "catalog:",
+    "@types/node": "catalog:",
+    "typescript": "catalog:",
+    "vite": "catalog:",
+    "vite-plus": "catalog:"
   }
 }

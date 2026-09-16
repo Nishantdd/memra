@@ -13,7 +13,11 @@ export function parseMarkdown(md: string): Root {
 const ZERO_WIDTH = /[\u200B-\u200D\uFEFF]/g;
 
 export function normalizeText(text: string): string {
-  return text.normalize("NFC").replace(ZERO_WIDTH, "").replace(/[ \t]+/g, " ").trim();
+  return text
+    .normalize("NFC")
+    .replace(ZERO_WIDTH, "")
+    .replace(/[ \t]+/g, " ")
+    .trim();
 }
 
 export function toPlainText(tree: Root): string {

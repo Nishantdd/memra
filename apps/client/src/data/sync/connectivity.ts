@@ -9,7 +9,11 @@ interface State {
   lastSyncAt: number | null;
 }
 
-let state: State = { connectivity: navigator.onLine ? "checking" : "offline", activity: "idle", lastSyncAt: null };
+let state: State = {
+  connectivity: navigator.onLine ? "checking" : "offline",
+  activity: "idle",
+  lastSyncAt: null,
+};
 const listeners = new Set<() => void>();
 
 function update(patch: Partial<State>) {
@@ -20,14 +24,18 @@ function update(patch: Partial<State>) {
 export const connectivityStore = {
   get: () => state,
   set: update,
-  subscribe(listener: () => void) {
+  subscribe: (listener: () => void) => {
     listeners.add(listener);
     return () => listeners.delete(listener);
   },
 };
 
 export function useConnectivity(): State {
-  return useSyncExternalStore(connectivityStore.subscribe, connectivityStore.get, connectivityStore.get);
+  return useSyncExternalStore(
+    connectivityStore.subscribe,
+    connectivityStore.get,
+    connectivityStore.get,
+  );
 }
 
 export async function probeHealth(): Promise<boolean> {

@@ -42,13 +42,22 @@ try {
     }
     case "db:doctor": {
       const integrity = services.db.get<{ integrity_check: string }>("PRAGMA integrity_check");
-      const counts = services.db.get<{ notes: number; folders: number; tags: number; jobs: number }>(
+      const counts = services.db.get<{
+        notes: number;
+        folders: number;
+        tags: number;
+        jobs: number;
+      }>(
         `SELECT (SELECT count(*) FROM notes WHERE deleted_at IS NULL) AS notes,
                 (SELECT count(*) FROM folders WHERE deleted_at IS NULL) AS folders,
                 (SELECT count(*) FROM tags WHERE deleted_at IS NULL) AS tags,
                 (SELECT count(*) FROM index_jobs) AS jobs`,
       );
-      console.log({ integrity: integrity?.integrity_check, ...counts, instanceId: services.instanceId });
+      console.log({
+        integrity: integrity?.integrity_check,
+        ...counts,
+        instanceId: services.instanceId,
+      });
       break;
     }
     default:

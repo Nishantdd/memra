@@ -1,8 +1,6 @@
 import { z } from "zod";
 
-const Bool = z
-  .enum(["0", "1", "true", "false"])
-  .transform((v) => v === "1" || v === "true");
+const Bool = z.enum(["0", "1", "true", "false"]).transform((v) => v === "1" || v === "true");
 
 const Env = z.object({
   HOST: z.string().default("127.0.0.1"),
@@ -43,10 +41,17 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env) {
   const secureCookies = !e.MEMRA_INSECURE_DEV;
 
   if (e.MEMRA_EMBEDDING_PROVIDER === "openai-compatible" && !e.MEMRA_EMBEDDING_BASE_URL) {
-    throw new Error("MEMRA_EMBEDDING_BASE_URL is required for the openai-compatible embedding provider");
+    throw new Error(
+      "MEMRA_EMBEDDING_BASE_URL is required for the openai-compatible embedding provider",
+    );
   }
-  if (e.MEMRA_LLM_PROVIDER === "openai-compatible" && (!e.MEMRA_LLM_BASE_URL || !e.MEMRA_LLM_MODEL)) {
-    throw new Error("MEMRA_LLM_BASE_URL and MEMRA_LLM_MODEL are required for the openai-compatible LLM provider");
+  if (
+    e.MEMRA_LLM_PROVIDER === "openai-compatible" &&
+    (!e.MEMRA_LLM_BASE_URL || !e.MEMRA_LLM_MODEL)
+  ) {
+    throw new Error(
+      "MEMRA_LLM_BASE_URL and MEMRA_LLM_MODEL are required for the openai-compatible LLM provider",
+    );
   }
 
   return {
@@ -62,7 +67,9 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env) {
       provider: e.MEMRA_EMBEDDING_PROVIDER,
       model:
         e.MEMRA_EMBEDDING_MODEL ??
-        (e.MEMRA_EMBEDDING_PROVIDER === "local" ? profile.embeddingModel : "text-embedding-3-small"),
+        (e.MEMRA_EMBEDDING_PROVIDER === "local"
+          ? profile.embeddingModel
+          : "text-embedding-3-small"),
       baseUrl: e.MEMRA_EMBEDDING_BASE_URL ?? null,
       apiKey: e.MEMRA_EMBEDDING_API_KEY ?? null,
       dims: e.MEMRA_EMBEDDING_DIMS ?? null,

@@ -1,4 +1,13 @@
-import { Button, ButtonSet, ClickableTile, ContentSwitcher, InlineNotification, Switch, TextInput, Tile } from "@carbon/react";
+import {
+  Button,
+  ButtonSet,
+  ClickableTile,
+  ContentSwitcher,
+  InlineNotification,
+  Switch,
+  TextInput,
+  Tile,
+} from "@carbon/react";
 import { useEffect, useRef, useState } from "react";
 import { LIMITS, type NoteColor } from "shared";
 import { useCreateNote } from "../../data/mutations.ts";
@@ -10,7 +19,7 @@ import { ColorField, FolderField, TagsField } from "./NoteMetaFields.tsx";
 interface ComposerProps {
   folderId: string | null;
   readOnly: boolean;
-  onCreated?(noteId: string): void;
+  onCreated?: (noteId: string) => void;
 }
 
 export function Composer({ folderId, readOnly, onCreated }: ComposerProps) {
@@ -26,12 +35,13 @@ export function Composer({ folderId, readOnly, onCreated }: ComposerProps) {
   const create = useCreateNote();
 
   useEffect(() => {
-    if (!open) setTargetFolder(folderId);
-  }, [folderId, open]);
-
-  useEffect(() => {
     if (open) titleRef.current?.focus();
   }, [open]);
+
+  const openComposer = () => {
+    setTargetFolder(folderId);
+    setOpen(true);
+  };
 
   const reset = () => {
     setOpen(false);
@@ -46,8 +56,21 @@ export function Composer({ folderId, readOnly, onCreated }: ComposerProps) {
   const save = () => {
     if (!title.trim() && !body.trim()) return reset();
     create.mutate(
-      { title: title.trim(), bodyMd: body, color, tagIds, folderId: targetFolder, pinned: false, sourceFilename: null },
-      { onSuccess: (note) => { reset(); onCreated?.(note.id); } },
+      {
+        title: title.trim(),
+        bodyMd: body,
+        color,
+        tagIds,
+        folderId: targetFolder,
+        pinned: false,
+        sourceFilename: null,
+      },
+      {
+        onSuccess: (note) => {
+          reset();
+          onCreated?.(note.id);
+        },
+      },
     );
   };
 
@@ -55,7 +78,7 @@ export function Composer({ folderId, readOnly, onCreated }: ComposerProps) {
     return (
       <ClickableTile
         className="memra-composer memra-composer--collapsed"
-        onClick={() => !readOnly && setOpen(true)}
+        onClick={() => !readOnly && openComposer()}
         disabled={readOnly}
         aria-label="Take a note"
       >
@@ -84,7 +107,12 @@ export function Composer({ folderId, readOnly, onCreated }: ComposerProps) {
         <ColorField id="composer-color" value={color} onChange={setColor} />
         <TagsField id="composer-tags" value={tagIds} onChange={setTagIds} color={color} />
       </div>
-      <ContentSwitcher size="sm" selectedIndex={mode === "write" ? 0 : 1} onChange={({ index }) => setMode(index === 0 ? "write" : "preview")} className="memra-composer__switcher">
+      <ContentSwitcher
+        size="sm"
+        selectedIndex={mode === "write" ? 0 : 1}
+        onChange={({ index }) => setMode(index === 0 ? "write" : "preview")}
+        className="memra-composer__switcher"
+      >
         <Switch name="write" text="Write" />
         <Switch name="preview" text="Preview" />
       </ContentSwitcher>
@@ -104,10 +132,19 @@ export function Composer({ folderId, readOnly, onCreated }: ComposerProps) {
           <EditorToolbar apiRef={editorApi} />
         </>
       ) : (
-        <MarkdownPreview markdown={body || "*Nothing to preview yet*"} className="memra-composer__preview" />
+        <MarkdownPreview
+          markdown={body || "*Nothing to preview yet*"}
+          className="memra-composer__preview"
+        />
       )}
       {create.isError && (
-        <InlineNotification kind="error" lowContrast hideCloseButton title="Couldn't save the note" subtitle="Check your connection and try again." />
+        <InlineNotification
+          kind="error"
+          lowContrast
+          hideCloseButton
+          title="Couldn't save the note"
+          subtitle="Check your connection and try again."
+        />
       )}
       <ButtonSet className="memra-composer__footer">
         <Button kind="secondary" size="md" onClick={reset} disabled={create.isPending}>

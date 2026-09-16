@@ -7,7 +7,13 @@ export function ConnectivityStatus() {
 
   if (connectivity === "offline") {
     return (
-      <Tag type="gray" size="md" renderIcon={CloudOffline} className="memra-status" title="Notes are read-only while offline">
+      <Tag
+        type="gray"
+        size="md"
+        renderIcon={CloudOffline}
+        className="memra-status"
+        title="Notes are read-only while offline"
+      >
         Offline · read-only
       </Tag>
     );
@@ -21,13 +27,25 @@ export function ConnectivityStatus() {
   }
   if (activity === "error") {
     return (
-      <Tag type="gray" size="md" renderIcon={WarningAlt} className="memra-status" title="Sync failed; retrying">
+      <Tag
+        type="gray"
+        size="md"
+        renderIcon={WarningAlt}
+        className="memra-status"
+        title="Sync failed; retrying"
+      >
         Sync issue
       </Tag>
     );
   }
   return (
-    <Tag type="gray" size="md" renderIcon={Checkmark} className="memra-status" title="All changes synced">
+    <Tag
+      type="gray"
+      size="md"
+      renderIcon={Checkmark}
+      className="memra-status"
+      title="All changes synced"
+    >
       Up to date
     </Tag>
   );
