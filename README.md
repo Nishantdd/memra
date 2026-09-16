@@ -48,13 +48,13 @@ Or `docker compose -f deploy/docker-compose.yml up -d`. The image is glibc-based
 
 Search providers, the answer model, API keys and the similarity threshold are set in **Settings → Search** (keys are stored encrypted with a key generated into the data directory). Only deployment concerns are environment variables; see `.env.example`.
 
-| Variable | Default | Purpose |
-|---|---|---|
-| `HOST` / `PORT` | `127.0.0.1` / `3000` | Bind address. Binding to a non-loopback host requires secure cookies (i.e. not `MEMRA_INSECURE_DEV`). |
-| `MEMRA_PUBLIC_ORIGIN` | — | Public origin used for Origin checks on mutating requests. |
-| `MEMRA_INSECURE_DEV` | `0` | `1` disables Secure cookies/HSTS; only for `http://localhost`. |
-| `MEMRA_DATA_DIR` | `./data` | SQLite files, `secret.key`, downloaded models, backups. Treat as sensitive. |
-| `MEMRA_LOG_LEVEL` | `info` | Pino log level. |
+| Variable              | Default              | Purpose                                                                                               |
+| --------------------- | -------------------- | ----------------------------------------------------------------------------------------------------- |
+| `HOST` / `PORT`       | `127.0.0.1` / `3000` | Bind address. Binding to a non-loopback host requires secure cookies (i.e. not `MEMRA_INSECURE_DEV`). |
+| `MEMRA_PUBLIC_ORIGIN` | —                    | Public origin used for Origin checks on mutating requests.                                            |
+| `MEMRA_INSECURE_DEV`  | `0`                  | `1` disables Secure cookies/HSTS; only for `http://localhost`.                                        |
+| `MEMRA_DATA_DIR`      | `./data`             | SQLite files, `secret.key`, downloaded models, backups. Treat as sensitive.                           |
+| `MEMRA_LOG_LEVEL`     | `info`               | Pino log level.                                                                                       |
 
 ### Air-gapped hosts
 
