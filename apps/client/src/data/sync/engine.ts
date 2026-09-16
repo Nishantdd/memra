@@ -9,6 +9,12 @@ import {
 } from "../../constants/index.ts";
 import { api } from "../api/orpc.ts";
 import { db, getMeta, setMeta, wipeLocalData } from "../db.ts";
+import {
+  applyDeltaToOfflineIndex,
+  clearOfflineIndex,
+  rebuildOfflineIndex,
+} from "../search/offlineIndex.ts";
+import { requestPersistentStorage } from "../storage.ts";
 import { sessionStore } from "../session.ts";
 import { connectivityStore } from "./connectivity.ts";
 
@@ -34,6 +40,13 @@ async function applyPage(page: SyncPage): Promise<void> {
     await upsertOrDelete(db.notes, page.notes);
     await setMeta("cursor", page.cursor);
   });
+  // Folder/tag renames change indexed text for their notes; rebuild instead of tracking fan-out.
+  if (page.folders.length || page.tags.length) await rebuildOfflineIndex();
+  else
+    await applyDeltaToOfflineIndex(
+      page.notes.filter((n) => n.deletedAt === null),
+      page.notes.filter((n) => n.deletedAt !== null).map((n) => n.id),
+    );
 }
 
 async function upsertOrDelete<T extends { id: string; deletedAt: number | null }>(
@@ -57,6 +70,7 @@ async function pullAll(): Promise<number> {
     } catch (error) {
       if (error instanceof ORPCError && error.code === "GONE") {
         await wipeLocalData();
+        clearOfflineIndex();
         cursor = 0;
         continue;
       }
@@ -84,13 +98,17 @@ export async function syncNow(): Promise<number> {
         if (!lock) return 0;
         const status = await api.status();
         const knownInstance = await getMeta<string>("instanceId");
-        if (knownInstance && knownInstance !== status.instanceId) await wipeLocalData();
+        if (knownInstance && knownInstance !== status.instanceId) {
+          await wipeLocalData();
+          clearOfflineIndex();
+        }
         await setMeta("instanceId", status.instanceId);
         return pullAll();
       },
     );
     backoffMs = SYNC_INITIAL_BACKOFF_MS;
     connectivityStore.set({ activity: "idle", lastSyncAt: Date.now(), connectivity: "online" });
+    void requestPersistentStorage();
     return applied;
   } catch (error) {
     if (error instanceof ORPCError && error.status === 401) {
