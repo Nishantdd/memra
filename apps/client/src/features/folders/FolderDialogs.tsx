@@ -1,26 +1,29 @@
 import { Modal, TextInput } from "@carbon/react";
-import { isDefinedError } from "@orpc/client";
-import { type FormEvent, useEffect, useState } from "react";
+import { ORPCError } from "@orpc/client";
+import { type FormEvent, useState } from "react";
 import { LIMITS, type Folder } from "shared";
 import { useCreateFolder, useDeleteFolder, useRenameFolder } from "../../data/mutations.ts";
 
 interface NameModalProps {
-  open: boolean;
   heading: string;
   primaryLabel: string;
   initialName?: string;
   pending: boolean;
   errorText: string | null;
-  onClose(): void;
-  onSubmit(name: string): void;
+  onClose: () => void;
+  onSubmit: (name: string) => void;
 }
 
-function FolderNameModal({ open, heading, primaryLabel, initialName = "", pending, errorText, onClose, onSubmit }: NameModalProps) {
+function FolderNameModal({
+  heading,
+  primaryLabel,
+  initialName = "",
+  pending,
+  errorText,
+  onClose,
+  onSubmit,
+}: NameModalProps) {
   const [name, setName] = useState(initialName);
-  useEffect(() => {
-    if (open) setName(initialName);
-  }, [open, initialName]);
-
   const trimmed = name.trim();
   const submit = (e?: FormEvent) => {
     e?.preventDefault();
@@ -29,7 +32,7 @@ function FolderNameModal({ open, heading, primaryLabel, initialName = "", pendin
 
   return (
     <Modal
-      open={open}
+      open
       size="xs"
       modalHeading={heading}
       primaryButtonText={primaryLabel}
@@ -56,55 +59,89 @@ function FolderNameModal({ open, heading, primaryLabel, initialName = "", pendin
 
 function folderErrorText(error: unknown): string | null {
   if (!error) return null;
-  if (isDefinedError(error)) {
+  if (error instanceof ORPCError) {
     if (error.code === "CONFLICT") return "A folder with this name already exists.";
     if (error.code === "FORBIDDEN") return `You can have at most ${LIMITS.folderCount} folders.`;
   }
   return "Something went wrong. Try again.";
 }
 
-export function CreateFolderModal({ open, onClose, onCreated }: { open: boolean; onClose(): void; onCreated?(folder: Folder): void }) {
-  const create = useCreateFolder();
-  useEffect(() => {
-    if (!open) create.reset();
-  }, [open]);
+interface CreateFolderModalProps {
+  open: boolean;
+  onClose: () => void;
+  onCreated?: (folder: Folder) => void;
+}
 
+export function CreateFolderModal({ open, onClose, onCreated }: CreateFolderModalProps) {
+  const create = useCreateFolder();
+  if (!open) return null;
+  const close = () => {
+    create.reset();
+    onClose();
+  };
   return (
     <FolderNameModal
-      open={open}
       heading="New folder"
       primaryLabel="Create"
       pending={create.isPending}
       errorText={folderErrorText(create.error)}
-      onClose={onClose}
+      onClose={close}
       onSubmit={(name) =>
-        create.mutate({ name }, { onSuccess: (folder) => { onClose(); onCreated?.(folder); } })
+        create.mutate(
+          { name },
+          {
+            onSuccess: (folder) => {
+              close();
+              onCreated?.(folder);
+            },
+          },
+        )
       }
     />
   );
 }
 
-export function RenameFolderModal({ folder, open, onClose }: { folder: Folder; open: boolean; onClose(): void }) {
-  const rename = useRenameFolder();
-  useEffect(() => {
-    if (!open) rename.reset();
-  }, [open]);
+interface RenameFolderModalProps {
+  folder: Folder;
+  open: boolean;
+  onClose: () => void;
+}
 
+export function RenameFolderModal({ folder, open, onClose }: RenameFolderModalProps) {
+  const rename = useRenameFolder();
+  if (!open) return null;
+  const close = () => {
+    rename.reset();
+    onClose();
+  };
   return (
     <FolderNameModal
-      open={open}
       heading="Rename folder"
       primaryLabel="Rename"
       initialName={folder.name}
       pending={rename.isPending}
       errorText={folderErrorText(rename.error)}
-      onClose={onClose}
-      onSubmit={(name) => rename.mutate({ id: folder.id, name }, { onSuccess: onClose })}
+      onClose={close}
+      onSubmit={(name) => rename.mutate({ id: folder.id, name }, { onSuccess: close })}
     />
   );
 }
 
-export function DeleteFolderModal({ folder, noteCount, open, onClose, onDeleted }: { folder: Folder; noteCount: number; open: boolean; onClose(): void; onDeleted(): void }) {
+interface DeleteFolderModalProps {
+  folder: Folder;
+  noteCount: number;
+  open: boolean;
+  onClose: () => void;
+  onDeleted: () => void;
+}
+
+export function DeleteFolderModal({
+  folder,
+  noteCount,
+  open,
+  onClose,
+  onDeleted,
+}: DeleteFolderModalProps) {
   const remove = useDeleteFolder();
   return (
     <Modal
@@ -116,7 +153,17 @@ export function DeleteFolderModal({ folder, noteCount, open, onClose, onDeleted 
       secondaryButtonText="Cancel"
       primaryButtonDisabled={remove.isPending}
       onRequestClose={onClose}
-      onRequestSubmit={() => remove.mutate({ id: folder.id }, { onSuccess: () => { onClose(); onDeleted(); } })}
+      onRequestSubmit={() =>
+        remove.mutate(
+          { id: folder.id },
+          {
+            onSuccess: () => {
+              onClose();
+              onDeleted();
+            },
+          },
+        )
+      }
     >
       <p>
         {noteCount === 0
