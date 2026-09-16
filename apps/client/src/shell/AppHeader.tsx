@@ -1,4 +1,4 @@
-import { Asleep, FolderAdd, Light, Logout, Settings, UserAvatar } from "@carbon/icons-react";
+import { Add, Asleep, Light, Logout, Settings, UserAvatar } from "@carbon/icons-react";
 import {
   Header,
   HeaderContainer,
@@ -60,7 +60,7 @@ export function AppHeader() {
         setCreating(true);
       }}
     >
-      <FolderAdd size={20} />
+      <Add size={20} />
     </HeaderMenuItem>
   );
 
