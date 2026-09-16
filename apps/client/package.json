@@ -11,14 +11,30 @@
     "check": "vp check"
   },
   "dependencies": {
+    "@carbon/icons-react": "catalog:",
+    "@carbon/react": "catalog:",
+    "@carbon/styles": "^1.115.0",
+    "@ibm/plex-mono": "catalog:",
+    "@ibm/plex-sans": "catalog:",
+    "@orpc/client": "catalog:",
+    "@orpc/tanstack-query": "catalog:",
+    "@tanstack/react-query": "catalog:",
+    "dexie": "catalog:",
+    "dexie-react-hooks": "catalog:",
     "react": "^19.2.8",
-    "react-dom": "^19.2.8"
+    "react-dom": "^19.2.8",
+    "react-markdown": "catalog:",
+    "react-router": "catalog:",
+    "rehype-sanitize": "catalog:",
+    "remark-gfm": "^4.0.1",
+    "shared": "workspace:*"
   },
   "devDependencies": {
     "@types/node": "catalog:",
     "@types/react": "^19.2.18",
     "@types/react-dom": "^19.2.7",
     "@vitejs/plugin-react": "^6.1.1",
+    "sass-embedded": "catalog:",
     "typescript": "catalog:",
     "vite": "catalog:",
     "vite-plus": "catalog:"
