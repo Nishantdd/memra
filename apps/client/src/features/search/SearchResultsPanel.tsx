@@ -1,4 +1,4 @@
-import { InlineLoading, Layer, Link } from "@carbon/react";
+import { InlineLoading, InlineNotification, Layer, Link } from "@carbon/react";
 import type { SearchMode, SearchOutput, SearchResult } from "shared";
 import { Link as RouterLink } from "react-router";
 import { resultOptionId } from "./resultIds.ts";
@@ -44,6 +44,24 @@ export function SearchResultsPanel({
           <p className="memra-search-panel__note">
             Search failed. Check your connection and try again.
           </p>
+        )}
+        {mode === "semantic" && data && (!data.semanticAvailable || data.indexedRatio < 1) && (
+          <InlineNotification
+            kind="info"
+            lowContrast
+            hideCloseButton
+            className="memra-search-panel__notice"
+            title={
+              data.semanticAvailable
+                ? "Some notes are still being indexed."
+                : "Semantic search is warming up."
+            }
+            subtitle={
+              data.semanticAvailable
+                ? "Semantic results may be incomplete."
+                : "Showing keyword results for now."
+            }
+          />
         )}
         {!isError && data && results.length === 0 && (
           <div className="memra-search-panel__empty">

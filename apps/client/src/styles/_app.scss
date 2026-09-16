@@ -155,6 +155,11 @@
   border: 1px solid $border-subtle-01;
 }
 
+.memra-search-panel__notice {
+  max-inline-size: none;
+  margin: $spacing-03;
+}
+
 .memra-search-panel__list {
   max-block-size: 24rem;
   overflow-y: auto;
