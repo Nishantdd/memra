@@ -3,6 +3,7 @@ import { useCallback } from "react";
 import { useSearchParams } from "react-router";
 import { SEARCH, type SearchMode } from "shared";
 import { orpc } from "../../data/api/orpc.ts";
+import { searchOffline } from "../../data/search/offlineIndex.ts";
 import { useConnectivity } from "../../data/sync/connectivity.ts";
 import { useDebounced } from "../../lib/useDebounced.ts";
 
@@ -64,16 +65,32 @@ export function useSearchResults({
   const { connectivity } = useConnectivity();
   const debounceMs = mode === "semantic" ? SEARCH.debounceSemanticMs : SEARCH.debounceKeywordMs;
   const debouncedQ = useDebounced(q.trim(), debounceMs);
-  const active = enabled && connectivity !== "offline" && debouncedQ.length >= minQueryLength(mode);
+  const offline = connectivity === "offline";
+  const longEnough = debouncedQ.length >= minQueryLength(offline ? "keyword" : mode);
+  const active = enabled && longEnough;
 
-  const query = useQuery(
+  const online = useQuery(
     orpc.search.query.queryOptions({
       input: { q: debouncedQ, mode, folderId, limit, offset },
-      enabled: active,
+      enabled: active && !offline,
       placeholderData: keepPreviousData,
       staleTime: 30_000,
     }),
   );
+  const local = useQuery({
+    queryKey: ["offline-search", debouncedQ, folderId, limit, offset],
+    queryFn: () => searchOffline(debouncedQ, folderId, limit, offset),
+    enabled: active && offline,
+    placeholderData: keepPreviousData,
+    staleTime: 0,
+  });
 
-  return { ...query, active, debouncedQ, offline: connectivity === "offline" };
+  const query = offline ? local : online;
+  return {
+    ...query,
+    active,
+    debouncedQ,
+    offline,
+    effectiveMode: offline ? ("keyword" as SearchMode) : mode,
+  };
 }

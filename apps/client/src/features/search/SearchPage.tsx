@@ -40,10 +40,11 @@ export function SearchPage() {
             kind="info"
             lowContrast
             hideCloseButton
-            title="Search is unavailable offline."
+            title="You're offline."
+            subtitle="Showing keyword matches from notes stored on this device."
           />
         )}
-        {!search.offline && tooShort && (
+        {tooShort && (
           <p className="memra-empty__body">
             Type at least {minQueryLength(mode)} characters to search.
           </p>

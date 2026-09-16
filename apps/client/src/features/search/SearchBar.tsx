@@ -36,7 +36,7 @@ export function SearchBar({ folderId }: { folderId: string | null }) {
     enabled: focused,
   });
   const results = search.data?.results ?? [];
-  const open = focused && !offline && q.trim().length >= minQueryLength(mode);
+  const open = focused && q.trim().length >= minQueryLength(offline ? "keyword" : mode);
   const resultsKey = `${mode}:${search.debouncedQ}`;
   const activeIndex = activeState.key === resultsKey ? activeState.index : -1;
   const setActiveIndex = (next: number | ((i: number) => number)) =>
@@ -94,10 +94,11 @@ export function SearchBar({ folderId }: { folderId: string | null }) {
           id={`${uid}-input`}
           size="lg"
           labelText="Search notes"
-          placeholder={offline ? "Search is unavailable offline" : "Ask your notes anything…"}
+          placeholder={
+            offline ? "Search your notes (offline, keyword only)" : "Ask your notes anything…"
+          }
           closeButtonLabelText="Clear search"
           value={q}
-          disabled={offline}
           onChange={(e) => setQuery(e.target.value)}
           onClear={() => setQuery("")}
           onFocus={() => setFocused(true)}
@@ -113,11 +114,11 @@ export function SearchBar({ folderId }: { folderId: string | null }) {
         />
         <ContentSwitcher
           size="lg"
-          selectedIndex={MODES.indexOf(mode)}
+          selectedIndex={MODES.indexOf(search.effectiveMode)}
           onChange={({ index }) => setMode(MODES[index ?? 0] ?? "keyword")}
           className="memra-search__mode"
         >
-          <Switch name="keyword" text="Keyword" disabled={offline} />
+          <Switch name="keyword" text="Keyword" />
           <Switch name="semantic" text="Semantic" disabled={offline || !semanticReady} />
         </ContentSwitcher>
       </div>
@@ -129,7 +130,7 @@ export function SearchBar({ folderId }: { folderId: string | null }) {
           isFetching={search.isFetching}
           isError={search.isError}
           q={search.debouncedQ}
-          mode={mode}
+          mode={search.effectiveMode}
           folderId={folderId}
           activeIndex={activeIndex}
           onActiveIndex={setActiveIndex}
