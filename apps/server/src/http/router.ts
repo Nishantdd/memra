@@ -280,6 +280,12 @@ export const router = base.router({
     }),
   },
 
+  search: {
+    query: authed.search.query.handler(({ input, context }) =>
+      context.services.search.search(input),
+    ),
+  },
+
   sync: {
     pull: authed.sync.pull.handler(({ input, context, errors }) => {
       try {

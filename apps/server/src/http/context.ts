@@ -5,6 +5,7 @@ import type { Database } from "../db/database.ts";
 import { AuthService, type Session } from "../modules/auth/auth.service.ts";
 import { FoldersRepo } from "../modules/folders/folders.repo.ts";
 import { NotesRepo } from "../modules/notes/notes.repo.ts";
+import { SearchService } from "../modules/search/search.service.ts";
 import { SyncRepo } from "../modules/sync/sync.repo.ts";
 import { TagsRepo } from "../modules/tags/tags.repo.ts";
 
@@ -19,6 +20,7 @@ export interface Services {
   folders: FoldersRepo;
   tags: TagsRepo;
   sync: SyncRepo;
+  search: SearchService;
   events: EventPublisher<{ event: ServerEvent }>;
 }
 
@@ -39,6 +41,7 @@ export function createServices(
     folders: new FoldersRepo(db),
     tags: new TagsRepo(db),
     sync: new SyncRepo(db),
+    search: new SearchService(db),
     events: new EventPublisher({ maxBufferedEvents: 100 }),
   };
 }
