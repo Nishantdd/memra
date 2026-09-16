@@ -12,6 +12,16 @@ import { db, getMeta, setMeta, wipeLocalData } from "../db.ts";
 import { sessionStore } from "../session.ts";
 import { connectivityStore } from "./connectivity.ts";
 
+const indexListeners = new Set<() => void>();
+export const indexEvents = {
+  subscribe: (listener: () => void) => {
+    indexListeners.add(listener);
+    return () => {
+      indexListeners.delete(listener);
+    };
+  },
+};
+
 let scheduled = false;
 let running = false;
 let backoffMs = SYNC_INITIAL_BACKOFF_MS;
@@ -110,6 +120,12 @@ async function listenForEvents(): Promise<void> {
     connectivityStore.set({ connectivity: "online" });
     for await (const event of iterator) {
       if (event.type === "changed") void syncNow();
+      else if (event.type === "indexed") {
+        void db.notes.update(event.noteId, { indexedVersion: event.version });
+        for (const l of indexListeners) l();
+      } else {
+        for (const l of indexListeners) l();
+      }
     }
   } catch {
     // Connection dropped; the connectivity monitor decides when to reconnect.
