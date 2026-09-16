@@ -1,7 +1,10 @@
 import { InlineLoading, InlineNotification, Layer, Link } from "@carbon/react";
 import type { SearchMode, SearchOutput, SearchResult } from "shared";
+import { useCallback, useMemo } from "react";
 import { Link as RouterLink } from "react-router";
+import { AiAnswer } from "./AiAnswer.tsx";
 import { resultOptionId } from "./resultIds.ts";
+import { useAsk } from "./useAsk.ts";
 import { ResultList } from "./ResultList.tsx";
 import { ResultRow } from "./ResultRow.tsx";
 
@@ -34,12 +37,31 @@ export function SearchResultsPanel({
   onSelect,
   onSwitchMode,
 }: SearchResultsPanelProps) {
-  const results = data?.results ?? [];
+  const results = useMemo(() => data?.results ?? [], [data]);
   const showAll = new URLSearchParams({ q, mode, ...(folderId ? { folder: folderId } : {}) });
+  const askEnabled = mode === "semantic" && !!data?.semanticAvailable && results.length > 0;
+  const ask = useAsk(q, folderId, askEnabled);
+
+  const onCitation = useCallback(
+    (n: number) => {
+      const source = ask.sources.find((s) => s.n === n);
+      const index = source ? results.findIndex((r) => r.noteId === source.noteId) : -1;
+      if (index >= 0) {
+        onActiveIndex(index);
+        document
+          .getElementById(resultOptionId(listboxId, index))
+          ?.scrollIntoView({ block: "nearest" });
+      } else if (source) {
+        onSelect({ ...results[0]!, noteId: source.noteId });
+      }
+    },
+    [ask.sources, results, onActiveIndex, onSelect, listboxId],
+  );
 
   return (
     <Layer level={1}>
       <div id={id} className="memra-search-panel">
+        {askEnabled && <AiAnswer {...ask} onStop={ask.stop} onCitation={onCitation} />}
         {isError && (
           <p className="memra-search-panel__note">
             Search failed. Check your connection and try again.
