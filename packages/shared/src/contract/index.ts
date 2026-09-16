@@ -14,6 +14,7 @@ import {
 import { askContract } from "./ask.ts";
 import { importContract } from "./import.ts";
 import { searchContract } from "./search.ts";
+import { settingsContract, setupContract } from "./settings.ts";
 
 const Ok = z.object({ ok: z.literal(true) });
 const ById = z.object({ id: Uuid });
@@ -64,8 +65,6 @@ export const Status = z.object({
     failed: z.number().int(),
     indexedRatio: z.number().min(0).max(1),
   }),
-  embedding: z.object({ provider: z.string(), model: z.string(), local: z.boolean() }),
-  llm: z.object({ provider: z.string(), model: z.string().nullable(), local: z.boolean() }),
 });
 export type Status = z.infer<typeof Status>;
 
@@ -75,7 +74,7 @@ export const notesContract = {
     .input(
       z.object({
         folderId: Uuid.nullable().optional(),
-        limit: z.number().int().min(1).max(200).default(50),
+        limit: z.number().int().min(1).max(LIMITS.notesPageMax).default(50),
         offset: z.number().int().min(0).default(0),
       }),
     )
@@ -152,15 +151,6 @@ export const tagsContract = {
     .output(Tag),
 };
 
-export const SyncPage = z.object({
-  cursor: z.number().int().nonnegative(),
-  hasMore: z.boolean(),
-  folders: z.array(Folder),
-  tags: z.array(Tag),
-  notes: z.array(Note),
-});
-export type SyncPage = z.infer<typeof SyncPage>;
-
 export const ServerEvent = z.discriminatedUnion("type", [
   z.object({ type: z.literal("changed"), seq: z.number().int() }),
   z.object({ type: z.literal("indexed"), noteId: Uuid, version: z.number().int() }),
@@ -169,16 +159,6 @@ export const ServerEvent = z.discriminatedUnion("type", [
 export type ServerEvent = z.infer<typeof ServerEvent>;
 
 export const syncContract = {
-  pull: oc
-    .route({ method: "GET", path: "/sync" })
-    .errors({ GONE: { data: z.object({ oldestSeq: z.number().int() }) } })
-    .input(
-      z.object({
-        cursor: z.number().int().nonnegative().default(0),
-        limit: z.number().int().min(1).max(LIMITS.syncPageMax).default(LIMITS.syncPageMax),
-      }),
-    )
-    .output(SyncPage),
   events: oc.route({ method: "GET", path: "/events" }).output(eventIterator(ServerEvent)),
 };
 
@@ -214,6 +194,8 @@ export const contract = {
   index: indexContract,
   ask: askContract,
   import: importContract,
+  settings: settingsContract,
+  setup: setupContract,
 };
 
 export type Contract = typeof contract;

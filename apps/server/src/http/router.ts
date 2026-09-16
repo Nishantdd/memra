@@ -10,9 +10,9 @@ import {
 } from "../modules/folders/folders.repo.ts";
 import { InvalidImportFile } from "../modules/import/import.service.ts";
 import { NoteConflict, NoteNotFound } from "../modules/notes/notes.repo.ts";
-import { CursorTooOld } from "../modules/sync/sync.repo.ts";
 import { DuplicateTagName, TagNotFound } from "../modules/tags/tags.repo.ts";
 import type { RequestContext } from "./context.ts";
+import { testProvider } from "./provider-test.ts";
 
 const base = implement(contract).$context<RequestContext>();
 
@@ -51,16 +51,6 @@ export const router = base.router({
         pending: jobs.pending,
         failed: jobs.failed ?? 0,
         indexedRatio: notes.total ? (notes.indexed ?? 0) / notes.total : 1,
-      },
-      embedding: {
-        provider: s.config.embedding.provider,
-        model: s.config.embedding.model,
-        local: s.config.embedding.provider === "local",
-      },
-      llm: {
-        provider: s.config.llm.provider,
-        model: s.config.llm.model,
-        local: s.config.llm.provider === "none",
       },
     };
   }),
@@ -299,10 +289,10 @@ export const router = base.router({
         indexedRatio: notes.total ? (notes.indexed ?? 0) / notes.total : 1,
         progress: s.index.progress,
         embedding: {
-          provider: s.config.embedding.provider,
-          model: s.config.embedding.model,
+          provider: s.settings.resolved().embedding.provider,
+          model: s.settings.resolved().embedding.model,
           dims: s.index.dims,
-          local: s.config.embedding.provider === "local",
+          local: s.settings.resolved().embedding.provider === "local",
         },
       };
     }),
@@ -362,15 +352,33 @@ export const router = base.router({
     ),
   },
 
-  sync: {
-    pull: authed.sync.pull.handler(({ input, context, errors }) => {
+  settings: {
+    get: authed.settings.get.handler(({ context }) => context.services.settings.public()),
+    update: authed.settings.update.handler(({ input, context }) =>
+      context.services.settings.update(input),
+    ),
+    testProvider: authed.settings.testProvider.handler(({ input }) => testProvider(input)),
+  },
+
+  setup: {
+    status: base.setup.status.handler(({ context }) => ({
+      needsSetup: !context.services.auth.hasPassword(),
+    })),
+    complete: base.setup.complete.handler(async ({ input, context, errors }) => {
+      const s = context.services;
+      if (s.auth.hasPassword()) throw errors.CONFLICT();
       try {
-        return context.services.sync.pull(input.cursor, input.limit);
+        await s.auth.setPassword(input.password);
       } catch (e) {
-        if (e instanceof CursorTooOld) throw errors.GONE({ data: { oldestSeq: e.oldestSeq } });
+        if (e instanceof WeakPassword) throw errors.BAD_REQUEST({ data: { reason: e.reason } });
         throw e;
       }
+      s.settings.update(input.settings);
+      return { ok: true as const };
     }),
+  },
+
+  sync: {
     events: authed.sync.events.handler(async function* ({ context, signal }) {
       for await (const event of context.services.events.subscribe("event", { signal })) {
         yield event;

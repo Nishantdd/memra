@@ -1,8 +1,8 @@
 import { EventPublisher } from "@orpc/server";
 import type { ServerEvent } from "shared";
 import type { Config } from "../config.ts";
-import type { Database } from "../db/database.ts";
 import { ASK_RATE_LIMIT } from "../constants/index.ts";
+import type { Database } from "../db/database.ts";
 import { AskService } from "../modules/ask/ask.service.ts";
 import { createLlmProvider } from "../modules/ask/providers/factory.ts";
 import { AskRetriever } from "../modules/ask/retrieval.ts";
@@ -11,10 +11,11 @@ import { FoldersRepo } from "../modules/folders/folders.repo.ts";
 import { ImportService } from "../modules/import/import.service.ts";
 import { NotesRepo } from "../modules/notes/notes.repo.ts";
 import { SearchService } from "../modules/search/search.service.ts";
-import { SyncRepo } from "../modules/sync/sync.repo.ts";
 import { TagsRepo } from "../modules/tags/tags.repo.ts";
 import { openRagDatabase } from "../rag/rag-db.ts";
 import { IndexSupervisor } from "../rag/supervisor.ts";
+import { SecretBox } from "../settings/secrets.ts";
+import { SettingsService } from "../settings/settings.service.ts";
 import { WindowRateLimiter } from "./rate-limit.ts";
 
 export interface Services {
@@ -23,11 +24,11 @@ export interface Services {
   instanceId: string;
   version: string;
   startedAt: number;
+  settings: SettingsService;
   auth: AuthService;
   notes: NotesRepo;
   folders: FoldersRepo;
   tags: TagsRepo;
-  sync: SyncRepo;
   search: SearchService;
   index: IndexSupervisor;
   ask: AskService;
@@ -42,11 +43,15 @@ export function createServices(
   instanceId: string,
   version: string,
 ): Services {
+  const settings = new SettingsService(db, SecretBox.load(config.dataDir));
   const notes = new NotesRepo(db);
   const folders = new FoldersRepo(db);
   const tags = new TagsRepo(db);
   const events = new EventPublisher<{ event: ServerEvent }>({ maxBufferedEvents: 100 });
-  const index = new IndexSupervisor(config);
+  const index = new IndexSupervisor(config, () => {
+    const s = settings.resolved();
+    return { settings: s.embedding, apiKey: s.embeddingApiKey };
+  });
   const rag = openRagDatabase(config.dataDir);
   index.on("indexed", (m) =>
     events.publish("event", { type: "indexed", noteId: m.noteId, version: m.version }),
@@ -54,20 +59,34 @@ export function createServices(
   index.on("progress", (p) =>
     events.publish("event", { type: "index-progress", done: p.done, total: p.total }),
   );
+  const embeddingKey = () =>
+    JSON.stringify([settings.resolved().embedding, settings.resolved().embeddingApiKey]);
+  let lastEmbedding = embeddingKey();
+  settings.on("changed", () => {
+    const next = embeddingKey();
+    if (next !== lastEmbedding) {
+      lastEmbedding = next;
+      void index.restart();
+    }
+  });
+
   return {
     config,
     db,
     instanceId,
     version,
     startedAt: Date.now(),
+    settings,
     auth: new AuthService(db),
     notes,
     folders,
     tags,
-    sync: new SyncRepo(db),
-    search: new SearchService(db, rag, index, config.embedding.minSimilarity),
+    search: new SearchService(db, rag, index, () => settings.resolved().search.minSimilarity),
     index,
-    ask: new AskService(new AskRetriever(db, rag, index), createLlmProvider(config)),
+    ask: new AskService(new AskRetriever(db, rag, index), () => {
+      const s = settings.resolved();
+      return createLlmProvider(s.llm, s.llmApiKey);
+    }),
     askLimiter: new WindowRateLimiter(ASK_RATE_LIMIT.max, ASK_RATE_LIMIT.windowMs),
     importer: new ImportService(db, notes, folders, tags),
     events,
@@ -79,5 +98,5 @@ export interface RequestContext {
   session: Session | null;
   ip: string;
   userAgent: string;
-  setSessionCookie(token: string | null): void;
+  setSessionCookie: (token: string | null) => void;
 }

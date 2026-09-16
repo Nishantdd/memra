@@ -5,5 +5,5 @@ export const LIMITS = {
   folderCount: 20,
   tagNameMax: 50,
   passwordMin: 12,
-  syncPageMax: 500,
+  notesPageMax: 500,
 } as const;

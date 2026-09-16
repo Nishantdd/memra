@@ -7,7 +7,6 @@ import {
   TOMBSTONE_RETENTION_MS,
 } from "./constants/index.ts";
 import { type Database, now } from "./db/database.ts";
-import { setMeta } from "./db/meta.ts";
 
 export async function backupDatabase(
   db: Database,
@@ -30,20 +29,10 @@ function pruneBackups(dir: string): void {
     unlinkSync(path.join(dir, f));
 }
 
-/** Removes tombstones older than the retention window and records the oldest sequence a client may still resume from. */
+/** Hard-deletes soft-deleted rows once the undo window has long passed. */
 export function purgeTombstones(db: Database): number {
   const cutoff = now() - TOMBSTONE_RETENTION_MS;
   return db.transaction(() => {
-    const maxPurged = db.get<{ m: number | null }>(
-      `SELECT max(server_seq) AS m FROM (
-         SELECT server_seq FROM notes WHERE deleted_at IS NOT NULL AND deleted_at < ?
-         UNION ALL SELECT server_seq FROM folders WHERE deleted_at IS NOT NULL AND deleted_at < ?
-         UNION ALL SELECT server_seq FROM tags WHERE deleted_at IS NOT NULL AND deleted_at < ?)`,
-      cutoff,
-      cutoff,
-      cutoff,
-    )!.m;
-    if (maxPurged === null) return 0;
     const removed =
       Number(
         db.run("DELETE FROM notes WHERE deleted_at IS NOT NULL AND deleted_at < ?", cutoff).changes,
@@ -55,7 +44,6 @@ export function purgeTombstones(db: Database): number {
       Number(
         db.run("DELETE FROM tags WHERE deleted_at IS NOT NULL AND deleted_at < ?", cutoff).changes,
       );
-    setMeta(db, "oldest_tombstone_seq", String(maxPurged + 1));
     return removed;
   });
 }
