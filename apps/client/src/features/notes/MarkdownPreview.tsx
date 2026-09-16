@@ -1,11 +1,15 @@
 import { CodeSnippet, Link } from "@carbon/react";
-import { memo } from "react";
+import { memo, type ReactNode, useMemo } from "react";
 import ReactMarkdown, { type Components } from "react-markdown";
 import rehypeSanitize, { defaultSchema } from "rehype-sanitize";
 import remarkGfm from "remark-gfm";
 
 const schema = {
   ...defaultSchema,
+  protocols: {
+    ...defaultSchema.protocols,
+    href: [...(defaultSchema.protocols?.href ?? []), "cite"],
+  },
   attributes: {
     ...defaultSchema.attributes,
     input: [
@@ -18,7 +22,9 @@ const schema = {
   },
 };
 
-const components: Components = {
+export type LinkOverride = (href: string, children: ReactNode) => ReactNode | null;
+
+const baseComponents: Components = {
   a: ({ href, children }) => {
     const external = !!href && /^https?:/i.test(href);
     return (
@@ -59,13 +65,30 @@ const components: Components = {
   ),
 };
 
+interface MarkdownPreviewProps {
+  markdown: string;
+  className?: string;
+  /** Return a node to take over rendering of a link (e.g. `cite:` links), or null to fall back. */
+  linkOverride?: LinkOverride;
+}
+
 export const MarkdownPreview = memo(function MarkdownPreview({
   markdown,
   className,
-}: {
-  markdown: string;
-  className?: string;
-}) {
+  linkOverride,
+}: MarkdownPreviewProps) {
+  const components = useMemo<Components>(() => {
+    if (!linkOverride) return baseComponents;
+    const BaseLink = baseComponents.a as (props: {
+      href?: string;
+      children?: ReactNode;
+    }) => ReactNode;
+    return {
+      ...baseComponents,
+      a: ({ href, children }) =>
+        (href && linkOverride(href, children)) ?? <BaseLink href={href}>{children}</BaseLink>,
+    };
+  }, [linkOverride]);
   return (
     <div className={`memra-markdown${className ? ` ${className}` : ""}`}>
       <ReactMarkdown
