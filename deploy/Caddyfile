@@ -1,0 +1,8 @@
+# Terminates TLS and forwards to Memra. Replace the hostname; Caddy obtains certificates automatically.
+notes.example.com {
+	encode zstd gzip
+	reverse_proxy 127.0.0.1:3000 {
+		# Server-sent events must not be buffered.
+		flush_interval -1
+	}
+}

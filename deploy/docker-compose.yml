@@ -1,0 +1,19 @@
+services:
+  memra:
+    build: ..
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:3000:3000"
+    environment:
+      MEMRA_PUBLIC_ORIGIN: https://notes.example.com
+      MEMRA_PROFILE: low
+      MEMRA_LLM_PROVIDER: none
+    volumes:
+      - memra-data:/data
+    deploy:
+      resources:
+        limits:
+          memory: 1g
+
+volumes:
+  memra-data:
