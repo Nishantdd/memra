@@ -9,6 +9,19 @@
   background: $background;
 }
 
+// Folder tabs sit flush against the product name; Carbon's divider adds a gap we don't need.
+.cds--header__nav {
+  padding-inline-start: 0;
+
+  &::before {
+    display: none;
+  }
+}
+
+.cds--header__name {
+  padding-inline: $spacing-05;
+}
+
 .memra-status {
   align-self: center;
   margin-inline-end: $spacing-03;

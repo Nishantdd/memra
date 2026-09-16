@@ -1,4 +1,4 @@
-import { Asleep, FolderAdd, Light, Logout, Settings, UserAvatar } from "@carbon/icons-react";
+import { Asleep, Light, Logout, Settings, UserAvatar } from "@carbon/icons-react";
 import {
   Header,
   HeaderContainer,
@@ -15,7 +15,7 @@ import {
   SkipToContent,
   Theme,
 } from "@carbon/react";
-import { useState } from "react";
+import { type MouseEvent, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router";
 import { INLINE_FOLDER_TABS } from "../constants/index.ts";
 import { useFolders } from "../data/queries.ts";
@@ -48,6 +48,18 @@ export function AppHeader() {
         {f.name}
       </HeaderMenuItem>
     ));
+  const newFolderItem = (onClick?: () => void) => (
+    <HeaderMenuItem
+      href="#"
+      onClick={(e: MouseEvent) => {
+        e.preventDefault();
+        onClick?.();
+        setCreating(true);
+      }}
+    >
+      New folder
+    </HeaderMenuItem>
+  );
 
   return (
     <HeaderContainer
@@ -78,16 +90,10 @@ export function AppHeader() {
                   {items(overflow)}
                 </HeaderMenu>
               )}
+              {newFolderItem()}
             </HeaderNavigation>
             <HeaderGlobalBar>
               <StatusTag />
-              <HeaderGlobalAction
-                aria-label="New folder"
-                tooltipAlignment="end"
-                onClick={() => setCreating(true)}
-              >
-                <FolderAdd size={20} />
-              </HeaderGlobalAction>
               <HeaderGlobalAction
                 aria-label={isDarkTheme(theme) ? "Switch to light theme" : "Switch to dark theme"}
                 tooltipAlignment="end"
@@ -107,6 +113,7 @@ export function AppHeader() {
                   renderIcon={Settings}
                   onClick={() => void navigate("/settings")}
                 />
+
                 <MenuItemDivider />
                 <MenuItem label="Sign out" renderIcon={Logout} onClick={() => void logout()} />
               </IconMenu>
@@ -128,6 +135,7 @@ export function AppHeader() {
                     All notes
                   </HeaderMenuItem>
                   {items(folders, onClickSideNavExpand)}
+                  {newFolderItem(onClickSideNavExpand)}
                 </HeaderSideNavItems>
               </SideNavItems>
             </SideNav>
