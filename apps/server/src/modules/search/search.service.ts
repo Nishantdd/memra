@@ -4,17 +4,25 @@ import {
   type SearchInput,
   type SearchOutput,
   type SearchResult,
+  type SnippetSegment,
 } from "shared";
 import {
   FTS_CANDIDATES,
   FTS_WEIGHTS,
   RRF_K,
   RRF_WEIGHT_KEYWORD,
+  RRF_WEIGHT_SEMANTIC,
+  SEMANTIC_EXTRA_CHUNK_BONUS,
+  SEMANTIC_EXTRA_CHUNK_CAP,
   SNIPPET_ELLIPSIS,
   SNIPPET_END,
   SNIPPET_START,
-} from "../../constants/search.ts";
+  VEC_CANDIDATES,
+  VEC_OVERFETCH_SCOPED,
+} from "../../constants/index.ts";
 import { type Database, now } from "../../db/database.ts";
+import { toBlob } from "../../rag/rag-db.ts";
+import type { IndexSupervisor } from "../../rag/supervisor.ts";
 import { buildFtsQuery } from "./fts-query.ts";
 import { plainSegments, toSegments } from "./snippet.ts";
 
@@ -22,13 +30,19 @@ interface Candidate {
   noteId: string;
   score: number;
   matchedBy: SearchResult["matchedBy"];
-  snippet: string | null;
+  snippet: SnippetSegment[] | null;
 }
 
 interface FtsRow {
   id: string;
   rank: number;
   snippet: string;
+}
+
+interface VecRow {
+  note_id: string;
+  display_text: string;
+  distance: number;
 }
 
 interface NoteMeta {
@@ -41,24 +55,45 @@ interface NoteMeta {
   updated_at: number;
 }
 
+const cutSnippet = (text: string) =>
+  text.length > SEARCH.semanticSnippetChars
+    ? `${text.slice(0, SEARCH.semanticSnippetChars).trimEnd()}…`
+    : text;
+
 export class SearchService {
   readonly #db: Database;
+  readonly #rag: Database;
+  readonly #index: IndexSupervisor;
+  readonly #minSimilarity: number;
 
-  constructor(db: Database) {
+  constructor(db: Database, rag: Database, index: IndexSupervisor, minSimilarity: number) {
     this.#db = db;
+    this.#rag = rag;
+    this.#index = index;
+    this.#minSimilarity = minSimilarity;
   }
 
-  search(input: SearchInput): SearchOutput {
+  async search(input: SearchInput): Promise<SearchOutput> {
     const started = performance.now();
-    const keyword = this.keywordCandidates(input.q, input.folderId);
-    const fused = this.fuse([{ candidates: keyword, weight: RRF_WEIGHT_KEYWORD }]);
+    const lists: { candidates: Candidate[]; weight: number }[] = [
+      { candidates: this.keywordCandidates(input.q, input.folderId), weight: RRF_WEIGHT_KEYWORD },
+    ];
+    let semanticUsed = false;
+    if (input.mode === "semantic" && this.#index.ready) {
+      const semantic = await this.semanticCandidates(input.q, input.folderId);
+      if (semantic) {
+        lists.push({ candidates: semantic, weight: RRF_WEIGHT_SEMANTIC });
+        semanticUsed = true;
+      }
+    }
+    const fused = this.fuse(lists);
     const page = fused.slice(input.offset, input.offset + input.limit);
     const results = this.hydrate(page, fused[0]?.score ?? 0);
     const tookMs = Math.round(performance.now() - started);
     this.#db.run(
       "INSERT INTO search_log(query, mode, hits, latency_ms, at) VALUES (?, ?, ?, ?, ?)",
       input.q.slice(0, 200),
-      input.mode,
+      semanticUsed ? "semantic" : "keyword",
       fused.length,
       tookMs,
       now(),
@@ -67,7 +102,7 @@ export class SearchService {
       results,
       total: fused.length,
       tookMs,
-      semanticAvailable: false,
+      semanticAvailable: this.#index.ready,
       indexedRatio: this.indexedRatio(),
     };
   }
@@ -81,7 +116,7 @@ export class SearchService {
       noteId: r.id,
       score: -r.rank,
       matchedBy: ["keyword"],
-      snippet: r.snippet,
+      snippet: toSegments(r.snippet),
     }));
   }
 
@@ -100,6 +135,54 @@ export class SearchService {
        LIMIT ?`,
       ...params,
     );
+  }
+
+  /** Returns null when the query embedding is unavailable so callers can fall back to keyword-only. */
+  private async semanticCandidates(
+    q: string,
+    folderId: string | null,
+  ): Promise<Candidate[] | null> {
+    let vector: Float32Array;
+    try {
+      vector = await this.#index.embedQuery(q);
+    } catch {
+      return null;
+    }
+    const k = folderId ? VEC_OVERFETCH_SCOPED : VEC_CANDIDATES;
+    const rows = this.#rag.all<VecRow>(
+      `SELECT c.note_id, c.display_text, v.distance
+       FROM vec_chunks v JOIN chunks c ON c.id = v.chunk_id
+       WHERE v.embedding MATCH ? AND k = ? ${folderId ? "AND v.folder_id = ?" : ""}
+       ORDER BY v.distance`,
+      toBlob(vector),
+      k,
+      ...(folderId ? [folderId] : []),
+    );
+
+    const indexed = new Set(
+      this.#db
+        .all<{ id: string }>(
+          "SELECT id FROM notes WHERE deleted_at IS NULL AND indexed_version = version",
+        )
+        .map((r) => r.id),
+    );
+    const byNote = new Map<string, { best: number; extra: number; snippet: string }>();
+    for (const r of rows) {
+      const similarity = 1 - r.distance;
+      if (similarity < this.#minSimilarity || !indexed.has(r.note_id)) continue;
+      const entry = byNote.get(r.note_id);
+      if (!entry) byNote.set(r.note_id, { best: similarity, extra: 0, snippet: r.display_text });
+      else entry.extra = Math.min(entry.extra + 1, SEMANTIC_EXTRA_CHUNK_CAP);
+    }
+    return [...byNote.entries()]
+      .map(([noteId, e]): Candidate => ({
+        noteId,
+        score: e.best + SEMANTIC_EXTRA_CHUNK_BONUS * e.extra,
+        matchedBy: ["semantic"],
+        snippet: plainSegments(cutSnippet(e.snippet)),
+      }))
+      .sort((a, b) => b.score - a.score || a.noteId.localeCompare(b.noteId))
+      .slice(0, VEC_CANDIDATES);
   }
 
   private fuse(lists: { candidates: Candidate[]; weight: number }[]): Candidate[] {
@@ -142,7 +225,7 @@ export class SearchService {
           folderId: meta.folder_id,
           folderName: meta.folder_name,
           color: meta.color,
-          snippet: c.snippet ? toSegments(c.snippet) : plainSegments(meta.excerpt),
+          snippet: c.snippet ?? plainSegments(meta.excerpt),
           relevance: topScore > 0 ? Math.round((100 * c.score) / topScore) : 0,
           matchedBy: c.matchedBy,
         },
