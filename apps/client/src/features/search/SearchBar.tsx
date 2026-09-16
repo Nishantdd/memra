@@ -2,6 +2,7 @@ import { ContentSwitcher, Search, Switch } from "@carbon/react";
 import { type KeyboardEvent, useEffect, useId, useRef, useState } from "react";
 import { useNavigate } from "react-router";
 import { SEARCH, type SearchMode, type SearchResult } from "shared";
+import { useIndexStatus } from "../../data/indexStatus.ts";
 import { useConnectivity } from "../../data/sync/connectivity.ts";
 import { resultOptionId } from "./resultIds.ts";
 import { SearchResultsPanel } from "./SearchResultsPanel.tsx";
@@ -13,6 +14,8 @@ export function SearchBar({ folderId }: { folderId: string | null }) {
   const { q, mode, setQuery, setMode } = useSearchState();
   const { connectivity } = useConnectivity();
   const offline = connectivity === "offline";
+  const indexStatus = useIndexStatus();
+  const semanticReady = indexStatus?.ready ?? false;
   const navigate = useNavigate();
   const [focused, setFocused] = useState(false);
   const [activeState, setActiveState] = useState<{ key: string; index: number }>({
@@ -115,11 +118,7 @@ export function SearchBar({ folderId }: { folderId: string | null }) {
           className="memra-search__mode"
         >
           <Switch name="keyword" text="Keyword" disabled={offline} />
-          <Switch
-            name="semantic"
-            text="Semantic"
-            disabled={offline || search.data?.semanticAvailable === false}
-          />
+          <Switch name="semantic" text="Semantic" disabled={offline || !semanticReady} />
         </ContentSwitcher>
       </div>
       {open && (
