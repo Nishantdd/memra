@@ -180,6 +180,26 @@ export const syncContract = {
   events: oc.route({ method: "GET", path: "/events" }).output(eventIterator(ServerEvent)),
 };
 
+export const IndexStatus = z.object({
+  ready: z.boolean(),
+  pending: z.number().int(),
+  failed: z.number().int(),
+  indexedRatio: z.number().min(0).max(1),
+  progress: z.object({ done: z.number().int(), total: z.number().int() }),
+  embedding: z.object({
+    provider: z.string(),
+    model: z.string(),
+    dims: z.number().int(),
+    local: z.boolean(),
+  }),
+});
+export type IndexStatus = z.infer<typeof IndexStatus>;
+
+export const indexContract = {
+  status: oc.route({ method: "GET", path: "/index/status" }).output(IndexStatus),
+  rebuild: oc.route({ method: "POST", path: "/index/rebuild" }).output(Ok),
+};
+
 export const contract = {
   health: oc.route({ method: "GET", path: "/health" }).output(Ok),
   status: oc.route({ method: "GET", path: "/status" }).output(Status),
@@ -189,6 +209,7 @@ export const contract = {
   tags: tagsContract,
   sync: syncContract,
   search: searchContract,
+  index: indexContract,
 };
 
 export type Contract = typeof contract;

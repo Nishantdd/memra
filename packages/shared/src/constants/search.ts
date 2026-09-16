@@ -8,6 +8,7 @@ export const SEARCH = {
   debounceKeywordMs: 150,
   debounceSemanticMs: 400,
   snippetTokens: 24,
+  semanticSnippetChars: 200,
 } as const;
 
 export const SEARCH_MODES = ["keyword", "semantic"] as const;
