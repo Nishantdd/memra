@@ -1,4 +1,4 @@
-import { Add, Edit, Search, TrashCan, Upload } from "@carbon/icons-react";
+import { Add, AddLarge, Edit, Search, TrashCan, Upload } from "@carbon/icons-react";
 import { Column, Grid, IconButton, SkeletonPlaceholder, Tag } from "@carbon/react";
 import { useEffect, useRef, useState } from "react";
 import { Navigate, useNavigate, useParams } from "react-router";
@@ -84,7 +84,7 @@ export function NotesPage() {
             >
               <Search />
             </IconButton>
-            <IconMenu label="New" renderIcon={Add} size="md" menuAlignment="bottom-end">
+            <IconMenu label="New" renderIcon={AddLarge} size="md" menuAlignment="bottom-end">
               <IconMenuItem
                 label="Note"
                 renderIcon={Add}
