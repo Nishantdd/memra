@@ -20,9 +20,6 @@
     "@orpc/contract": "^1.15.0",
     "@orpc/tanstack-query": "catalog:",
     "@tanstack/react-query": "catalog:",
-    "dexie": "catalog:",
-    "dexie-react-hooks": "catalog:",
-    "minisearch": "catalog:",
     "react": "^19.2.8",
     "react-dom": "^19.2.8",
     "react-markdown": "catalog:",
@@ -39,8 +36,6 @@
     "sass-embedded": "catalog:",
     "typescript": "catalog:",
     "vite": "catalog:",
-    "vite-plugin-pwa": "catalog:",
-    "vite-plus": "catalog:",
-    "workbox-window": "catalog:"
+    "vite-plus": "catalog:"
   }
 }
