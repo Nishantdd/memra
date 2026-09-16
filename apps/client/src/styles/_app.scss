@@ -74,7 +74,8 @@ a.cds--header__name {
 }
 
 .memra-search-row__mode {
-  flex: 0 0 16rem;
+  display: flex;
+  flex: none;
 }
 
 .memra-editor-mode {

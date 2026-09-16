@@ -1,17 +1,8 @@
-import {
-  ComposedModal,
-  ContentSwitcher,
-  ModalBody,
-  ModalHeader,
-  Search,
-  Switch,
-} from "@carbon/react";
+import { Button, ComposedModal, ModalBody, ModalHeader, Search } from "@carbon/react";
 import { useState } from "react";
 import type { SearchMode } from "shared";
 import { useIndexStatus } from "../../data/indexStatus.ts";
 import { SearchResults } from "./SearchResults.tsx";
-
-const MODES: SearchMode[] = ["keyword", "semantic"];
 
 interface SearchModalProps {
   open: boolean;
@@ -40,15 +31,25 @@ export function SearchModal({ open, folderId, onClose }: SearchModalProps) {
             onClear={() => setQ("")}
             autoComplete="off"
           />
-          <ContentSwitcher
-            size="lg"
-            selectedIndex={MODES.indexOf(mode)}
-            onChange={({ index }) => setMode(MODES[index ?? 0] ?? "keyword")}
-            className="memra-search-row__mode"
-          >
-            <Switch name="keyword" text="Keyword" />
-            <Switch name="semantic" text="Semantic" disabled={!status?.ready} />
-          </ContentSwitcher>
+          <div className="memra-search-row__mode" role="group" aria-label="Search mode">
+            <Button
+              size="lg"
+              kind={mode === "keyword" ? "primary" : "tertiary"}
+              aria-pressed={mode === "keyword"}
+              onClick={() => setMode("keyword")}
+            >
+              Keyword
+            </Button>
+            <Button
+              size="lg"
+              kind={mode === "semantic" ? "primary" : "tertiary"}
+              aria-pressed={mode === "semantic"}
+              disabled={!status?.ready}
+              onClick={() => setMode("semantic")}
+            >
+              Semantic
+            </Button>
+          </div>
         </div>
         {q.trim() && <SearchResults q={q} mode={mode} folderId={folderId} onNavigate={onClose} />}
       </ModalBody>
