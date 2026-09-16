@@ -8,7 +8,8 @@ import {
   TextInput,
   Tile,
 } from "@carbon/react";
-import { useEffect, useRef, useState } from "react";
+import { Upload } from "@carbon/icons-react";
+import { type DragEvent, useEffect, useRef, useState } from "react";
 import { LIMITS, type NoteColor } from "shared";
 import { COMPOSER_ROWS } from "../../constants/index.ts";
 import { useCreateNote } from "../../data/mutations.ts";
@@ -16,6 +17,9 @@ import { Editor, type EditorApi } from "./editor/Editor.tsx";
 import { EditorToolbar } from "./editor/EditorToolbar.tsx";
 import { MarkdownPreview } from "./MarkdownPreview.tsx";
 import { ColorField, FolderField, TagsField } from "./NoteMetaFields.tsx";
+import { UploadPreviewModal } from "./UploadPreviewModal.tsx";
+
+const MARKDOWN_FILE = /\.(md|markdown)$/i;
 
 interface ComposerProps {
   folderId: string | null;
@@ -33,7 +37,49 @@ export function Composer({ folderId, readOnly, onCreated }: ComposerProps) {
   const [mode, setMode] = useState<"write" | "preview">("write");
   const editorApi = useRef<EditorApi>(null);
   const titleRef = useRef<HTMLInputElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [upload, setUpload] = useState<File | null>(null);
+  const [dragging, setDragging] = useState(false);
   const create = useCreateNote();
+
+  const acceptFile = (files: FileList | File[] | null) => {
+    const file = files ? Array.from(files).find((f) => MARKDOWN_FILE.test(f.name)) : undefined;
+    if (file) setUpload(file);
+  };
+  const onDrop = (e: DragEvent) => {
+    e.preventDefault();
+    setDragging(false);
+    if (!readOnly) acceptFile(e.dataTransfer.files);
+  };
+  const onDragOver = (e: DragEvent) => {
+    if (readOnly || !Array.from(e.dataTransfer.items).some((i) => i.kind === "file")) return;
+    e.preventDefault();
+    setDragging(true);
+  };
+
+  const uploadUi = (
+    <>
+      <input
+        ref={fileInputRef}
+        type="file"
+        accept=".md,.markdown,text/markdown"
+        hidden
+        onChange={(e) => {
+          acceptFile(e.target.files);
+          e.target.value = "";
+        }}
+      />
+      <UploadPreviewModal
+        file={upload}
+        defaultFolderId={folderId}
+        onClose={() => setUpload(null)}
+        onCreated={(id) => {
+          setUpload(null);
+          onCreated?.(id);
+        }}
+      />
+    </>
+  );
 
   useEffect(() => {
     if (open) titleRef.current?.focus();
@@ -77,19 +123,44 @@ export function Composer({ folderId, readOnly, onCreated }: ComposerProps) {
 
   if (!open) {
     return (
-      <ClickableTile
-        className="memra-composer memra-composer--collapsed"
-        onClick={() => !readOnly && openComposer()}
-        disabled={readOnly}
-        aria-label="Take a note"
+      <div
+        className={`memra-composer-row${dragging ? " memra-composer-row--dragging" : ""}`}
+        onDrop={onDrop}
+        onDragOver={onDragOver}
+        onDragLeave={() => setDragging(false)}
       >
-        <span className="memra-composer__placeholder">Take a note…</span>
-      </ClickableTile>
+        <ClickableTile
+          className="memra-composer memra-composer--collapsed"
+          onClick={() => !readOnly && openComposer()}
+          disabled={readOnly}
+          aria-label="Take a note"
+        >
+          <span className="memra-composer__placeholder">
+            {dragging ? "Drop a Markdown file to save it as a note" : "Take a note…"}
+          </span>
+        </ClickableTile>
+        <Button
+          kind="ghost"
+          size="lg"
+          renderIcon={Upload}
+          disabled={readOnly}
+          onClick={() => fileInputRef.current?.click()}
+        >
+          Upload .md
+        </Button>
+        {uploadUi}
+      </div>
     );
   }
 
   return (
-    <Tile className="memra-composer memra-composer--expanded">
+    <Tile
+      className="memra-composer memra-composer--expanded"
+      onDrop={onDrop}
+      onDragOver={onDragOver}
+      onDragLeave={() => setDragging(false)}
+    >
+      {uploadUi}
       <TextInput
         ref={titleRef}
         id="composer-title"
