@@ -4,40 +4,27 @@ import { useState } from "react";
 import { NOTE_COLORS, type NoteColor, type Tag as TagEntity } from "shared";
 import { useCreateTag } from "../../data/mutations.ts";
 import { useFolders, useTags } from "../../data/queries.ts";
-
-export const COLOR_LABELS: Record<NoteColor, string> = {
-  none: "No colour",
-  red: "Red",
-  magenta: "Magenta",
-  purple: "Purple",
-  blue: "Blue",
-  cyan: "Cyan",
-  teal: "Teal",
-  green: "Green",
-  gray: "Gray",
-  "cool-gray": "Cool gray",
-  "warm-gray": "Warm gray",
-};
-
-export const tagType = (color: NoteColor) => (color === "none" ? "gray" : color);
+import { COLOR_LABELS, tagType } from "./noteColors.ts";
 
 interface FolderFieldProps {
   id: string;
   value: string | null;
-  onChange(folderId: string | null): void;
+  onChange: (folderId: string | null) => void;
   disabled?: boolean;
   size?: "sm" | "md" | "lg";
 }
 
 export function FolderField({ id, value, onChange, disabled, size = "sm" }: FolderFieldProps) {
   const folders = useFolders() ?? [];
-  const items = [{ id: null as string | null, name: "All notes" }, ...folders.map((f) => ({ id: f.id as string | null, name: f.name }))];
+  const items = [
+    { id: null as string | null, name: "All notes" },
+    ...folders.map((f) => ({ id: f.id as string | null, name: f.name })),
+  ];
   return (
     <Dropdown
       id={id}
       titleText="Folder"
       label="Folder"
-      hideLabel
       size={size}
       disabled={disabled}
       items={items}
@@ -51,7 +38,7 @@ export function FolderField({ id, value, onChange, disabled, size = "sm" }: Fold
 interface ColorFieldProps {
   id: string;
   value: NoteColor;
-  onChange(color: NoteColor): void;
+  onChange: (color: NoteColor) => void;
   disabled?: boolean;
   size?: "sm" | "md" | "lg";
 }
@@ -62,7 +49,6 @@ export function ColorField({ id, value, onChange, disabled, size = "sm" }: Color
       id={id}
       titleText="Colour"
       label="Colour"
-      hideLabel
       size={size}
       disabled={disabled}
       items={[...NOTE_COLORS]}
@@ -86,7 +72,7 @@ export function ColorField({ id, value, onChange, disabled, size = "sm" }: Color
 interface TagsFieldProps {
   id: string;
   value: string[];
-  onChange(tagIds: string[]): void;
+  onChange: (tagIds: string[]) => void;
   disabled?: boolean;
   color: NoteColor;
 }
@@ -95,7 +81,9 @@ export function TagsField({ id, value, onChange, disabled, color }: TagsFieldPro
   const tags = useTags() ?? [];
   const createTag = useCreateTag();
   const [error, setError] = useState<string | null>(null);
-  const selected = value.map((tid) => tags.find((t) => t.id === tid)).filter((t): t is TagEntity => !!t);
+  const selected = value
+    .map((tid) => tags.find((t) => t.id === tid))
+    .filter((t): t is TagEntity => !!t);
   const available = tags.filter((t) => !value.includes(t.id));
 
   const add = (tag: TagEntity | null, typed?: string) => {
@@ -122,7 +110,6 @@ export function TagsField({ id, value, onChange, disabled, color }: TagsFieldPro
       <ComboBox
         id={id}
         titleText="Tags"
-        hideLabel
         placeholder="Add tag"
         size="sm"
         disabled={disabled}
@@ -130,7 +117,9 @@ export function TagsField({ id, value, onChange, disabled, color }: TagsFieldPro
         itemToString={(t) => t?.name ?? ""}
         selectedItem={null}
         allowCustomValue
-        onChange={({ selectedItem, inputValue }) => add(selectedItem ?? null, inputValue ?? undefined)}
+        onChange={({ selectedItem, inputValue }) =>
+          add(selectedItem ?? null, inputValue ?? undefined)
+        }
         invalid={error !== null}
         invalidText={error ?? ""}
       />
