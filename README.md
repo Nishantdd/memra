@@ -1,6 +1,6 @@
 # Memra
 
-Self-hosted Markdown notes with keyword and semantic search, an optional AI answer over your own notes, and an offline-capable web app. Built with IBM Carbon Design System, Fastify, SQLite (FTS5 + sqlite-vec) and React.
+Self-hosted Markdown notes with keyword and semantic search and an optional AI answer over your own notes. Built with IBM Carbon Design System, Fastify, SQLite (FTS5 + sqlite-vec) and React.
 
 - **Single user, hosted securely** — password login, hardened sessions, HTTPS behind a reverse proxy.
 - **Runs on a small VM** — defaults fit 1 vCPU / 1 GB RAM with a local embedding model; no data leaves your server unless you configure a remote provider in Settings.
