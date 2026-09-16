@@ -2,6 +2,7 @@ import { Content, InlineNotification } from "@carbon/react";
 import { Outlet } from "react-router";
 import { useConnectivity } from "../data/sync/connectivity.ts";
 import { AppHeader } from "./AppHeader.tsx";
+import { UpdatePrompt } from "./UpdatePrompt.tsx";
 
 export function AppShell() {
   const { connectivity } = useConnectivity();
@@ -22,6 +23,7 @@ export function AppShell() {
         )}
         <Outlet />
       </Content>
+      <UpdatePrompt />
     </>
   );
 }
