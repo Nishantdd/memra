@@ -45,6 +45,26 @@ export default defineConfig(({ mode }) => ({
       devOptions: { enabled: mode === "pwa-dev", type: "module" },
     }),
   ]),
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks(id: string) {
+          if (id.includes("/@carbon/")) return "carbon";
+          if (
+            /\/(react-markdown|remark-|rehype-|micromark|mdast-|hast-|unified|unist-|vfile)/.test(
+              id,
+            )
+          )
+            return "markdown";
+          if (id.includes("/minisearch/")) return "minisearch";
+          if (/\/(react|react-dom|scheduler|react-router)\//.test(id)) return "react";
+          if (id.includes("/dexie")) return "dexie";
+          if (id.includes("/@tanstack/") || id.includes("/@orpc/")) return "data";
+          return undefined;
+        },
+      },
+    },
+  },
   css: {
     preprocessorOptions: {
       scss: { quietDeps: true, silenceDeprecations: ["mixed-decls", "import"] },
