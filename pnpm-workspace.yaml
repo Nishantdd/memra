@@ -32,6 +32,7 @@ catalog:
   gray-matter: ^4.0.3
   js-tiktoken: ^1.0.21
   mdast-util-to-string: ^4.0.0
+  minisearch: ^7.2.0
   react-markdown: ^10.1.0
   react-router: ^8.3.1
   rehype-sanitize: ^6.0.0
@@ -43,7 +44,9 @@ catalog:
   unified: ^11.0.5
   uuid: ^14.0.2
   vite: npm:@voidzero-dev/vite-plus-core@0.3.1
+  vite-plugin-pwa: ^1.3.0
   vite-plus: 0.3.1
+  workbox-window: ^7.4.1
   zod: ^4.6.5
 overrides:
   vite@*: "catalog:"
@@ -53,51 +56,28 @@ peerDependencyRules:
   allowedVersions:
     vite: "*"
 allowBuilds:
-  "@carbon/colors": set this to true or false
-  "@carbon/feature-flags": set this to true or false
-  "@carbon/grid": set this to true or false
-  "@carbon/icon-helpers": set this to true or false
-  "@carbon/icons-react": set this to true or false
-  "@carbon/layout": set this to true or false
-  "@carbon/motion": set this to true or false
-  "@carbon/react": set this to true or false
-  "@carbon/styles": set this to true or false
-  "@carbon/themes": set this to true or false
-  "@carbon/type": set this to true or false
-  "@carbon/utilities": set this to true or false
-  "@ibm/plex": set this to true or false
-  "@ibm/plex-mono": set this to true or false
-  "@ibm/plex-sans": set this to true or false
-  "@ibm/plex-sans-arabic": set this to true or false
-  "@ibm/plex-sans-devanagari": set this to true or false
-  "@ibm/plex-sans-hebrew": set this to true or false
-  "@ibm/plex-sans-thai": set this to true or false
-  "@ibm/plex-sans-thai-looped": set this to true or false
-  "@ibm/plex-serif": set this to true or false
-  "@parcel/watcher": set this to true or false
-  onnxruntime-node: set this to true or false
-  protobufjs: set this to true or false
-  sharp: set this to true or false
-ignoredBuiltDependencies:
-  - "@carbon/colors"
-  - "@carbon/feature-flags"
-  - "@carbon/grid"
-  - "@carbon/icon-helpers"
-  - "@carbon/icons-react"
-  - "@carbon/layout"
-  - "@carbon/motion"
-  - "@carbon/react"
-  - "@carbon/styles"
-  - "@carbon/themes"
-  - "@carbon/type"
-  - "@carbon/utilities"
-  - "@ibm/plex"
-  - "@ibm/plex-mono"
-  - "@ibm/plex-sans"
-  - "@ibm/plex-sans-arabic"
-  - "@ibm/plex-sans-devanagari"
-  - "@ibm/plex-sans-hebrew"
-  - "@ibm/plex-sans-thai"
-  - "@ibm/plex-sans-thai-looped"
-  - "@ibm/plex-serif"
-  - "@parcel/watcher"
+  "@carbon/colors": true
+  "@carbon/feature-flags": true
+  "@carbon/grid": true
+  "@carbon/icon-helpers": true
+  "@carbon/icons-react": true
+  "@carbon/layout": true
+  "@carbon/motion": true
+  "@carbon/react": true
+  "@carbon/styles": true
+  "@carbon/themes": true
+  "@carbon/type": true
+  "@carbon/utilities": true
+  "@ibm/plex": true
+  "@ibm/plex-mono": true
+  "@ibm/plex-sans": true
+  "@ibm/plex-sans-arabic": true
+  "@ibm/plex-sans-devanagari": true
+  "@ibm/plex-sans-hebrew": true
+  "@ibm/plex-sans-thai": true
+  "@ibm/plex-sans-thai-looped": true
+  "@ibm/plex-serif": true
+  "@parcel/watcher": true
+  onnxruntime-node: true
+  protobufjs: true
+  sharp: true
