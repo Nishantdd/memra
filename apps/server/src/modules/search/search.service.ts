@@ -64,9 +64,9 @@ export class SearchService {
   readonly #db: Database;
   readonly #rag: Database;
   readonly #index: IndexSupervisor;
-  readonly #minSimilarity: number;
+  readonly #minSimilarity: () => number;
 
-  constructor(db: Database, rag: Database, index: IndexSupervisor, minSimilarity: number) {
+  constructor(db: Database, rag: Database, index: IndexSupervisor, minSimilarity: () => number) {
     this.#db = db;
     this.#rag = rag;
     this.#index = index;
@@ -169,7 +169,7 @@ export class SearchService {
     const byNote = new Map<string, { best: number; extra: number; snippet: string }>();
     for (const r of rows) {
       const similarity = 1 - r.distance;
-      if (similarity < this.#minSimilarity || !indexed.has(r.note_id)) continue;
+      if (similarity < this.#minSimilarity() || !indexed.has(r.note_id)) continue;
       const entry = byNote.get(r.note_id);
       if (!entry) byNote.set(r.note_id, { best: similarity, extra: 0, snippet: r.display_text });
       else entry.extra = Math.min(entry.extra + 1, SEMANTIC_EXTRA_CHUNK_CAP);

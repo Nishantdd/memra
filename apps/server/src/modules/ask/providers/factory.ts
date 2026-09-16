@@ -1,4 +1,4 @@
-import type { Config } from "../../../config.ts";
+import type { LlmSettings } from "shared";
 import { OpenAICompatibleLlmProvider } from "./openai-compatible.ts";
 import type { LlmProvider } from "./provider.ts";
 
@@ -13,13 +13,12 @@ export const noneProvider: LlmProvider = {
   },
 };
 
-export function createLlmProvider(config: Config): LlmProvider {
-  const l = config.llm;
-  if (l.provider === "openai-compatible") {
+export function createLlmProvider(settings: LlmSettings, apiKey: string | null): LlmProvider {
+  if (settings.provider === "openai-compatible") {
     return new OpenAICompatibleLlmProvider({
-      baseUrl: l.baseUrl!,
-      apiKey: l.apiKey,
-      model: l.model!,
+      baseUrl: settings.baseUrl,
+      apiKey,
+      model: settings.model,
     });
   }
   return noneProvider;

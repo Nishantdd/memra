@@ -15,10 +15,10 @@ export class AskUnavailable extends Error {}
 
 export class AskService {
   readonly #retriever: AskRetriever;
-  readonly #llm: LlmProvider;
+  readonly #llm: () => LlmProvider;
   readonly #cache = new Map<string, CachedAnswer>();
 
-  constructor(retriever: AskRetriever, llm: LlmProvider) {
+  constructor(retriever: AskRetriever, llm: () => LlmProvider) {
     this.#retriever = retriever;
     this.#llm = llm;
   }
@@ -38,7 +38,8 @@ export class AskService {
       return;
     }
 
-    const extractive = this.#llm.providerName === "none";
+    const llm = this.#llm();
+    const extractive = llm.providerName === "none";
     const sources: AskSource[] = notes.map((n, i) => ({
       n: i + 1,
       noteId: n.noteId,
@@ -48,9 +49,9 @@ export class AskService {
     }));
     yield {
       type: "meta",
-      provider: this.#llm.providerName,
-      model: this.#llm.model,
-      local: this.#llm.local,
+      provider: llm.providerName,
+      model: llm.model,
+      local: llm.local,
       extractive,
       sources,
     };
@@ -61,7 +62,7 @@ export class AskService {
       return;
     }
 
-    const key = cacheKey(input.q, notes, this.#llm.model);
+    const key = cacheKey(input.q, notes, llm.model);
     const cached = this.#cache.get(key);
     if (cached && cached.expiresAt > Date.now()) {
       yield { type: "delta", text: cached.text };
@@ -71,7 +72,7 @@ export class AskService {
 
     let text = "";
     try {
-      for await (const delta of this.#llm.stream({
+      for await (const delta of llm.stream({
         system: SYSTEM_PROMPT,
         user: buildUserPrompt(input.q, notes),
         maxTokens: ASK.maxAnswerTokens,

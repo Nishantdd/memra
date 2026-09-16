@@ -1,9 +1,11 @@
+import type { EmbeddingSettings } from "shared";
 import type { Config } from "../config.ts";
 import {
   INDEX_BACKOFF_BASE_MS,
   INDEX_BACKOFF_MAX_MS,
   INDEX_POLL_MS,
   INDEX_QUIET_MS,
+  WORKER_RSS_LIMIT_MB,
 } from "../constants/index.ts";
 import { openAppDatabase } from "../db/open.ts";
 import { createEmbeddingProvider } from "./embedding/factory.ts";
@@ -17,9 +19,13 @@ const log = (level: "info" | "warn" | "error", message: string) =>
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
 const config = JSON.parse(process.env.MEMRA_WORKER_CONFIG ?? "{}") as Config;
+const embeddingSettings = JSON.parse(
+  process.env.MEMRA_WORKER_EMBEDDING ?? "{}",
+) as EmbeddingSettings;
+const embeddingApiKey = process.env.MEMRA_WORKER_EMBEDDING_KEY || null;
 const app = openAppDatabase(config);
 const rag = openRagDatabase(config.dataDir);
-const embed = createEmbeddingProvider(config);
+const embed = createEmbeddingProvider(embeddingSettings, embeddingApiKey, config.dataDir);
 const indexer = new Indexer(app, rag, embed);
 
 let wakeResolve: (() => void) | null = null;
@@ -117,7 +123,7 @@ async function main(): Promise<void> {
     }
 
     const rssMb = process.memoryUsage().rss / 1_048_576;
-    if (rssMb > config.embedding.workerRssLimitMb)
+    if (rssMb > WORKER_RSS_LIMIT_MB)
       log("warn", `Index worker RSS ${rssMb.toFixed(0)} MB exceeds limit`);
   }
 }

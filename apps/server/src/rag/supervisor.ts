@@ -2,6 +2,7 @@ import { EventEmitter } from "node:events";
 import { type ChildProcess, fork } from "node:child_process";
 import { fileURLToPath } from "node:url";
 import { QUERY_EMBED_CACHE_SIZE, QUERY_EMBED_TIMEOUT_MS } from "../constants/index.ts";
+import type { EmbeddingSettings } from "shared";
 import type { Config } from "../config.ts";
 import type { FromWorker, ToWorker } from "./messages.ts";
 
@@ -32,6 +33,7 @@ export class IndexSupervisor extends EventEmitter<{
   log: [{ level: "info" | "warn" | "error"; message: string }];
 }> {
   readonly #config: Config;
+  readonly #embedding: () => { settings: EmbeddingSettings; apiKey: string | null };
   #worker: ChildProcess | null = null;
   #ready = false;
   #dims = 0;
@@ -42,9 +44,21 @@ export class IndexSupervisor extends EventEmitter<{
   readonly #pending = new Map<number, Pending>();
   readonly #cache = new Map<string, Float32Array>();
 
-  constructor(config: Config) {
+  constructor(
+    config: Config,
+    embedding: () => { settings: EmbeddingSettings; apiKey: string | null },
+  ) {
     super();
     this.#config = config;
+    this.#embedding = embedding;
+  }
+
+  /** Stops the current worker and starts a fresh one with the latest embedding settings. */
+  async restart(): Promise<void> {
+    await this.stop();
+    this.#cache.clear();
+    this.#progress = { done: 0, total: 0 };
+    this.start();
   }
 
   get ready(): boolean {
@@ -126,7 +140,12 @@ export class IndexSupervisor extends EventEmitter<{
     );
     const worker = fork(file, [], {
       serialization: "advanced",
-      env: { ...process.env, MEMRA_WORKER_CONFIG: JSON.stringify(this.#config) },
+      env: {
+        ...process.env,
+        MEMRA_WORKER_CONFIG: JSON.stringify(this.#config),
+        MEMRA_WORKER_EMBEDDING: JSON.stringify(this.#embedding().settings),
+        MEMRA_WORKER_EMBEDDING_KEY: this.#embedding().apiKey ?? "",
+      },
       execArgv: process.execArgv,
     });
     this.#worker = worker;
