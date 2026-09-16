@@ -89,6 +89,7 @@ export async function syncNow(): Promise<number> {
     return 0;
   }
   running = true;
+  const wasDisconnected = connectivityStore.get().connectivity !== "online";
   connectivityStore.set({ activity: "syncing" });
   try {
     const applied = await navigator.locks.request(
@@ -107,7 +108,12 @@ export async function syncNow(): Promise<number> {
       },
     );
     backoffMs = SYNC_INITIAL_BACKOFF_MS;
-    connectivityStore.set({ activity: "idle", lastSyncAt: Date.now(), connectivity: "online" });
+    connectivityStore.set({
+      activity: "idle",
+      lastSyncAt: Date.now(),
+      connectivity: "online",
+      ...(wasDisconnected && applied > 0 ? { reconnectNotice: { applied, at: Date.now() } } : {}),
+    });
     void requestPersistentStorage();
     return applied;
   } catch (error) {

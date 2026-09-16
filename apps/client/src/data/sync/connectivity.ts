@@ -8,12 +8,15 @@ interface State {
   connectivity: Connectivity;
   activity: SyncActivity;
   lastSyncAt: number | null;
+  /** Set when a sync after a disconnection applied changes; cleared by the UI. */
+  reconnectNotice: { applied: number; at: number } | null;
 }
 
 let state: State = {
   connectivity: navigator.onLine ? "checking" : "offline",
   activity: "idle",
   lastSyncAt: null,
+  reconnectNotice: null,
 };
 const listeners = new Set<() => void>();
 
