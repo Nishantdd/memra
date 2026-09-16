@@ -1,39 +1,35 @@
 @use "@carbon/react/scss/spacing" as *;
 @use "@carbon/react/scss/theme" as *;
 @use "@carbon/react/scss/type" as *;
-@use "@carbon/react/scss/motion" as *;
-@use "@carbon/react/scss/breakpoint" as *;
 
-// Layout -----------------------------------------------------------------
+// Only layout rhythm lives here; component appearance is Carbon's.
 
 .memra-content {
-  padding-block: $spacing-07;
-  background: $background;
   min-block-size: 100vh;
+  background: $background;
 }
 
-.memra-offline-banner {
-  margin-block-end: $spacing-06;
-  max-inline-size: none;
-}
-
-.memra-page__title-row {
-  display: flex;
-  align-items: center;
-  gap: $spacing-03;
-  margin-block-end: $spacing-06;
+.memra-status {
+  align-self: center;
+  margin-inline-end: $spacing-03;
 }
 
 .memra-page-title {
-  @include type-style("heading-03");
+  @include type-style("heading-04");
+  margin-block: $spacing-06 $spacing-07;
+  display: flex;
+  align-items: center;
+  gap: $spacing-04;
 }
 
-.memra-page__composer {
-  margin-block-end: $spacing-07;
+.memra-page-title__actions {
+  margin-inline-start: auto;
+  display: flex;
+  gap: $spacing-03;
 }
 
 .memra-section {
-  margin-block-end: $spacing-07;
+  margin-block-end: $spacing-08;
 }
 
 .memra-section__heading {
@@ -42,552 +38,54 @@
   margin-block-end: $spacing-05;
 }
 
+.memra-search {
+  margin-block-end: $spacing-07;
+}
+
+.memra-search__mode {
+  margin-block-start: $spacing-05;
+  inline-size: 20rem;
+}
+
 .memra-notes-grid {
   row-gap: $spacing-05;
 }
 
-.memra-empty {
-  padding-block: $spacing-07;
-}
-
-.memra-empty__heading {
-  @include type-style("heading-compact-02");
-  margin-block-end: $spacing-03;
-}
-
-.memra-empty__body {
-  @include type-style("body-compact-01");
-  color: $text-secondary;
-  margin-block-end: $spacing-05;
-}
-
-.memra-toasts {
-  position: fixed;
-  inset-block-end: $spacing-05;
-  inset-inline-end: $spacing-05;
-  z-index: 9000;
-}
-
-// Header ------------------------------------------------------------------
-
-.memra-header__add {
-  white-space: nowrap;
-}
-
-.memra-header__add svg {
-  margin-inline-end: $spacing-02;
-  vertical-align: text-bottom;
-}
-
-.cds--header__menu-bar .cds--header__menu-item {
-  max-inline-size: 10rem;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.memra-status {
-  align-self: center;
-  margin-inline-end: $spacing-03;
-}
-
-.memra-status--busy svg {
-  animation: memra-spin 1s linear infinite;
-}
-
-@keyframes memra-spin {
-  to {
-    transform: rotate(360deg);
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .memra-status--busy svg {
-    animation: none;
-  }
-}
-
-// Login -------------------------------------------------------------------
-
-.memra-login {
-  min-block-size: 100vh;
-  display: flex;
-  align-items: center;
-  background: $background;
-}
-
-.memra-login__heading {
-  @include type-style("heading-04");
-}
-
-// Search ------------------------------------------------------------------
-
-.memra-page__search {
-  margin-block-end: $spacing-05;
-}
-
-.memra-search {
-  position: relative;
-}
-
-.memra-search__row {
-  display: flex;
-  align-items: stretch;
-  gap: $spacing-03;
-}
-
-.memra-search__row > .cds--search {
-  flex: 1;
-}
-
-.memra-search__mode {
-  inline-size: auto;
-  flex-shrink: 0;
-}
-
-.memra-search-panel {
-  position: absolute;
-  inset-inline: 0;
-  inset-block-start: 100%;
-  z-index: 60;
-  margin-block-start: $spacing-02;
-  background: $layer-02;
-  border: 1px solid $border-subtle-01;
-}
-
-.memra-search-panel__notice {
-  max-inline-size: none;
-  margin: $spacing-03;
-}
-
-.memra-search-panel__list {
-  max-block-size: 24rem;
-  overflow-y: auto;
-}
-
-.memra-search-panel__empty {
-  padding: $spacing-05;
-}
-
-.memra-search-panel__empty-title {
-  @include type-style("heading-compact-01");
-  margin-block-end: $spacing-02;
-}
-
-.memra-search-panel__note {
-  @include type-style("body-compact-01");
-  color: $text-secondary;
-  padding: $spacing-03 $spacing-05;
-}
-
-.memra-search-panel__foot {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: $spacing-05;
-  padding: $spacing-03 $spacing-05;
-  border-block-start: 1px solid $border-subtle-01;
-}
-
-.memra-search-panel__status {
-  @include type-style("label-01");
-  color: $text-secondary;
-}
-
-.memra-result {
-  cursor: pointer;
-}
-
-.memra-result .cds--contained-list-item__content {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: $spacing-05;
-}
-
-.memra-result--active {
-  background: $layer-hover-02;
-}
-
-.memra-result__main {
-  display: flex;
-  gap: $spacing-03;
-  align-items: flex-start;
-  min-inline-size: 0;
-}
-
-.memra-result__index {
-  flex-shrink: 0;
-}
-
-.memra-result__text {
-  min-inline-size: 0;
-}
-
-.memra-result__title {
-  @include type-style("heading-compact-01");
-  display: flex;
-  align-items: center;
-  gap: $spacing-02;
-}
-
-.memra-result__dot {
-  inline-size: $spacing-03;
-  block-size: $spacing-03;
-  border-radius: 50%;
-  padding: 0;
-  min-inline-size: 0;
-  min-block-size: 0;
-}
-
-.memra-result__snippet {
-  @include type-style("body-compact-01");
-  color: $text-secondary;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.memra-result__snippet mark {
-  background: $highlight;
-  color: $text-primary;
-}
-
-.memra-result__folder {
-  @include type-style("label-01");
-  color: $text-secondary;
-}
-
-.memra-result__relevance {
-  display: flex;
-  align-items: center;
-  gap: $spacing-03;
-  flex-shrink: 0;
-}
-
-.memra-result__meter {
-  inline-size: 3.5rem;
-  block-size: $spacing-02;
-  appearance: none;
-  border: 0;
-  background: $layer-accent-01;
-}
-
-.memra-result__meter::-webkit-meter-bar {
-  background: $layer-accent-01;
-  border: 0;
-  border-radius: 0;
-}
-
-.memra-result__meter::-webkit-meter-optimum-value,
-.memra-result__meter::-moz-meter-bar {
-  background: $interactive;
-}
-
-.memra-result__pct {
-  @include type-style("label-01");
-  color: $text-secondary;
-  min-inline-size: 2.5rem;
-  text-align: end;
-}
-
-// AI answer ---------------------------------------------------------------
-
-.memra-ai {
-  margin: $spacing-03;
-}
-
-.memra-ai__head {
-  display: flex;
-  align-items: center;
-  gap: $spacing-03;
-  margin-block-end: $spacing-03;
-}
-
-.memra-ai__title {
-  @include type-style("heading-compact-01");
-  flex: 1;
-}
-
-.memra-ai__body {
-  @include type-style("body-01");
-}
-
-.memra-ai__note {
-  @include type-style("body-compact-01");
-  color: $text-secondary;
-}
-
-.memra-ai__citation {
-  @include type-style("label-01");
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  min-inline-size: 1.25rem;
-  block-size: 1.25rem;
-  padding-inline: $spacing-02;
-  margin-inline: $spacing-01;
-  border: 1px solid $border-interactive;
-  background: $layer-02;
-  color: $link-primary;
-  cursor: pointer;
-  vertical-align: text-bottom;
-}
-
-.memra-ai__citation:hover {
-  background: $layer-hover-02;
-}
-
-.memra-ai__citation:focus-visible {
-  outline: 2px solid $focus;
-  outline-offset: -2px;
-}
-
-.memra-ai__explain-title {
-  @include type-style("heading-compact-01");
-  margin-block-end: $spacing-02;
-}
-
-.memra-ai__explain {
-  @include type-style("body-compact-01");
-  color: $text-secondary;
-  margin-block: $spacing-03;
-}
-
-.memra-ai__sources {
-  list-style: none;
-  padding: 0;
-}
-
-.memra-ai__source {
-  @include type-style("body-compact-01");
-  background: none;
-  border: 0;
-  padding: $spacing-02 0;
-  color: $link-primary;
-  cursor: pointer;
-  text-align: start;
-}
-
-.memra-ai__source:hover {
-  text-decoration: underline;
-}
-
-.memra-ai__source:focus-visible {
-  outline: 2px solid $focus;
-}
-
-.memra-search-page__list {
-  margin-block-end: $spacing-05;
-}
-
-// Composer ----------------------------------------------------------------
-
-.memra-composer-row {
-  display: flex;
-  align-items: stretch;
-  gap: $spacing-03;
-}
-
-.memra-composer-row > .memra-composer {
-  flex: 1;
-}
-
-.memra-composer-row--dragging > .memra-composer,
-.memra-composer--expanded:has(.memra-upload-dragging) {
-  outline: 2px dashed $border-interactive;
-  outline-offset: -2px;
-}
-
-// Upload preview ----------------------------------------------------------
-
-.memra-upload__preview {
-  max-block-size: 24rem;
-  overflow: auto;
-  padding: $spacing-05;
-  background: $layer-01;
-  border: 1px solid $border-subtle-01;
-}
-
-.memra-upload__fields {
-  display: flex;
-  flex-direction: column;
-  gap: $spacing-05;
-}
-
-.memra-upload__warning {
-  max-inline-size: none;
-}
-
-.memra-upload__pending {
-  @include type-style("body-compact-01");
-  color: $text-secondary;
-}
-
-// Settings ----------------------------------------------------------------
-
-.memra-settings__section {
-  margin-block-end: $spacing-08;
-}
-
-.memra-settings__heading {
-  @include type-style("heading-compact-02");
-  margin-block-end: $spacing-03;
-}
-
-.memra-settings__help {
-  @include type-style("body-compact-01");
-  color: $text-secondary;
-  margin-block-end: $spacing-05;
-}
-
-.memra-settings__row {
-  display: flex;
-  align-items: flex-end;
-  gap: $spacing-05;
-  flex-wrap: wrap;
-}
-
-.memra-settings__warnings {
-  margin-block-start: $spacing-05;
-}
-
-.memra-settings__current {
-  margin-inline-start: $spacing-03;
-}
-
-.memra-composer--collapsed {
-  min-block-size: $spacing-09;
-  display: flex;
-  align-items: center;
-}
-
-.memra-composer__placeholder {
-  @include type-style("body-01");
-  color: $text-placeholder;
-}
-
-.memra-composer--expanded {
-  display: flex;
-  flex-direction: column;
-  gap: $spacing-05;
-}
-
-.memra-composer__meta {
-  display: flex;
-  flex-wrap: wrap;
-  gap: $spacing-03;
-  align-items: flex-start;
-}
-
-.memra-composer__meta > * {
-  flex: 1 1 10rem;
-}
-
-.memra-composer__switcher {
-  max-inline-size: 16rem;
-}
-
-.memra-composer__preview {
-  min-block-size: 8rem;
-  padding: $spacing-05;
-  border: 1px solid $border-subtle-01;
-}
-
-.memra-composer__footer {
-  justify-content: flex-end;
-}
-
-.memra-toolbar {
-  display: flex;
-  gap: $spacing-01;
-  border-block-start: 1px solid $border-subtle-01;
-  padding-block-start: $spacing-02;
-}
-
-.memra-tags-field__list {
-  display: flex;
-  flex-wrap: wrap;
-  gap: $spacing-02;
-  margin-block-start: $spacing-03;
-}
-
-// Note card ---------------------------------------------------------------
-
 .memra-note {
+  block-size: 100%;
   display: flex;
   flex-direction: column;
   gap: $spacing-04;
-  block-size: 100%;
-  transition: background-color $duration-fast-02 motion(standard, productive);
-}
-
-.memra-note:hover {
-  background: $layer-hover-01;
 }
 
 .memra-note__head {
   display: flex;
-  justify-content: space-between;
   align-items: flex-start;
+  justify-content: space-between;
   gap: $spacing-03;
 }
 
 .memra-note__title {
   @include type-style("heading-compact-02");
-  min-inline-size: 0;
   overflow-wrap: anywhere;
 }
 
-.memra-note__title--derived a {
-  color: $text-secondary;
-}
-
-.memra-note__actions {
-  display: flex;
-  flex-shrink: 0;
-  opacity: 0;
-  transition: opacity $duration-fast-02 motion(standard, productive);
-}
-
-.memra-note:hover .memra-note__actions,
-.memra-note:focus-within .memra-note__actions,
-.memra-note__actions:has([aria-expanded="true"]) {
-  opacity: 1;
-}
-
-@media (hover: none) {
-  .memra-note__actions {
-    opacity: 1;
-  }
-}
-
-.memra-note__body {
+.memra-note__excerpt {
   @include type-style("body-compact-01");
-  max-block-size: 7.5rem;
-  overflow: hidden;
-  position: relative;
+  color: $text-secondary;
   flex: 1;
-}
-
-.memra-note__body::after {
-  content: "";
-  position: absolute;
-  inset-block-end: 0;
-  inset-inline: 0;
-  block-size: $spacing-06;
-  background: linear-gradient(transparent, $layer-01);
-}
-
-.memra-note:hover .memra-note__body::after {
-  background: linear-gradient(transparent, $layer-hover-01);
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 4;
+  overflow: hidden;
 }
 
 .memra-note__foot {
   display: flex;
+  align-items: center;
   justify-content: space-between;
-  align-items: flex-end;
   gap: $spacing-03;
+  flex-wrap: wrap;
 }
 
 .memra-note__tags {
@@ -596,43 +94,59 @@
   gap: $spacing-02;
 }
 
-.memra-note__meta {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  flex-shrink: 0;
-}
-
-.memra-note__folder,
 .memra-note__time {
   @include type-style("helper-text-01");
   color: $text-helper;
 }
 
-.memra-note-skeleton {
-  inline-size: 100%;
-  block-size: 12rem;
+.memra-empty {
+  @include type-style("body-01");
+  color: $text-secondary;
 }
 
-// Markdown ----------------------------------------------------------------
+.memra-result__snippet mark {
+  background: $highlight;
+  color: $text-primary;
+}
+
+.memra-result__meta {
+  @include type-style("label-01");
+  color: $text-secondary;
+}
+
+.memra-form {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-06;
+  max-inline-size: 32rem;
+}
+
+.memra-form__actions {
+  display: flex;
+  gap: $spacing-03;
+}
+
+.memra-editor-meta {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr));
+  gap: $spacing-05;
+  margin-block: $spacing-06;
+}
+
+.memra-toolbar {
+  display: flex;
+  gap: $spacing-01;
+  margin-block: $spacing-03;
+}
+
+.memra-preview {
+  min-block-size: 16rem;
+  padding: $spacing-05;
+  background: $layer-01;
+}
 
 .memra-markdown > * + * {
-  margin-block-start: $spacing-03;
-}
-
-.memra-markdown h1,
-.memra-markdown h2,
-.memra-markdown h3,
-.memra-markdown h4 {
-  @include type-style("heading-compact-02");
-}
-
-.memra-note__body .memra-markdown h1,
-.memra-note__body .memra-markdown h2,
-.memra-note__body .memra-markdown h3,
-.memra-note__body .memra-markdown h4 {
-  @include type-style("body-compact-01");
-  font-weight: 600;
+  margin-block-start: $spacing-04;
 }
 
 .memra-markdown ul,
@@ -646,10 +160,6 @@
 
 .memra-markdown ol {
   list-style: decimal;
-}
-
-.memra-markdown li + li {
-  margin-block-start: $spacing-02;
 }
 
 .memra-markdown li:has(> input[type="checkbox"]) {
@@ -686,48 +196,46 @@
   border-block-end: 1px solid $border-subtle-01;
 }
 
-.memra-markdown th {
-  @include type-style("heading-compact-01");
+.memra-ai__citation {
+  @include type-style("label-01");
+  padding: 0 $spacing-02;
+  margin-inline: $spacing-01;
+  border: 1px solid $border-interactive;
+  background: transparent;
+  color: $link-primary;
+  cursor: pointer;
 }
 
-.memra-markdown hr {
+.memra-ai__citation:focus-visible {
+  outline: 2px solid $focus;
+  outline-offset: -2px;
+}
+
+.memra-ai__sources {
+  list-style: none;
+  padding: 0;
+}
+
+.memra-ai__source {
+  @include type-style("body-compact-01");
+  background: none;
   border: 0;
-  border-block-start: 1px solid $border-subtle-01;
+  padding: $spacing-02 0;
+  color: $link-primary;
+  cursor: pointer;
+  text-align: start;
 }
 
-// Editor page -------------------------------------------------------------
-
-.memra-editor-page__meta {
-  display: flex;
-  flex-wrap: wrap;
-  gap: $spacing-03;
-  align-items: flex-start;
-  margin-block: $spacing-05;
+.memra-toasts {
+  position: fixed;
+  inset-block-end: $spacing-05;
+  inset-inline-end: $spacing-05;
+  z-index: 9000;
 }
 
-.memra-editor-page__meta > * {
-  flex: 1 1 12rem;
-}
-
-.memra-editor-page__status {
-  margin-block-start: $spacing-05;
+.memra-login {
+  min-block-size: 100vh;
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: $spacing-05;
-}
-
-.memra-editor-page__preview {
-  min-block-size: 16rem;
-  padding: $spacing-05;
-  border: 1px solid $border-subtle-01;
-  background: $layer-01;
-}
-
-.memra-editor textarea {
-  @include type-style("body-01");
-}
-
-.memra-editor-page .memra-editor textarea {
-  min-block-size: 16rem;
+  background: $background;
 }
