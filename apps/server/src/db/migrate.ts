@@ -10,6 +10,10 @@ export function currentSchemaVersion(db: Database): number {
   return row ? Number(row.value) : 0;
 }
 
+export function pendingMigrations(db: Database): number {
+  return Math.max(0, MIGRATIONS.length - currentSchemaVersion(db));
+}
+
 export function migrate(db: Database): { from: number; to: number } {
   const from = currentSchemaVersion(db);
   if (from > MIGRATIONS.length) {
