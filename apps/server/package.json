@@ -5,12 +5,27 @@
   "type": "module",
   "scripts": {
     "dev": "node --watch --conditions=development --env-file-if-exists=.env src/index.ts",
+    "cli": "node --conditions=development --env-file-if-exists=.env src/cli.ts",
+    "auth:set-password": "pnpm run cli auth:set-password",
     "build": "vp pack",
     "start": "node --env-file-if-exists=.env dist/index.mjs",
     "check": "vp check"
   },
   "dependencies": {
-    "fastify": "^5.7.2"
+    "@fastify/cookie": "catalog:",
+    "@fastify/helmet": "catalog:",
+    "@fastify/rate-limit": "catalog:",
+    "@fastify/sensible": "catalog:",
+    "@fastify/static": "catalog:",
+    "@node-rs/argon2": "catalog:",
+    "@orpc/openapi": "catalog:",
+    "@orpc/server": "catalog:",
+    "@orpc/zod": "catalog:",
+    "fastify": "^5.7.2",
+    "shared": "workspace:*",
+    "sqlite-vec": "catalog:",
+    "uuid": "catalog:",
+    "zod": "catalog:"
   },
   "devDependencies": {
     "@types/node": "catalog:",
