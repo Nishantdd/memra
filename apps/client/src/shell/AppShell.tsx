@@ -2,6 +2,7 @@ import { Content, InlineNotification } from "@carbon/react";
 import { Outlet } from "react-router";
 import { useConnectivity } from "../data/sync/connectivity.ts";
 import { AppHeader } from "./AppHeader.tsx";
+import { ReconnectToast } from "./ReconnectToast.tsx";
 import { UpdatePrompt } from "./UpdatePrompt.tsx";
 
 export function AppShell() {
@@ -24,6 +25,7 @@ export function AppShell() {
         <Outlet />
       </Content>
       <UpdatePrompt />
+      <ReconnectToast />
     </>
   );
 }
