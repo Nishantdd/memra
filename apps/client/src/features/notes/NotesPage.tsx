@@ -14,6 +14,7 @@ import { useUpdateNote } from "../../data/mutations.ts";
 import { useFolders, useNotes } from "../../data/queries.ts";
 import { useConnectivity } from "../../data/sync/connectivity.ts";
 import { DeleteFolderModal, RenameFolderModal } from "../folders/FolderDialogs.tsx";
+import { SearchBar } from "../search/SearchBar.tsx";
 import { Composer } from "./Composer.tsx";
 import { NoteCard } from "./NoteCard.tsx";
 import { MoveNoteModal, RecolorNoteModal } from "./NoteDialogs.tsx";
@@ -84,6 +85,10 @@ export function NotesPage() {
             />
           </OverflowMenu>
         )}
+      </Column>
+
+      <Column sm={4} md={8} lg={10} className="memra-page__search">
+        <SearchBar folderId={folder?.id ?? null} />
       </Column>
 
       <Column sm={4} md={8} lg={10} className="memra-page__composer">
