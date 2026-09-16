@@ -14,3 +14,5 @@ export const QUERY_EMBED_CACHE_SIZE = 500;
 export const BGE_QUERY_PREFIX = "Represent this sentence for searching relevant passages: ";
 export const REMOTE_EMBED_TIMEOUT_MS = 30_000;
 export const REMOTE_EMBED_RETRIES = 3;
+/** vec0 metadata columns cannot be NULL; unfiled notes use this sentinel. */
+export const UNFILED_FOLDER_KEY = "";
