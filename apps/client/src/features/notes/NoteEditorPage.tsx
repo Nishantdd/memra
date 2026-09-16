@@ -16,6 +16,7 @@ import { Link, Navigate, useParams } from "react-router";
 import { LIMITS, type Note, type NoteColor } from "shared";
 import { AUTOSAVE_MS, EDITOR_ROWS } from "../../constants/index.ts";
 import { useUpdateNote } from "../../data/mutations.ts";
+import { useUnsavedGuard } from "../../data/unsaved.ts";
 import { useNote } from "../../data/queries.ts";
 import { useConnectivity } from "../../data/sync/connectivity.ts";
 import { Editor, type EditorApi } from "./editor/Editor.tsx";
@@ -63,6 +64,7 @@ function NoteEditor({ note }: { note: Note }) {
   const [mode, setMode] = useState<"write" | "preview">("write");
   const editorApi = useRef<EditorApi>(null);
   const dirty = isDirty(draft, note);
+  useUnsavedGuard(`note:${note.id}`, dirty);
 
   const save = (expectedVersion = baseVersion) => {
     if (!dirty || readOnly || update.isPending) return;

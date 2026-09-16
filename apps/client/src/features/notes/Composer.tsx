@@ -13,6 +13,7 @@ import { type DragEvent, useEffect, useRef, useState } from "react";
 import { LIMITS, type NoteColor } from "shared";
 import { COMPOSER_ROWS } from "../../constants/index.ts";
 import { useCreateNote } from "../../data/mutations.ts";
+import { useUnsavedGuard } from "../../data/unsaved.ts";
 import { Editor, type EditorApi } from "./editor/Editor.tsx";
 import { EditorToolbar } from "./editor/EditorToolbar.tsx";
 import { MarkdownPreview } from "./MarkdownPreview.tsx";
@@ -41,6 +42,7 @@ export function Composer({ folderId, readOnly, onCreated }: ComposerProps) {
   const [upload, setUpload] = useState<File | null>(null);
   const [dragging, setDragging] = useState(false);
   const create = useCreateNote();
+  useUnsavedGuard("composer", open && (title.trim() !== "" || body.trim() !== ""));
 
   const acceptFile = (files: FileList | File[] | null) => {
     const file = files ? Array.from(files).find((f) => MARKDOWN_FILE.test(f.name)) : undefined;
