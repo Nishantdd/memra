@@ -10,6 +10,7 @@ import {
 } from "@carbon/react";
 import { useEffect, useRef, useState } from "react";
 import { LIMITS, type NoteColor } from "shared";
+import { COMPOSER_ROWS } from "../../constants/index.ts";
 import { useCreateNote } from "../../data/mutations.ts";
 import { Editor, type EditorApi } from "./editor/Editor.tsx";
 import { EditorToolbar } from "./editor/EditorToolbar.tsx";
@@ -127,7 +128,7 @@ export function Composer({ folderId, readOnly, onCreated }: ComposerProps) {
             placeholder="Take a note in Markdown… **bold**, *italic*, - lists, `code`"
             maxLength={LIMITS.bodyMax}
             apiRef={editorApi}
-            rows={6}
+            rows={COMPOSER_ROWS}
           />
           <EditorToolbar apiRef={editorApi} />
         </>

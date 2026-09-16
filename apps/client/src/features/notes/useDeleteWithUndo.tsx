@@ -1,9 +1,8 @@
 import { ActionableNotification, Modal } from "@carbon/react";
 import { useEffect, useState } from "react";
 import type { Note } from "shared";
+import { UNDO_MS } from "../../constants/index.ts";
 import { useDeleteNote, useRestoreNote } from "../../data/mutations.ts";
-
-const UNDO_MS = 10_000;
 
 export function useDeleteWithUndo() {
   const remove = useDeleteNote();

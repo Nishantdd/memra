@@ -21,14 +21,13 @@ import {
 } from "@carbon/react";
 import { useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router";
+import { INLINE_FOLDER_TABS } from "../constants/index.ts";
 import { useFolders } from "../data/queries.ts";
 import { useConnectivity } from "../data/sync/connectivity.ts";
 import { CreateFolderModal } from "../features/folders/FolderDialogs.tsx";
 import { isDarkTheme, setTheme, useTheme } from "../lib/theme.ts";
 import { useLogout } from "../features/auth/useLogout.ts";
 import { ConnectivityStatus } from "./ConnectivityStatus.tsx";
-
-const INLINE_TABS = 8;
 
 export function AppHeader() {
   const folders = useFolders() ?? [];
@@ -42,8 +41,8 @@ export function AppHeader() {
   const logout = useLogout();
 
   const activeFolderId = location.pathname.startsWith("/f/") ? location.pathname.slice(3) : null;
-  const inline = folders.slice(0, INLINE_TABS);
-  const overflow = folders.slice(INLINE_TABS);
+  const inline = folders.slice(0, INLINE_FOLDER_TABS);
+  const overflow = folders.slice(INLINE_FOLDER_TABS);
 
   const folderItems = (items: typeof folders) =>
     items.map((f) => (

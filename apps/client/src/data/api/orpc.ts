@@ -3,10 +3,11 @@ import { RPCLink } from "@orpc/client/fetch";
 import type { ContractRouterClient } from "@orpc/contract";
 import { createTanstackQueryUtils } from "@orpc/tanstack-query";
 import type { Contract } from "shared";
+import { RPC_PATH } from "../../constants/index.ts";
 import { sessionStore } from "../session.ts";
 
 const link = new RPCLink({
-  url: `${window.location.origin}/api/rpc`,
+  url: `${window.location.origin}${RPC_PATH}`,
   fetch: (request, init) => globalThis.fetch(request, { ...init, credentials: "same-origin" }),
   interceptors: [
     async (options) => {

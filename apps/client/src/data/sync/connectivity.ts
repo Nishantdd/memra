@@ -1,4 +1,5 @@
 import { useSyncExternalStore } from "react";
+import { HEALTH_ENDPOINT, OFFLINE_HEARTBEAT_MS } from "../../constants/index.ts";
 
 export type Connectivity = "online" | "offline" | "checking";
 export type SyncActivity = "idle" | "syncing" | "error";
@@ -40,7 +41,7 @@ export function useConnectivity(): State {
 
 export async function probeHealth(): Promise<boolean> {
   try {
-    const res = await fetch("/api/v1/health", { cache: "no-store", credentials: "same-origin" });
+    const res = await fetch(HEALTH_ENDPOINT, { cache: "no-store", credentials: "same-origin" });
     const ok = res.ok;
     update({ connectivity: ok ? "online" : "offline" });
     return ok;
@@ -62,7 +63,7 @@ export function startConnectivityMonitor(onOnline: () => void): () => void {
   window.addEventListener("offline", handleOffline);
   heartbeat = setInterval(() => {
     if (state.connectivity === "offline") void probeHealth().then((ok) => ok && onOnline());
-  }, 30_000);
+  }, OFFLINE_HEARTBEAT_MS);
   void probeHealth().then((ok) => ok && onOnline());
   return () => {
     window.removeEventListener("online", handleOnline);

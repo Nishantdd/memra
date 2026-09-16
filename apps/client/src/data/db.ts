@@ -1,12 +1,13 @@
 import Dexie, { type EntityTable } from "dexie";
 import type { Folder, Note, Tag } from "shared";
+import { LOCAL_DB_NAME } from "../constants/index.ts";
 
 export interface MetaEntry {
   key: string;
   value: unknown;
 }
 
-export const db = new Dexie("memra") as Dexie & {
+export const db = new Dexie(LOCAL_DB_NAME) as Dexie & {
   notes: EntityTable<Note, "id">;
   folders: EntityTable<Folder, "id">;
   tags: EntityTable<Tag, "id">;

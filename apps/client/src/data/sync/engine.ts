@@ -1,17 +1,20 @@
 import { ORPCError } from "@orpc/client";
 import type { EntityTable } from "dexie";
 import type { Folder, Note, SyncPage, Tag } from "shared";
+import {
+  SYNC_INITIAL_BACKOFF_MS,
+  SYNC_LOCK_NAME,
+  SYNC_MAX_BACKOFF_MS,
+  SYNC_PERIODIC_MS,
+} from "../../constants/index.ts";
 import { api } from "../api/orpc.ts";
 import { db, getMeta, setMeta, wipeLocalData } from "../db.ts";
 import { sessionStore } from "../session.ts";
 import { connectivityStore } from "./connectivity.ts";
 
-const LOCK = "memra-sync";
-const MAX_BACKOFF_MS = 60_000;
-
 let scheduled = false;
 let running = false;
-let backoffMs = 1000;
+let backoffMs = SYNC_INITIAL_BACKOFF_MS;
 let eventsAbort: AbortController | null = null;
 
 async function applyPage(page: SyncPage): Promise<void> {
@@ -64,15 +67,19 @@ export async function syncNow(): Promise<number> {
   running = true;
   connectivityStore.set({ activity: "syncing" });
   try {
-    const applied = await navigator.locks.request(LOCK, { ifAvailable: true }, async (lock) => {
-      if (!lock) return 0;
-      const status = await api.status();
-      const knownInstance = await getMeta<string>("instanceId");
-      if (knownInstance && knownInstance !== status.instanceId) await wipeLocalData();
-      await setMeta("instanceId", status.instanceId);
-      return pullAll();
-    });
-    backoffMs = 1000;
+    const applied = await navigator.locks.request(
+      SYNC_LOCK_NAME,
+      { ifAvailable: true },
+      async (lock) => {
+        if (!lock) return 0;
+        const status = await api.status();
+        const knownInstance = await getMeta<string>("instanceId");
+        if (knownInstance && knownInstance !== status.instanceId) await wipeLocalData();
+        await setMeta("instanceId", status.instanceId);
+        return pullAll();
+      },
+    );
+    backoffMs = SYNC_INITIAL_BACKOFF_MS;
     connectivityStore.set({ activity: "idle", lastSyncAt: Date.now(), connectivity: "online" });
     return applied;
   } catch (error) {
@@ -83,7 +90,7 @@ export async function syncNow(): Promise<number> {
     connectivityStore.set({ activity: "error" });
     if (!(error instanceof ORPCError)) connectivityStore.set({ connectivity: "offline" });
     setTimeout(() => void syncNow(), backoffMs);
-    backoffMs = Math.min(backoffMs * 2, MAX_BACKOFF_MS);
+    backoffMs = Math.min(backoffMs * 2, SYNC_MAX_BACKOFF_MS);
     return 0;
   } finally {
     running = false;
@@ -115,7 +122,7 @@ async function listenForEvents(): Promise<void> {
 export function startSyncEngine(): () => void {
   const onVisible = () => document.visibilityState === "visible" && void syncNow();
   document.addEventListener("visibilitychange", onVisible);
-  const timer = setInterval(() => void syncNow(), 60_000);
+  const timer = setInterval(() => void syncNow(), SYNC_PERIODIC_MS);
 
   const unsubscribe = sessionStore.subscribe(() => {
     const s = sessionStore.get();

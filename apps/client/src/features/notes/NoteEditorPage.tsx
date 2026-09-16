@@ -14,6 +14,7 @@ import { isDefinedError } from "@orpc/client";
 import { useEffect, useRef, useState } from "react";
 import { Link, Navigate, useParams } from "react-router";
 import { LIMITS, type Note, type NoteColor } from "shared";
+import { AUTOSAVE_MS, EDITOR_ROWS } from "../../constants/index.ts";
 import { useUpdateNote } from "../../data/mutations.ts";
 import { useNote } from "../../data/queries.ts";
 import { useConnectivity } from "../../data/sync/connectivity.ts";
@@ -21,8 +22,6 @@ import { Editor, type EditorApi } from "./editor/Editor.tsx";
 import { EditorToolbar } from "./editor/EditorToolbar.tsx";
 import { MarkdownPreview } from "./MarkdownPreview.tsx";
 import { ColorField, FolderField, TagsField } from "./NoteMetaFields.tsx";
-
-const AUTOSAVE_MS = 1000;
 
 interface Draft {
   title: string;
@@ -185,7 +184,7 @@ function NoteEditor({ note }: { note: Note }) {
               readOnly={readOnly}
               maxLength={LIMITS.bodyMax}
               apiRef={editorApi}
-              rows={16}
+              rows={EDITOR_ROWS}
             />
             <EditorToolbar apiRef={editorApi} disabled={readOnly} />
           </>

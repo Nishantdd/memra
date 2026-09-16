@@ -1,5 +1,6 @@
 import { TextArea } from "@carbon/react";
 import { type KeyboardEvent, type Ref, useImperativeHandle, useRef } from "react";
+import { COUNTER_VISIBLE_RATIO } from "../../../constants/index.ts";
 
 export interface EditorApi {
   wrapSelection: (before: string, after: string) => void;
@@ -111,7 +112,7 @@ export function Editor({
       placeholder={placeholder}
       rows={rows}
       maxCount={maxLength}
-      enableCounter={maxLength !== undefined && value.length > maxLength * 0.9}
+      enableCounter={maxLength !== undefined && value.length > maxLength * COUNTER_VISIBLE_RATIO}
       className="memra-editor"
       spellCheck
     />
