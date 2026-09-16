@@ -1,6 +1,7 @@
 import { eventIterator, oc } from "@orpc/contract";
 import { z } from "zod";
-import { LIMITS, Uuid } from "../schemas/common.ts";
+import { LIMITS } from "../constants/limits.ts";
+import { Uuid } from "../schemas/common.ts";
 import {
   Folder,
   FolderName,

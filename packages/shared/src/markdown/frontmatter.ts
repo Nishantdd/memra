@@ -1,6 +1,7 @@
 import matter from "gray-matter";
 import { z } from "zod";
-import { NOTE_COLORS, type NoteColor } from "../schemas/common.ts";
+import { NOTE_COLORS } from "../constants/colors.ts";
+import type { NoteColor } from "../schemas/common.ts";
 import { firstHeading, normalizeText, parseMarkdown } from "./parse.ts";
 
 const FrontMatter = z.object({

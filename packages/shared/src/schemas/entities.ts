@@ -1,5 +1,6 @@
 import { z } from "zod";
-import { LIMITS, NoteColor, Timestamp, Uuid } from "./common.ts";
+import { LIMITS } from "../constants/limits.ts";
+import { NoteColor, Timestamp, Uuid } from "./common.ts";
 
 const Synced = {
   id: Uuid,
