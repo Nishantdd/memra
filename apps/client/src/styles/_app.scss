@@ -291,6 +291,92 @@
   text-align: end;
 }
 
+// AI answer ---------------------------------------------------------------
+
+.memra-ai {
+  margin: $spacing-03;
+}
+
+.memra-ai__head {
+  display: flex;
+  align-items: center;
+  gap: $spacing-03;
+  margin-block-end: $spacing-03;
+}
+
+.memra-ai__title {
+  @include type-style("heading-compact-01");
+  flex: 1;
+}
+
+.memra-ai__body {
+  @include type-style("body-01");
+}
+
+.memra-ai__note {
+  @include type-style("body-compact-01");
+  color: $text-secondary;
+}
+
+.memra-ai__citation {
+  @include type-style("label-01");
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-inline-size: 1.25rem;
+  block-size: 1.25rem;
+  padding-inline: $spacing-02;
+  margin-inline: $spacing-01;
+  border: 1px solid $border-interactive;
+  background: $layer-02;
+  color: $link-primary;
+  cursor: pointer;
+  vertical-align: text-bottom;
+}
+
+.memra-ai__citation:hover {
+  background: $layer-hover-02;
+}
+
+.memra-ai__citation:focus-visible {
+  outline: 2px solid $focus;
+  outline-offset: -2px;
+}
+
+.memra-ai__explain-title {
+  @include type-style("heading-compact-01");
+  margin-block-end: $spacing-02;
+}
+
+.memra-ai__explain {
+  @include type-style("body-compact-01");
+  color: $text-secondary;
+  margin-block: $spacing-03;
+}
+
+.memra-ai__sources {
+  list-style: none;
+  padding: 0;
+}
+
+.memra-ai__source {
+  @include type-style("body-compact-01");
+  background: none;
+  border: 0;
+  padding: $spacing-02 0;
+  color: $link-primary;
+  cursor: pointer;
+  text-align: start;
+}
+
+.memra-ai__source:hover {
+  text-decoration: underline;
+}
+
+.memra-ai__source:focus-visible {
+  outline: 2px solid $focus;
+}
+
 .memra-search-page__list {
   margin-block-end: $spacing-05;
 }
