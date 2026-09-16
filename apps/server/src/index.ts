@@ -2,6 +2,7 @@ import { existsSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { bootstrap } from "./bootstrap.ts";
+import { SESSION_PURGE_INTERVAL_MS } from "./constants/index.ts";
 import { buildApp } from "./http/app.ts";
 
 const services = bootstrap();
@@ -24,7 +25,7 @@ const clientDist =
 
 const app = buildApp(services, clientDist);
 
-const purge = setInterval(() => services.auth.purge(), 3600_000);
+const purge = setInterval(() => services.auth.purge(), SESSION_PURGE_INTERVAL_MS);
 purge.unref();
 
 const shutdown = async () => {

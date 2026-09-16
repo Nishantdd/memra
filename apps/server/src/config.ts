@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { DEFAULT_REMOTE_EMBEDDING_MODEL, PROFILE_DEFAULTS } from "./constants/index.ts";
 
 const Bool = z.enum(["0", "1", "true", "false"]).transform((v) => v === "1" || v === "true");
 
@@ -25,11 +26,6 @@ const Env = z.object({
   MEMRA_LLM_MODEL: z.string().optional(),
   MEMRA_LOG_LEVEL: z.enum(["fatal", "error", "warn", "info", "debug", "trace"]).default("info"),
 });
-
-const PROFILE_DEFAULTS = {
-  low: { embeddingModel: "Xenova/bge-small-en-v1.5", batch: 4, warmup: false },
-  standard: { embeddingModel: "Xenova/bge-base-en-v1.5", batch: 16, warmup: true },
-} as const;
 
 export function loadConfig(env: NodeJS.ProcessEnv = process.env) {
   const parsed = Env.safeParse(Object.fromEntries(Object.entries(env).filter(([, v]) => v !== "")));
@@ -69,7 +65,7 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env) {
         e.MEMRA_EMBEDDING_MODEL ??
         (e.MEMRA_EMBEDDING_PROVIDER === "local"
           ? profile.embeddingModel
-          : "text-embedding-3-small"),
+          : DEFAULT_REMOTE_EMBEDDING_MODEL),
       baseUrl: e.MEMRA_EMBEDDING_BASE_URL ?? null,
       apiKey: e.MEMRA_EMBEDDING_API_KEY ?? null,
       dims: e.MEMRA_EMBEDDING_DIMS ?? null,

@@ -3,25 +3,19 @@ import { hash, verify } from "@node-rs/argon2";
 import { LIMITS } from "shared";
 import { type Database, now } from "../../db/database.ts";
 import { getMeta, setMeta } from "../../db/meta.ts";
-
-const ARGON = { memoryCost: 65_536, timeCost: 3, parallelism: 1 } as const;
-const SESSION_ABSOLUTE_MS = 30 * 24 * 3600_000;
-const SESSION_IDLE_MS = 14 * 24 * 3600_000;
-const TOUCH_INTERVAL_MS = 5 * 60_000;
-const IP_WINDOW_MS = 15 * 60_000;
-const IP_MAX_FAILURES = 5;
-const GLOBAL_WINDOW_MS = 3600_000;
-const GLOBAL_MAX_FAILURES = 30;
-const FAILURE_DELAY_MS = 500;
-
-const COMMON_PASSWORDS = new Set([
-  "password1234",
-  "123456789012",
-  "qwertyuiop12",
-  "letmeinplease",
-  "administrator",
-  "passw0rd1234",
-]);
+import {
+  ARGON,
+  COMMON_PASSWORDS,
+  LOGIN_ATTEMPT_RETENTION_MS,
+  LOGIN_FAILURE_DELAY_MS,
+  LOGIN_GLOBAL_MAX_FAILURES,
+  LOGIN_GLOBAL_WINDOW_MS,
+  LOGIN_IP_MAX_FAILURES,
+  LOGIN_IP_WINDOW_MS,
+  SESSION_ABSOLUTE_MS,
+  SESSION_IDLE_MS,
+  SESSION_TOUCH_INTERVAL_MS,
+} from "../../constants/index.ts";
 
 export interface Session {
   id: string;
@@ -90,16 +84,16 @@ export class AuthService {
     const ipFailures = this.#db.get<{ c: number; last: number | null }>(
       "SELECT count(*) AS c, max(at) AS last FROM login_attempts WHERE ip = ? AND success = 0 AND at > ?",
       ip,
-      t - IP_WINDOW_MS,
+      t - LOGIN_IP_WINDOW_MS,
     )!;
-    if (ipFailures.c >= IP_MAX_FAILURES)
-      return Math.ceil((ipFailures.last! + IP_WINDOW_MS - t) / 1000);
+    if (ipFailures.c >= LOGIN_IP_MAX_FAILURES)
+      return Math.ceil((ipFailures.last! + LOGIN_IP_WINDOW_MS - t) / 1000);
     const global = this.#db.get<{ c: number; last: number | null }>(
       "SELECT count(*) AS c, max(at) AS last FROM login_attempts WHERE success = 0 AND at > ?",
-      t - GLOBAL_WINDOW_MS,
+      t - LOGIN_GLOBAL_WINDOW_MS,
     )!;
-    if (global.c >= GLOBAL_MAX_FAILURES)
-      return Math.ceil((global.last! + GLOBAL_WINDOW_MS - t) / 1000);
+    if (global.c >= LOGIN_GLOBAL_MAX_FAILURES)
+      return Math.ceil((global.last! + LOGIN_GLOBAL_WINDOW_MS - t) / 1000);
     return 0;
   }
 
@@ -118,7 +112,7 @@ export class AuthService {
       ok ? 1 : 0,
     );
     if (!ok) {
-      await sleep(FAILURE_DELAY_MS);
+      await sleep(LOGIN_FAILURE_DELAY_MS);
       throw new Error("invalid_credentials");
     }
     return this.createSession(ip, userAgent);
@@ -165,7 +159,7 @@ export class AuthService {
       this.#db.run("DELETE FROM sessions WHERE id = ?", id);
       return null;
     }
-    if (t - row.last_seen_at > TOUCH_INTERVAL_MS) {
+    if (t - row.last_seen_at > SESSION_TOUCH_INTERVAL_MS) {
       this.#db.run("UPDATE sessions SET last_seen_at = ? WHERE id = ?", t, id);
       row.last_seen_at = t;
     }
@@ -214,6 +208,6 @@ export class AuthService {
       t,
       t - SESSION_IDLE_MS,
     );
-    this.#db.run("DELETE FROM login_attempts WHERE at <= ?", t - 24 * 3600_000);
+    this.#db.run("DELETE FROM login_attempts WHERE at <= ?", t - LOGIN_ATTEMPT_RETENTION_MS);
   }
 }

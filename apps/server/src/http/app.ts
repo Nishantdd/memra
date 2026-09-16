@@ -12,13 +12,18 @@ import { RPCHandler } from "@orpc/server/fastify";
 import { ZodToJsonSchemaConverter } from "@orpc/zod/zod4";
 import Fastify, { type FastifyInstance, type FastifyReply, type FastifyRequest } from "fastify";
 import { contract } from "shared";
+import {
+  API_PREFIX,
+  BODY_LIMIT_BYTES,
+  MUTATING_METHODS,
+  RATE_LIMIT_DEFAULT,
+  RATE_LIMIT_LOGIN,
+  RPC_PREFIX,
+  SESSION_ABSOLUTE_MS,
+  SESSION_COOKIE,
+} from "../constants/index.ts";
 import type { RequestContext, Services } from "./context.ts";
 import { router } from "./router.ts";
-
-export const SESSION_COOKIE = "memra_session";
-const API_PREFIX = "/api/v1";
-const RPC_PREFIX = "/api/rpc";
-const MUTATING = new Set(["POST", "PUT", "PATCH", "DELETE"]);
 
 function isSameOrigin(request: FastifyRequest, publicOrigin: string | null): boolean {
   const fetchSite = request.headers["sec-fetch-site"];
@@ -37,7 +42,7 @@ export function buildApp(services: Services, clientDist: string | null): Fastify
       redact: ["req.headers.authorization", "req.headers.cookie", "res.headers.set-cookie"],
     },
     trustProxy: config.trustProxy,
-    bodyLimit: 2 * 1024 * 1024,
+    bodyLimit: BODY_LIMIT_BYTES,
   });
 
   app.register(sensible);
@@ -69,7 +74,7 @@ export function buildApp(services: Services, clientDist: string | null): Fastify
 
   app.addHook("onRequest", async (request, reply) => {
     if (!request.url.startsWith("/api/")) return;
-    if (MUTATING.has(request.method) && !isSameOrigin(request, config.publicOrigin)) {
+    if (MUTATING_METHODS.has(request.method) && !isSameOrigin(request, config.publicOrigin)) {
       return reply.code(403).send({ code: "FORBIDDEN", message: "Cross-site request rejected" });
     }
   });
@@ -86,7 +91,8 @@ export function buildApp(services: Services, clientDist: string | null): Fastify
         sameSite: "strict" as const,
         secure: config.secureCookies,
       };
-      if (token) reply.setCookie(SESSION_COOKIE, token, { ...opts, maxAge: 30 * 24 * 3600 });
+      if (token)
+        reply.setCookie(SESSION_COOKIE, token, { ...opts, maxAge: SESSION_ABSOLUTE_MS / 1000 });
       else reply.clearCookie(SESSION_COOKIE, opts);
     },
   });
@@ -100,7 +106,7 @@ export function buildApp(services: Services, clientDist: string | null): Fastify
   app.route({
     method: ["GET", "POST", "PUT", "PATCH", "DELETE"],
     url: `${RPC_PREFIX}/*`,
-    config: { rateLimit: { max: 300, timeWindow: "1 minute" } },
+    config: { rateLimit: RATE_LIMIT_DEFAULT },
     handler: async (request, reply) => {
       const { matched } = await rpcHandler.handle(request, reply, {
         prefix: RPC_PREFIX,
@@ -114,7 +120,7 @@ export function buildApp(services: Services, clientDist: string | null): Fastify
   app.route({
     method: ["GET", "POST", "PUT", "PATCH", "DELETE"],
     url: `${API_PREFIX}/*`,
-    config: { rateLimit: { max: 300, timeWindow: "1 minute" } },
+    config: { rateLimit: RATE_LIMIT_DEFAULT },
     handler: async (request, reply) => {
       const context = buildContext(request, reply);
       if (request.url === `${API_PREFIX}/openapi.json`) {
@@ -142,7 +148,7 @@ export function buildApp(services: Services, clientDist: string | null): Fastify
   app.route({
     method: "POST",
     url: `${API_PREFIX}/auth/login`,
-    config: { rateLimit: { max: 10, timeWindow: "1 minute" } },
+    config: { rateLimit: RATE_LIMIT_LOGIN },
     handler: async (request, reply) => {
       const { matched } = await openApiHandler.handle(request, reply, {
         prefix: API_PREFIX,
