@@ -15,6 +15,7 @@ import { contract } from "shared";
 import {
   API_PREFIX,
   BODY_LIMIT_BYTES,
+  MAX_REQUEST_BYTES,
   MUTATING_METHODS,
   RATE_LIMIT_DEFAULT,
   RATE_LIMIT_LOGIN,
@@ -76,6 +77,9 @@ export function buildApp(services: Services, clientDist: string | null): Fastify
     if (!request.url.startsWith("/api/")) return;
     if (MUTATING_METHODS.has(request.method) && !isSameOrigin(request, config.publicOrigin)) {
       return reply.code(403).send({ code: "FORBIDDEN", message: "Cross-site request rejected" });
+    }
+    if (Number(request.headers["content-length"] ?? 0) > MAX_REQUEST_BYTES) {
+      return reply.code(413).send({ code: "PAYLOAD_TOO_LARGE", message: "Request body too large" });
     }
   });
 

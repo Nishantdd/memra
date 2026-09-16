@@ -8,6 +8,7 @@ import {
   FolderNotFound,
   FolderOrderMismatch,
 } from "../modules/folders/folders.repo.ts";
+import { InvalidImportFile } from "../modules/import/import.service.ts";
 import { NoteConflict, NoteNotFound } from "../modules/notes/notes.repo.ts";
 import { CursorTooOld } from "../modules/sync/sync.repo.ts";
 import { DuplicateTagName, TagNotFound } from "../modules/tags/tags.repo.ts";
@@ -328,6 +329,37 @@ export const router = base.router({
         throw e;
       }
     }),
+  },
+
+  import: {
+    parse: authed.import.parse.handler(async ({ input, context, errors }) => {
+      try {
+        return await context.services.importer.parse(input.file);
+      } catch (e) {
+        if (e instanceof InvalidImportFile)
+          throw errors.BAD_REQUEST({ data: { reason: e.message } });
+        throw e;
+      }
+    }),
+    bulk: authed.import.bulk.handler(async ({ input, context, errors }) => {
+      try {
+        const report = await context.services.importer.bulk(input.file);
+        if (
+          report.imported > 0 ||
+          report.foldersCreated.length > 0 ||
+          report.tagsCreated.length > 0
+        )
+          publishChange(context);
+        return report;
+      } catch (e) {
+        if (e instanceof InvalidImportFile)
+          throw errors.BAD_REQUEST({ data: { reason: e.message } });
+        throw e;
+      }
+    }),
+    export: authed.import.export.handler(({ input, context }) =>
+      context.services.importer.export(input.folderId),
+    ),
   },
 
   sync: {

@@ -8,6 +8,7 @@ import { createLlmProvider } from "../modules/ask/providers/factory.ts";
 import { AskRetriever } from "../modules/ask/retrieval.ts";
 import { AuthService, type Session } from "../modules/auth/auth.service.ts";
 import { FoldersRepo } from "../modules/folders/folders.repo.ts";
+import { ImportService } from "../modules/import/import.service.ts";
 import { NotesRepo } from "../modules/notes/notes.repo.ts";
 import { SearchService } from "../modules/search/search.service.ts";
 import { SyncRepo } from "../modules/sync/sync.repo.ts";
@@ -31,6 +32,7 @@ export interface Services {
   index: IndexSupervisor;
   ask: AskService;
   askLimiter: WindowRateLimiter;
+  importer: ImportService;
   events: EventPublisher<{ event: ServerEvent }>;
 }
 
@@ -40,6 +42,9 @@ export function createServices(
   instanceId: string,
   version: string,
 ): Services {
+  const notes = new NotesRepo(db);
+  const folders = new FoldersRepo(db);
+  const tags = new TagsRepo(db);
   const events = new EventPublisher<{ event: ServerEvent }>({ maxBufferedEvents: 100 });
   const index = new IndexSupervisor(config);
   const rag = openRagDatabase(config.dataDir);
@@ -56,14 +61,15 @@ export function createServices(
     version,
     startedAt: Date.now(),
     auth: new AuthService(db),
-    notes: new NotesRepo(db),
-    folders: new FoldersRepo(db),
-    tags: new TagsRepo(db),
+    notes,
+    folders,
+    tags,
     sync: new SyncRepo(db),
     search: new SearchService(db, rag, index, config.embedding.minSimilarity),
     index,
     ask: new AskService(new AskRetriever(db, rag, index), createLlmProvider(config)),
     askLimiter: new WindowRateLimiter(ASK_RATE_LIMIT.max, ASK_RATE_LIMIT.windowMs),
+    importer: new ImportService(db, notes, folders, tags),
     events,
   };
 }
