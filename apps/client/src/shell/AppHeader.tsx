@@ -1,4 +1,4 @@
-import { Add, Asleep, Light, Logout, UserAvatar } from "@carbon/icons-react";
+import { Asleep, FolderAdd, Light, Logout, Settings, UserAvatar } from "@carbon/icons-react";
 import {
   Header,
   HeaderContainer,
@@ -9,44 +9,42 @@ import {
   HeaderMenuItem,
   HeaderName,
   HeaderNavigation,
-  HeaderPanel,
   HeaderSideNavItems,
   SideNav,
   SideNavItems,
   SkipToContent,
-  Switcher,
-  SwitcherDivider,
-  SwitcherItem,
   Theme,
 } from "@carbon/react";
 import { useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router";
 import { INLINE_FOLDER_TABS } from "../constants/index.ts";
 import { useFolders } from "../data/queries.ts";
-import { useConnectivity } from "../data/sync/connectivity.ts";
-import { CreateFolderModal } from "../features/folders/FolderDialogs.tsx";
-import { isDarkTheme, setTheme, useTheme } from "../lib/theme.ts";
 import { useLogout } from "../features/auth/useLogout.ts";
-import { ConnectivityStatus } from "./ConnectivityStatus.tsx";
+import { CreateFolderModal } from "../features/folders/FolderDialogs.tsx";
+import { IconMenu, MenuItem, MenuItemDivider } from "../lib/carbon.ts";
+import { isDarkTheme, setTheme, useTheme } from "../lib/theme.ts";
+import { StatusTag } from "./StatusTag.tsx";
 
 export function AppHeader() {
   const folders = useFolders() ?? [];
   const location = useLocation();
   const navigate = useNavigate();
   const theme = useTheme();
-  const { connectivity } = useConnectivity();
-  const readOnly = connectivity === "offline";
-  const [creating, setCreating] = useState(false);
-  const [accountOpen, setAccountOpen] = useState(false);
   const logout = useLogout();
+  const [creating, setCreating] = useState(false);
 
   const activeFolderId = location.pathname.startsWith("/f/") ? location.pathname.slice(3) : null;
   const inline = folders.slice(0, INLINE_FOLDER_TABS);
   const overflow = folders.slice(INLINE_FOLDER_TABS);
-
-  const folderItems = (items: typeof folders) =>
-    items.map((f) => (
-      <HeaderMenuItem key={f.id} as={Link} to={`/f/${f.id}`} isActive={activeFolderId === f.id}>
+  const items = (list: typeof folders, onClick?: () => void) =>
+    list.map((f) => (
+      <HeaderMenuItem
+        key={f.id}
+        as={Link}
+        to={`/f/${f.id}`}
+        isActive={activeFolderId === f.id}
+        onClick={onClick}
+      >
         {f.name}
       </HeaderMenuItem>
     ));
@@ -70,29 +68,26 @@ export function AppHeader() {
               <HeaderMenuItem as={Link} to="/" isActive={location.pathname === "/"}>
                 All notes
               </HeaderMenuItem>
-              {folderItems(inline)}
+              {items(inline)}
               {overflow.length > 0 && (
                 <HeaderMenu
                   aria-label="More folders"
                   menuLinkName="More"
                   isActive={overflow.some((f) => f.id === activeFolderId)}
                 >
-                  {folderItems(overflow)}
+                  {items(overflow)}
                 </HeaderMenu>
-              )}
-              {!readOnly && (
-                <HeaderMenuItem
-                  as="button"
-                  type="button"
-                  onClick={() => setCreating(true)}
-                  className="memra-header__add"
-                >
-                  <Add size={16} aria-hidden /> New folder
-                </HeaderMenuItem>
               )}
             </HeaderNavigation>
             <HeaderGlobalBar>
-              <ConnectivityStatus />
+              <StatusTag />
+              <HeaderGlobalAction
+                aria-label="New folder"
+                tooltipAlignment="end"
+                onClick={() => setCreating(true)}
+              >
+                <FolderAdd size={20} />
+              </HeaderGlobalAction>
               <HeaderGlobalAction
                 aria-label={isDarkTheme(theme) ? "Switch to light theme" : "Switch to dark theme"}
                 tooltipAlignment="end"
@@ -100,36 +95,22 @@ export function AppHeader() {
               >
                 {isDarkTheme(theme) ? <Light size={20} /> : <Asleep size={20} />}
               </HeaderGlobalAction>
-              <HeaderGlobalAction
-                aria-label="Account"
-                tooltipAlignment="end"
-                isActive={accountOpen}
-                onClick={() => setAccountOpen((o) => !o)}
+              <IconMenu
+                label="Account"
+                renderIcon={UserAvatar}
+                size="lg"
+                menuAlignment="bottom-end"
+                tooltipAlignment="bottom-end"
               >
-                <UserAvatar size={20} />
-              </HeaderGlobalAction>
+                <MenuItem
+                  label="Settings"
+                  renderIcon={Settings}
+                  onClick={() => void navigate("/settings")}
+                />
+                <MenuItemDivider />
+                <MenuItem label="Sign out" renderIcon={Logout} onClick={() => void logout()} />
+              </IconMenu>
             </HeaderGlobalBar>
-            <HeaderPanel aria-label="Account" expanded={accountOpen} onHeaderPanelFocus={() => {}}>
-              <Switcher aria-label="Account actions">
-                <SwitcherItem
-                  aria-label="Settings"
-                  onClick={() => {
-                    setAccountOpen(false);
-                    void navigate("/settings");
-                  }}
-                >
-                  Settings
-                </SwitcherItem>
-                {!readOnly && (
-                  <>
-                    <SwitcherDivider />
-                    <SwitcherItem aria-label="Sign out" onClick={() => logout()}>
-                      <Logout size={16} aria-hidden /> Sign out
-                    </SwitcherItem>
-                  </>
-                )}
-              </Switcher>
-            </HeaderPanel>
             <SideNav
               aria-label="Folders"
               expanded={isSideNavExpanded}
@@ -146,17 +127,7 @@ export function AppHeader() {
                   >
                     All notes
                   </HeaderMenuItem>
-                  {folders.map((f) => (
-                    <HeaderMenuItem
-                      key={f.id}
-                      as={Link}
-                      to={`/f/${f.id}`}
-                      isActive={activeFolderId === f.id}
-                      onClick={onClickSideNavExpand}
-                    >
-                      {f.name}
-                    </HeaderMenuItem>
-                  ))}
+                  {items(folders, onClickSideNavExpand)}
                 </HeaderSideNavItems>
               </SideNavItems>
             </SideNav>
