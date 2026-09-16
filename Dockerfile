@@ -2,7 +2,7 @@
 # glibc image: onnxruntime-node and sqlite-vec ship glibc binaries (no Alpine).
 FROM node:26-slim AS build
 WORKDIR /app
-RUN corepack enable && corepack prepare pnpm@12.4.1 --activate
+RUN npm install -g pnpm@12.4.1
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml tsconfig.base.json tsconfig.json vite.config.ts ./
 COPY packages/shared/package.json packages/shared/
 COPY apps/server/package.json apps/server/
@@ -19,7 +19,7 @@ ENV NODE_ENV=production \
     MEMRA_DATA_DIR=/data \
     NODE_OPTIONS=--max-old-space-size=384
 WORKDIR /app
-RUN corepack enable && corepack prepare pnpm@12.4.1 --activate
+RUN npm install -g pnpm@12.4.1
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
 COPY packages/shared/package.json packages/shared/
 COPY apps/server/package.json apps/server/
