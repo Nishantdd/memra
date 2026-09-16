@@ -120,6 +120,176 @@
   @include type-style("heading-04");
 }
 
+// Search ------------------------------------------------------------------
+
+.memra-page__search {
+  margin-block-end: $spacing-05;
+}
+
+.memra-search {
+  position: relative;
+}
+
+.memra-search__row {
+  display: flex;
+  align-items: stretch;
+  gap: $spacing-03;
+}
+
+.memra-search__row > .cds--search {
+  flex: 1;
+}
+
+.memra-search__mode {
+  inline-size: auto;
+  flex-shrink: 0;
+}
+
+.memra-search-panel {
+  position: absolute;
+  inset-inline: 0;
+  inset-block-start: 100%;
+  z-index: 60;
+  margin-block-start: $spacing-02;
+  background: $layer-02;
+  border: 1px solid $border-subtle-01;
+}
+
+.memra-search-panel__list {
+  max-block-size: 24rem;
+  overflow-y: auto;
+}
+
+.memra-search-panel__empty {
+  padding: $spacing-05;
+}
+
+.memra-search-panel__empty-title {
+  @include type-style("heading-compact-01");
+  margin-block-end: $spacing-02;
+}
+
+.memra-search-panel__note {
+  @include type-style("body-compact-01");
+  color: $text-secondary;
+  padding: $spacing-03 $spacing-05;
+}
+
+.memra-search-panel__foot {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: $spacing-05;
+  padding: $spacing-03 $spacing-05;
+  border-block-start: 1px solid $border-subtle-01;
+}
+
+.memra-search-panel__status {
+  @include type-style("label-01");
+  color: $text-secondary;
+}
+
+.memra-result {
+  cursor: pointer;
+}
+
+.memra-result .cds--contained-list-item__content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: $spacing-05;
+}
+
+.memra-result--active {
+  background: $layer-hover-02;
+}
+
+.memra-result__main {
+  display: flex;
+  gap: $spacing-03;
+  align-items: flex-start;
+  min-inline-size: 0;
+}
+
+.memra-result__index {
+  flex-shrink: 0;
+}
+
+.memra-result__text {
+  min-inline-size: 0;
+}
+
+.memra-result__title {
+  @include type-style("heading-compact-01");
+  display: flex;
+  align-items: center;
+  gap: $spacing-02;
+}
+
+.memra-result__dot {
+  inline-size: $spacing-03;
+  block-size: $spacing-03;
+  border-radius: 50%;
+  padding: 0;
+  min-inline-size: 0;
+  min-block-size: 0;
+}
+
+.memra-result__snippet {
+  @include type-style("body-compact-01");
+  color: $text-secondary;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.memra-result__snippet mark {
+  background: $highlight;
+  color: $text-primary;
+}
+
+.memra-result__folder {
+  @include type-style("label-01");
+  color: $text-secondary;
+}
+
+.memra-result__relevance {
+  display: flex;
+  align-items: center;
+  gap: $spacing-03;
+  flex-shrink: 0;
+}
+
+.memra-result__meter {
+  inline-size: 3.5rem;
+  block-size: $spacing-02;
+  appearance: none;
+  border: 0;
+  background: $layer-accent-01;
+}
+
+.memra-result__meter::-webkit-meter-bar {
+  background: $layer-accent-01;
+  border: 0;
+  border-radius: 0;
+}
+
+.memra-result__meter::-webkit-meter-optimum-value,
+.memra-result__meter::-moz-meter-bar {
+  background: $interactive;
+}
+
+.memra-result__pct {
+  @include type-style("label-01");
+  color: $text-secondary;
+  min-inline-size: 2.5rem;
+  text-align: end;
+}
+
+.memra-search-page__list {
+  margin-block-end: $spacing-05;
+}
+
 // Composer ----------------------------------------------------------------
 
 .memra-composer--collapsed {
