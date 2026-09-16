@@ -1,4 +1,4 @@
-import type { Root } from "mdast";
+import type { Root, RootContent } from "mdast";
 import { toString } from "mdast-util-to-string";
 import remarkGfm from "remark-gfm";
 import remarkParse from "remark-parse";
@@ -20,11 +20,28 @@ export function normalizeText(text: string): string {
     .trim();
 }
 
+const CONTAINERS = new Set([
+  "list",
+  "listItem",
+  "blockquote",
+  "table",
+  "tableRow",
+  "footnoteDefinition",
+]);
+
+function collectBlocks(node: RootContent, out: string[]): void {
+  if (CONTAINERS.has(node.type) && "children" in node) {
+    for (const child of node.children as RootContent[]) collectBlocks(child, out);
+    return;
+  }
+  const text = normalizeText(toString(node));
+  if (text) out.push(text);
+}
+
 export function toPlainText(tree: Root): string {
-  return tree.children
-    .map((node) => normalizeText(toString(node)))
-    .filter(Boolean)
-    .join("\n");
+  const blocks: string[] = [];
+  for (const node of tree.children) collectBlocks(node, blocks);
+  return blocks.join("\n");
 }
 
 export function firstHeading(tree: Root): string | null {
