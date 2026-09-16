@@ -1,0 +1,13 @@
+@use "@carbon/react/scss/config" with (
+  $font-path: "@ibm/plex",
+  $use-per-family-plex: true,
+  $font-display: swap,
+  $css--reset: true,
+  $css--default-type: true,
+  $css--body: true
+);
+@use "@carbon/react/scss/fonts" with (
+  $fonts: (
+    IBM-Plex-Serif: false,
+  )
+);
