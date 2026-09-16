@@ -1,4 +1,12 @@
-import { Button, Column, Grid, OverflowMenu, OverflowMenuItem, SkeletonPlaceholder, Tag } from "@carbon/react";
+import {
+  Button,
+  Column,
+  Grid,
+  OverflowMenu,
+  OverflowMenuItem,
+  SkeletonPlaceholder,
+  Tag,
+} from "@carbon/react";
 import { useState } from "react";
 import { Navigate, useNavigate, useParams } from "react-router";
 import type { Note } from "shared";
@@ -8,7 +16,8 @@ import { useConnectivity } from "../../data/sync/connectivity.ts";
 import { DeleteFolderModal, RenameFolderModal } from "../folders/FolderDialogs.tsx";
 import { Composer } from "./Composer.tsx";
 import { NoteCard } from "./NoteCard.tsx";
-import { MoveNoteModal, RecolorNoteModal, useDeleteWithUndo } from "./NoteDialogs.tsx";
+import { MoveNoteModal, RecolorNoteModal } from "./NoteDialogs.tsx";
+import { useDeleteWithUndo } from "./useDeleteWithUndo.tsx";
 
 export function NotesPage() {
   const { folderId } = useParams();
@@ -27,7 +36,8 @@ export function NotesPage() {
   const folder = folderId ? folders?.find((f) => f.id === folderId) : undefined;
   if (folderId && folders && !folder) return <Navigate to="/" replace />;
 
-  const togglePin = (note: Note) => update.mutate({ id: note.id, expectedVersion: note.version, pinned: !note.pinned });
+  const togglePin = (note: Note) =>
+    update.mutate({ id: note.id, expectedVersion: note.version, pinned: !note.pinned });
   const pinned = notes?.filter((n) => n.pinned) ?? [];
   const others = notes?.filter((n) => !n.pinned) ?? [];
 
@@ -59,9 +69,19 @@ export function NotesPage() {
           </Tag>
         )}
         {folder && !readOnly && (
-          <OverflowMenu aria-label="Folder actions" iconDescription="Folder actions" flipped size="sm">
+          <OverflowMenu
+            aria-label="Folder actions"
+            iconDescription="Folder actions"
+            flipped
+            size="sm"
+          >
             <OverflowMenuItem itemText="Rename folder…" onClick={() => setRenaming(true)} />
-            <OverflowMenuItem itemText="Delete folder…" isDelete hasDivider onClick={() => setDeletingFolder(true)} />
+            <OverflowMenuItem
+              itemText="Delete folder…"
+              isDelete
+              hasDivider
+              onClick={() => setDeletingFolder(true)}
+            />
           </OverflowMenu>
         )}
       </Column>
@@ -86,10 +106,16 @@ export function NotesPage() {
         <Column sm={4} md={8} lg={8} className="memra-empty">
           <h2 className="memra-empty__heading">No notes {folder ? "in this folder" : ""} yet</h2>
           <p className="memra-empty__body">
-            {readOnly ? "You're offline. Notes you create when back online will appear here." : "Capture something with the composer above."}
+            {readOnly
+              ? "You're offline. Notes you create when back online will appear here."
+              : "Capture something with the composer above."}
           </p>
           {!readOnly && (
-            <Button kind="tertiary" size="md" onClick={() => document.querySelector<HTMLElement>(".memra-composer")?.click()}>
+            <Button
+              kind="tertiary"
+              size="md"
+              onClick={() => document.querySelector<HTMLElement>(".memra-composer")?.click()}
+            >
               Create a note
             </Button>
           )}
