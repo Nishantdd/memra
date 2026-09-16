@@ -7,7 +7,7 @@ import sensible from "@fastify/sensible";
 import fastifyStatic from "@fastify/static";
 import { OpenAPIHandler } from "@orpc/openapi/fastify";
 import { OpenAPIGenerator } from "@orpc/openapi";
-import { onError } from "@orpc/server";
+import { onError, ORPCError } from "@orpc/server";
 import { RPCHandler } from "@orpc/server/fastify";
 import { ZodToJsonSchemaConverter } from "@orpc/zod/zod4";
 import Fastify, { type FastifyInstance, type FastifyReply, type FastifyRequest } from "fastify";
@@ -80,26 +80,32 @@ export function buildApp(services: Services, clientDist: string | null): Fastify
     ip: request.ip,
     userAgent: request.headers["user-agent"] ?? "",
     setSessionCookie(token) {
-      const opts = { path: "/", httpOnly: true, sameSite: "strict" as const, secure: config.secureCookies };
+      const opts = {
+        path: "/",
+        httpOnly: true,
+        sameSite: "strict" as const,
+        secure: config.secureCookies,
+      };
       if (token) reply.setCookie(SESSION_COOKIE, token, { ...opts, maxAge: 30 * 24 * 3600 });
       else reply.clearCookie(SESSION_COOKIE, opts);
     },
   });
 
-  const logError = onError((error) => {
-    if (!(error instanceof Error) || !("status" in error) || (error as { status: number }).status >= 500) {
-      app.log.error(error);
-    }
-  });
-  const rpcHandler = new RPCHandler(router, { interceptors: [logError] });
-  const openApiHandler = new OpenAPIHandler(router, { interceptors: [logError] });
+  const logError = (error: unknown) => {
+    if (!(error instanceof ORPCError) || error.status >= 500) app.log.error(error);
+  };
+  const rpcHandler = new RPCHandler(router, { interceptors: [onError(logError)] });
+  const openApiHandler = new OpenAPIHandler(router, { interceptors: [onError(logError)] });
 
   app.route({
     method: ["GET", "POST", "PUT", "PATCH", "DELETE"],
     url: `${RPC_PREFIX}/*`,
     config: { rateLimit: { max: 300, timeWindow: "1 minute" } },
     handler: async (request, reply) => {
-      const { matched } = await rpcHandler.handle(request, reply, { prefix: RPC_PREFIX, context: buildContext(request, reply) });
+      const { matched } = await rpcHandler.handle(request, reply, {
+        prefix: RPC_PREFIX,
+        context: buildContext(request, reply),
+      });
       if (matched) return reply;
       return reply.code(404).send({ code: "NOT_FOUND", message: "Not found" });
     },
@@ -112,11 +118,22 @@ export function buildApp(services: Services, clientDist: string | null): Fastify
     handler: async (request, reply) => {
       const context = buildContext(request, reply);
       if (request.url === `${API_PREFIX}/openapi.json`) {
-        if (!context.session) return reply.code(401).send({ code: "UNAUTHORIZED", message: "Unauthorized" });
-        const generator = new OpenAPIGenerator({ schemaConverters: [new ZodToJsonSchemaConverter()] });
-        return reply.send(await generator.generate(contract, { info: { title: "Memra", version: services.version }, servers: [{ url: API_PREFIX }] }));
+        if (!context.session)
+          return reply.code(401).send({ code: "UNAUTHORIZED", message: "Unauthorized" });
+        const generator = new OpenAPIGenerator({
+          schemaConverters: [new ZodToJsonSchemaConverter()],
+        });
+        return reply.send(
+          await generator.generate(contract, {
+            info: { title: "Memra", version: services.version },
+            servers: [{ url: API_PREFIX }],
+          }),
+        );
       }
-      const { matched } = await openApiHandler.handle(request, reply, { prefix: API_PREFIX, context });
+      const { matched } = await openApiHandler.handle(request, reply, {
+        prefix: API_PREFIX,
+        context,
+      });
       if (matched) return reply;
       return reply.code(404).send({ code: "NOT_FOUND", message: "Not found" });
     },
@@ -127,7 +144,10 @@ export function buildApp(services: Services, clientDist: string | null): Fastify
     url: `${API_PREFIX}/auth/login`,
     config: { rateLimit: { max: 10, timeWindow: "1 minute" } },
     handler: async (request, reply) => {
-      const { matched } = await openApiHandler.handle(request, reply, { prefix: API_PREFIX, context: buildContext(request, reply) });
+      const { matched } = await openApiHandler.handle(request, reply, {
+        prefix: API_PREFIX,
+        context: buildContext(request, reply),
+      });
       if (matched) return reply;
       return reply.code(404).send({ code: "NOT_FOUND", message: "Not found" });
     },
@@ -137,13 +157,17 @@ export function buildApp(services: Services, clientDist: string | null): Fastify
     app.register(fastifyStatic, {
       root: clientDist,
       wildcard: false,
-      setHeaders(res, filePath) {
+      setHeaders(reply, filePath) {
         const immutable = filePath.includes(`${path.sep}assets${path.sep}`);
-        res.setHeader("cache-control", immutable ? "public, max-age=31536000, immutable" : "no-cache");
+        reply.header(
+          "cache-control",
+          immutable ? "public, max-age=31536000, immutable" : "no-cache",
+        );
       },
     });
     app.setNotFoundHandler((request, reply) => {
-      if (request.url.startsWith("/api/")) return reply.code(404).send({ code: "NOT_FOUND", message: "Not found" });
+      if (request.url.startsWith("/api/"))
+        return reply.code(404).send({ code: "NOT_FOUND", message: "Not found" });
       return reply.header("cache-control", "no-cache").sendFile("index.html");
     });
   }
