@@ -452,6 +452,10 @@
   margin-block-start: $spacing-05;
 }
 
+.memra-settings__current {
+  margin-inline-start: $spacing-03;
+}
+
 .memra-composer--collapsed {
   min-block-size: $spacing-09;
   display: flex;
