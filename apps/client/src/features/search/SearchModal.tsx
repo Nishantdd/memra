@@ -1,4 +1,4 @@
-import { Button, ComposedModal, ModalBody, ModalHeader, Search } from "@carbon/react";
+import { ComposedModal, MenuButton, MenuItem, ModalBody, ModalHeader, Search } from "@carbon/react";
 import { useState } from "react";
 import type { SearchMode } from "shared";
 import { useIndexStatus } from "../../data/indexStatus.ts";
@@ -31,25 +31,20 @@ export function SearchModal({ open, folderId, onClose }: SearchModalProps) {
             onClear={() => setQ("")}
             autoComplete="off"
           />
-          <div className="memra-search-row__mode" role="group" aria-label="Search mode">
-            <Button
-              size="lg"
-              kind={mode === "keyword" ? "primary" : "tertiary"}
-              aria-pressed={mode === "keyword"}
-              onClick={() => setMode("keyword")}
-            >
-              Keyword
-            </Button>
-            <Button
-              size="lg"
-              kind={mode === "semantic" ? "primary" : "tertiary"}
-              aria-pressed={mode === "semantic"}
+          <MenuButton
+            label={mode === "semantic" ? "Semantic" : "Keyword"}
+            kind="tertiary"
+            size="lg"
+            menuAlignment="bottom-end"
+            className="memra-search-row__mode"
+          >
+            <MenuItem label="Keyword" onClick={() => setMode("keyword")} />
+            <MenuItem
+              label="Semantic"
               disabled={!status?.ready}
               onClick={() => setMode("semantic")}
-            >
-              Semantic
-            </Button>
-          </div>
+            />
+          </MenuButton>
         </div>
         {q.trim() && <SearchResults q={q} mode={mode} folderId={folderId} onNavigate={onClose} />}
       </ModalBody>
