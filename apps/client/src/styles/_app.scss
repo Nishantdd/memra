@@ -195,10 +195,18 @@ a.cds--header__name {
   margin-block: $spacing-06;
 }
 
+// Toolbar is the top edge of the editor field, not a separate row.
 .memra-toolbar {
   display: flex;
   gap: $spacing-01;
-  margin-block: $spacing-03;
+  padding: $spacing-02;
+  background: $layer-accent-01;
+  border-block-end: 1px solid $border-subtle-01;
+}
+
+.memra-editor-frame .cds--text-area {
+  resize: none;
+  overflow: hidden;
 }
 
 .memra-preview {

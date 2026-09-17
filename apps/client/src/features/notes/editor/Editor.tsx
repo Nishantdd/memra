@@ -1,5 +1,5 @@
 import { TextArea } from "@carbon/react";
-import { type KeyboardEvent, type Ref, useImperativeHandle, useRef } from "react";
+import { type KeyboardEvent, type Ref, useImperativeHandle, useLayoutEffect, useRef } from "react";
 import { COUNTER_VISIBLE_RATIO } from "../../../constants/index.ts";
 
 export interface EditorApi {
@@ -35,6 +35,14 @@ export function Editor({
   apiRef,
 }: EditorProps) {
   const ref = useRef<HTMLTextAreaElement>(null);
+
+  // Grow with content; `rows` acts as the minimum height.
+  useLayoutEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    el.style.blockSize = "auto";
+    el.style.blockSize = `${el.scrollHeight}px`;
+  }, [value]);
 
   const replaceRange = (start: number, end: number, text: string, cursor: [number, number]) => {
     const next = value.slice(0, start) + text + value.slice(end);
