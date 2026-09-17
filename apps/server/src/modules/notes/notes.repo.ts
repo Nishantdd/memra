@@ -1,4 +1,5 @@
-import { deriveFields, type Note, type NoteCreate, type NotePatch } from "shared";
+import type { Note, NoteCreate, NotePatch } from "shared";
+import { deriveFields } from "shared/markdown";
 import { v7 as uuidv7 } from "uuid";
 import { type Database, now } from "../../db/database.ts";
 import { nextSeq } from "../../db/meta.ts";

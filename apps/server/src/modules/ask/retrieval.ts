@@ -1,4 +1,5 @@
-import { ASK, countTokens } from "shared";
+import { ASK } from "shared";
+import { countTokens } from "shared/markdown";
 import { ASK_VEC_CANDIDATES, UNFILED_FOLDER_KEY } from "../../constants/index.ts";
 import type { Database } from "../../db/database.ts";
 import { toBlob } from "../../rag/rag-db.ts";

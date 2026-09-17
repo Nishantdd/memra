@@ -1,13 +1,7 @@
 import { createHash } from "node:crypto";
 import { strFromU8, strToU8, unzipSync, zipSync } from "fflate";
-import {
-  IMPORT,
-  LIMITS,
-  type ImportReport,
-  type ParsedMarkdown,
-  parseMarkdownFile,
-  toMarkdownFile,
-} from "shared";
+import { IMPORT, LIMITS, type ImportReport, type ParsedMarkdown } from "shared";
+import { parseMarkdownFile, toMarkdownFile } from "shared/markdown";
 import { EXPORT_ZIP_NAME } from "../../constants/index.ts";
 import type { Database } from "../../db/database.ts";
 import { DuplicateFolderName, FolderLimitReached, FoldersRepo } from "../folders/folders.repo.ts";

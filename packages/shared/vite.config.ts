@@ -2,8 +2,9 @@ import { defineConfig } from "vite-plus";
 
 export default defineConfig({
   pack: {
-    entry: "src/index.ts",
+    entry: { index: "src/index.ts", "markdown/index": "src/markdown/index.ts" },
     dts: true,
     unbundle: true,
+    deps: { onlyBundle: false },
   },
 });

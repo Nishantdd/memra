@@ -1,5 +1,6 @@
 import { createHash } from "node:crypto";
-import { chunkNote, type NoteColor } from "shared";
+import type { NoteColor } from "shared";
+import { chunkNote } from "shared/markdown";
 import { INDEX_MAX_ATTEMPTS, UNFILED_FOLDER_KEY } from "../constants/index.ts";
 import { type Database, now } from "../db/database.ts";
 import type { EmbeddingProvider } from "./embedding/provider.ts";
