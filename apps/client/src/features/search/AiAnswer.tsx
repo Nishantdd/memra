@@ -43,6 +43,7 @@ export function AiAnswer({
     [onCitation],
   );
 
+  const loading = status === "retrieving" || status === "streaming";
   const label = (
     <AILabel
       size="xs"
@@ -85,22 +86,21 @@ export function AiAnswer({
 
   return (
     <Tile className="memra-ai" decorator={label}>
-      <div className="memra-ai__head">
-        <span className="memra-ai__title">{extractive ? "From your notes" : "Answer"}</span>
-        {cached && (
-          <Tag type="gray" size="sm">
-            Cached
-          </Tag>
-        )}
-        {status === "streaming" && !extractive && (
-          <Button kind="ghost" size="sm" onClick={onStop}>
-            Stop
-          </Button>
-        )}
-      </div>
-      {(status === "retrieving" || (status === "streaming" && !text)) && (
-        <AISkeletonText paragraph lineCount={3} />
+      {(cached || loading) && (
+        <div className="memra-ai__head">
+          {cached && (
+            <Tag type="gray" size="sm">
+              Cached
+            </Tag>
+          )}
+          {loading && !extractive && (
+            <Button kind="ghost" size="sm" onClick={onStop}>
+              Stop
+            </Button>
+          )}
+        </div>
       )}
+      {loading && !text && <AISkeletonText paragraph lineCount={3} />}
       {status === "insufficient" && (
         <p className="memra-ai__note">No sufficiently related notes to answer from.</p>
       )}

@@ -349,6 +349,15 @@ $note-colours: (
   border-block-end: 1px solid $border-subtle-01;
 }
 
+.memra-ai__head {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: $spacing-03;
+  margin-inline-end: $spacing-07;
+  margin-block-end: $spacing-03;
+}
+
 .memra-ai__citation {
   @include type-style("label-01");
   padding: 0 $spacing-02;
