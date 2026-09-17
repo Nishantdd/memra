@@ -79,7 +79,10 @@ function NewNote({ folderId }: { folderId: string | null }) {
     tagIds: [],
   });
   const empty = !draft.title.trim() && !draft.bodyMd.trim();
-  useReportSaveStatus("new-note", empty ? "saved" : create.isPending ? "saving" : "unsaved");
+  useReportSaveStatus(
+    "new-note",
+    empty || create.isSuccess ? "saved" : create.isPending ? "saving" : "unsaved",
+  );
 
   useEffect(() => {
     if (empty || create.isPending || create.isSuccess) return;
