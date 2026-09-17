@@ -67,85 +67,90 @@ export function AppHeader() {
   );
 
   return (
-    <HeaderContainer
-      render={({ isSideNavExpanded, onClickSideNavExpand }) => (
-        <Theme theme="g100">
-          <Header aria-label="Memra">
-            <SkipToContent href="#main-content" />
-            <HeaderMenuButton
-              aria-label={isSideNavExpanded ? "Close folders" : "Open folders"}
-              onClick={onClickSideNavExpand}
-              isActive={isSideNavExpanded}
-              aria-expanded={isSideNavExpanded}
-            />
-            <HeaderName as={Link} to="/" prefix="">
-              Memra
-            </HeaderName>
-            <HeaderNavigation aria-label="Folders">
-              <HeaderMenuItem as={Link} to="/" isActive={location.pathname === "/"}>
-                All notes
-              </HeaderMenuItem>
-              {items(inline)}
-              {overflow.length > 0 && (
-                <HeaderMenu
-                  aria-label="More folders"
-                  menuLinkName="More"
-                  isActive={overflow.some((f) => f.id === activeFolderId)}
-                >
-                  {items(overflow)}
-                </HeaderMenu>
-              )}
-              {newFolderItem()}
-            </HeaderNavigation>
-            <HeaderGlobalBar>
-              <StatusTag />
-              <HeaderGlobalAction
-                aria-label={isDarkTheme(theme) ? "Switch to light theme" : "Switch to dark theme"}
-                tooltipAlignment="end"
-                onClick={() => setTheme(isDarkTheme(theme) ? "g10" : "g100")}
-              >
-                {isDarkTheme(theme) ? <Light size={20} /> : <Asleep size={20} />}
-              </HeaderGlobalAction>
-              <OverflowMenu
-                aria-label="Account"
-                iconDescription="Account"
-                renderIcon={UserAvatar}
-                size="lg"
-                flipped
-              >
-                <OverflowMenuItem itemText="Settings" onClick={() => void navigate("/settings")} />
-                <OverflowMenuItem itemText="Sign out" onClick={() => void logout()} />
-              </OverflowMenu>
-            </HeaderGlobalBar>
-            <SideNav
-              aria-label="Folders"
-              expanded={isSideNavExpanded}
-              isPersistent={false}
-              onOverlayClick={onClickSideNavExpand}
-            >
-              <SideNavItems>
-                <HeaderSideNavItems>
-                  <HeaderMenuItem
-                    as={Link}
-                    to="/"
-                    isActive={location.pathname === "/"}
-                    onClick={onClickSideNavExpand}
+    <>
+      <HeaderContainer
+        render={({ isSideNavExpanded, onClickSideNavExpand }) => (
+          <Theme theme="g100">
+            <Header aria-label="Memra">
+              <SkipToContent href="#main-content" />
+              <HeaderMenuButton
+                aria-label={isSideNavExpanded ? "Close folders" : "Open folders"}
+                onClick={onClickSideNavExpand}
+                isActive={isSideNavExpanded}
+                aria-expanded={isSideNavExpanded}
+              />
+              <HeaderName as={Link} to="/" prefix="">
+                Memra
+              </HeaderName>
+              <HeaderNavigation aria-label="Folders">
+                <HeaderMenuItem as={Link} to="/" isActive={location.pathname === "/"}>
+                  All notes
+                </HeaderMenuItem>
+                {items(inline)}
+                {overflow.length > 0 && (
+                  <HeaderMenu
+                    aria-label="More folders"
+                    menuLinkName="More"
+                    isActive={overflow.some((f) => f.id === activeFolderId)}
                   >
-                    All notes
-                  </HeaderMenuItem>
-                  {items(folders, onClickSideNavExpand)}
-                  {newFolderItem(onClickSideNavExpand)}
-                </HeaderSideNavItems>
-              </SideNavItems>
-            </SideNav>
-          </Header>
-          <CreateFolderModal
-            open={creating}
-            onClose={() => setCreating(false)}
-            onCreated={(f) => void navigate(`/f/${f.id}`)}
-          />
-        </Theme>
-      )}
-    />
+                    {items(overflow)}
+                  </HeaderMenu>
+                )}
+                {newFolderItem()}
+              </HeaderNavigation>
+              <HeaderGlobalBar>
+                <StatusTag />
+                <HeaderGlobalAction
+                  aria-label={isDarkTheme(theme) ? "Switch to light theme" : "Switch to dark theme"}
+                  tooltipAlignment="end"
+                  onClick={() => setTheme(isDarkTheme(theme) ? "g10" : "g100")}
+                >
+                  {isDarkTheme(theme) ? <Light size={20} /> : <Asleep size={20} />}
+                </HeaderGlobalAction>
+                <OverflowMenu
+                  aria-label="Account"
+                  iconDescription="Account"
+                  renderIcon={UserAvatar}
+                  size="lg"
+                  flipped
+                >
+                  <OverflowMenuItem
+                    itemText="Settings"
+                    onClick={() => void navigate("/settings")}
+                  />
+                  <OverflowMenuItem itemText="Sign out" onClick={() => void logout()} />
+                </OverflowMenu>
+              </HeaderGlobalBar>
+              <SideNav
+                aria-label="Folders"
+                expanded={isSideNavExpanded}
+                isPersistent={false}
+                onOverlayClick={onClickSideNavExpand}
+              >
+                <SideNavItems>
+                  <HeaderSideNavItems>
+                    <HeaderMenuItem
+                      as={Link}
+                      to="/"
+                      isActive={location.pathname === "/"}
+                      onClick={onClickSideNavExpand}
+                    >
+                      All notes
+                    </HeaderMenuItem>
+                    {items(folders, onClickSideNavExpand)}
+                    {newFolderItem(onClickSideNavExpand)}
+                  </HeaderSideNavItems>
+                </SideNavItems>
+              </SideNav>
+            </Header>
+          </Theme>
+        )}
+      />
+      <CreateFolderModal
+        open={creating}
+        onClose={() => setCreating(false)}
+        onCreated={(f) => void navigate(`/f/${f.id}`)}
+      />
+    </>
   );
 }
