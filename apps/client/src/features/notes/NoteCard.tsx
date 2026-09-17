@@ -1,9 +1,9 @@
-import { Link, OverflowMenu, OverflowMenuItem, Tag, Tile } from "@carbon/react";
+import { Link, OverflowMenu, OverflowMenuItem, Tile } from "@carbon/react";
 import type { Note } from "shared";
 import { Link as RouterLink } from "react-router";
 import { useTags } from "../../data/queries.ts";
 import { formatAbsolute, formatRelative } from "../../lib/time.ts";
-import { tagType } from "./noteColors.ts";
+import { NoteTags } from "./NoteTags.tsx";
 
 interface NoteCardProps {
   note: Note;
@@ -37,13 +37,7 @@ export function NoteCard({ note, onTogglePin, onMove, onRecolor, onDelete }: Not
       </div>
       {note.excerpt && <p className="memra-note__excerpt">{note.excerpt}</p>}
       <div className="memra-note__foot">
-        <div className="memra-note__tags">
-          {noteTags.map((t) => (
-            <Tag key={t.id} type={tagType(note.color)} size="sm">
-              {t.name}
-            </Tag>
-          ))}
-        </div>
+        <NoteTags tags={noteTags} color={note.color} />
         <time
           className="memra-note__time"
           dateTime={new Date(note.updatedAt).toISOString()}

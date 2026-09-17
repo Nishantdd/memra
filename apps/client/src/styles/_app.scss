@@ -138,18 +138,42 @@ $note-colours: (
   align-items: center;
   justify-content: space-between;
   gap: $spacing-03;
-  flex-wrap: wrap;
 }
 
 .memra-note__tags {
+  position: relative;
+  display: flex;
+  flex: 1;
+  min-inline-size: 0;
+  gap: $spacing-02;
+  overflow: hidden;
+}
+
+.memra-note__tags-probe {
+  position: absolute;
+  visibility: hidden;
+  display: flex;
+  gap: $spacing-02;
+  pointer-events: none;
+}
+
+.memra-note__tags .cds--tag {
+  margin: 0;
+  flex: none;
+}
+
+.memra-note__tags-all {
   display: flex;
   flex-wrap: wrap;
   gap: $spacing-02;
+  padding: $spacing-03;
+  max-inline-size: 16rem;
 }
 
 .memra-note__time {
   @include type-style("helper-text-01");
   color: $text-helper;
+  flex: none;
 }
 
 .memra-empty {
