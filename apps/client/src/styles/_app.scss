@@ -92,16 +92,16 @@ a.cds--header__name {
 
 // Note colour shows as a bottom edge in the matching Carbon tag colour.
 $note-colours: (
-  "red": tag.$tag-color-red,
-  "magenta": tag.$tag-color-magenta,
-  "purple": tag.$tag-color-purple,
-  "blue": tag.$tag-color-blue,
-  "cyan": tag.$tag-color-cyan,
-  "teal": tag.$tag-color-teal,
-  "green": tag.$tag-color-green,
-  "gray": tag.$tag-color-gray,
-  "cool-gray": tag.$tag-color-cool-gray,
-  "warm-gray": tag.$tag-color-warm-gray,
+  "red": tag.$tag-background-red,
+  "magenta": tag.$tag-background-magenta,
+  "purple": tag.$tag-background-purple,
+  "blue": tag.$tag-background-blue,
+  "cyan": tag.$tag-background-cyan,
+  "teal": tag.$tag-background-teal,
+  "green": tag.$tag-background-green,
+  "gray": tag.$tag-background-gray,
+  "cool-gray": tag.$tag-background-cool-gray,
+  "warm-gray": tag.$tag-background-warm-gray,
 );
 
 @each $name, $colour in $note-colours {
@@ -146,11 +146,13 @@ $note-colours: (
   flex: 1;
   min-inline-size: 0;
   gap: $spacing-02;
-  overflow: hidden;
 }
 
+// Hidden copy used only to measure how many tags fit; clipped so it never adds scroll.
 .memra-note__tags-probe {
   position: absolute;
+  inset: 0;
+  overflow: hidden;
   visibility: hidden;
   display: flex;
   gap: $spacing-02;
