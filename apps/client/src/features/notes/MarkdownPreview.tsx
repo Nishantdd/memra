@@ -58,6 +58,11 @@ const baseComponents: Components = {
       </CodeSnippet>
     );
   },
+  table: ({ children }) => (
+    <div className="memra-markdown__scroll">
+      <table>{children}</table>
+    </div>
+  ),
   input: ({ checked }) => (
     <input
       type="checkbox"

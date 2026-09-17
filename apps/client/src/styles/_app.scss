@@ -333,6 +333,26 @@ $note-colours: (
   background: $layer-01;
 }
 
+// Nothing in rendered Markdown may widen the page: wrap text, scroll tables, shrink images.
+.memra-markdown {
+  min-inline-size: 0;
+  overflow-wrap: anywhere;
+}
+
+.memra-markdown img {
+  max-inline-size: 100%;
+  block-size: auto;
+}
+
+.memra-markdown .cds--snippet--inline code {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.memra-markdown__scroll {
+  overflow-x: auto;
+}
+
 .memra-markdown > * + * {
   margin-block-start: $spacing-04;
 }
