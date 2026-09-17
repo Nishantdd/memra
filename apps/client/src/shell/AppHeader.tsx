@@ -50,12 +50,12 @@ export function AppHeader() {
         {f.name}
       </HeaderMenuItem>
     ));
-  const newFolderItem = (onClick?: () => void) => (
+  const newFolderItem = (labelled: boolean, onClick?: () => void) => (
     <HeaderMenuItem
       href="#"
       className="memra-header__icon-item"
-      aria-label="New folder"
-      title="New folder"
+      aria-label={labelled ? undefined : "New folder"}
+      title={labelled ? undefined : "New folder"}
       onClick={(e: MouseEvent) => {
         e.preventDefault();
         onClick?.();
@@ -63,6 +63,7 @@ export function AppHeader() {
       }}
     >
       <Add size={20} />
+      {labelled && <span>New folder</span>}
     </HeaderMenuItem>
   );
 
@@ -96,7 +97,7 @@ export function AppHeader() {
                     {items(overflow)}
                   </HeaderMenu>
                 )}
-                {newFolderItem()}
+                {newFolderItem(false)}
               </HeaderNavigation>
               <HeaderGlobalBar>
                 <StatusTag />
@@ -138,7 +139,7 @@ export function AppHeader() {
                       All notes
                     </HeaderMenuItem>
                     {items(folders, onClickSideNavExpand)}
-                    {newFolderItem(onClickSideNavExpand)}
+                    {newFolderItem(true, onClickSideNavExpand)}
                   </HeaderSideNavItems>
                 </SideNavItems>
               </SideNav>

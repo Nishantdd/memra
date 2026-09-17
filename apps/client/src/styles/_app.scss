@@ -36,6 +36,8 @@ a.cds--header__name {
 
 .memra-header__icon-item .cds--text-truncate--end {
   display: flex;
+  align-items: center;
+  gap: $spacing-03;
 }
 
 .memra-status {
