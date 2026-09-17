@@ -6,9 +6,9 @@ import { SearchSettings } from "./SearchSettings.tsx";
 import { SecuritySettings } from "./SecuritySettings.tsx";
 
 const TABS = [
-  { id: "search", label: "Search", Component: SearchSettings },
   { id: "appearance", label: "Appearance", Component: AppearanceSection },
   { id: "security", label: "Security", Component: SecuritySettings },
+  { id: "search", label: "Search", Component: SearchSettings },
   { id: "data", label: "Data", Component: DataSettings },
 ] as const;
 
