@@ -172,10 +172,7 @@ export function NotesPage() {
         file={upload}
         defaultFolderId={folder?.id ?? null}
         onClose={() => setUpload(null)}
-        onCreated={(id) => {
-          setUpload(null);
-          void navigate(`/n/${id}`);
-        }}
+        onCreated={() => setUpload(null)}
       />
       <SearchModal
         open={searching}

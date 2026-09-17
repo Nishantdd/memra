@@ -25,7 +25,7 @@ interface UploadPreviewModalProps {
   file: File | null;
   defaultFolderId: string | null;
   onClose: () => void;
-  onCreated: (noteId: string) => void;
+  onCreated: () => void;
 }
 
 interface Draft {
@@ -106,7 +106,7 @@ function UploadPreview({
         tagIds: draft.tagIds,
         sourceFilename: parsed.filename,
       },
-      { onSuccess: (note) => onCreated(note.id) },
+      { onSuccess: onCreated },
     );
   };
 
