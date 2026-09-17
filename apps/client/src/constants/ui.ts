@@ -4,3 +4,5 @@ export const UNDO_MS = 10_000;
 export const UPLOAD_ROWS = 14;
 export const EDITOR_ROWS = 4;
 export const COUNTER_VISIBLE_RATIO = 0.9;
+/** Inline code longer than this renders as a single-line snippet bar instead of a chip. */
+export const INLINE_CODE_MAX = 40;

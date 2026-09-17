@@ -344,11 +344,7 @@ $note-colours: (
   block-size: auto;
 }
 
-.memra-markdown .cds--snippet--inline code {
-  white-space: pre-wrap;
-  overflow-wrap: anywhere;
-}
-
+// Tables keep their natural width and scroll inside their wrapper instead of breaking words.
 .memra-markdown__scroll {
   overflow-x: auto;
 }
@@ -389,6 +385,7 @@ $note-colours: (
 .memra-markdown table {
   border-collapse: collapse;
   inline-size: 100%;
+  overflow-wrap: normal;
 }
 
 .memra-markdown th,
@@ -396,6 +393,7 @@ $note-colours: (
   text-align: start;
   padding: $spacing-03;
   border-block-end: 1px solid $border-subtle-01;
+  min-inline-size: 6rem;
 }
 
 .memra-ai__head {

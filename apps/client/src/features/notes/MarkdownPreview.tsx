@@ -3,6 +3,7 @@ import { memo, type ReactNode, useMemo } from "react";
 import ReactMarkdown, { type Components } from "react-markdown";
 import rehypeSanitize, { defaultSchema } from "rehype-sanitize";
 import remarkGfm from "remark-gfm";
+import { INLINE_CODE_MAX } from "../../constants/index.ts";
 
 const schema = {
   ...defaultSchema,
@@ -53,7 +54,7 @@ const baseComponents: Components = {
       );
     }
     return (
-      <CodeSnippet type="inline" feedback="Copied">
+      <CodeSnippet type={text.length > INLINE_CODE_MAX ? "single" : "inline"} feedback="Copied">
         {text}
       </CodeSnippet>
     );
