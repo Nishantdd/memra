@@ -1,12 +1,11 @@
-import { Add } from "@carbon/icons-react";
+import { Add, Edit, TrashCan } from "@carbon/icons-react";
 import {
   Button,
   ContainedList,
   ContainedListItem,
   Form,
+  IconButton,
   Modal,
-  OverflowMenu,
-  OverflowMenuItem,
   Stack,
   TextInput,
 } from "@carbon/react";
@@ -72,15 +71,26 @@ export function TagsSettings() {
             <ContainedListItem
               key={t.id}
               action={
-                <OverflowMenu
-                  aria-label="Tag actions"
-                  iconDescription="Tag actions"
-                  size="lg"
-                  flipped
-                >
-                  <OverflowMenuItem itemText="Rename" onClick={() => setRenaming(t)} />
-                  <OverflowMenuItem itemText="Delete" isDelete onClick={() => setDeleting(t)} />
-                </OverflowMenu>
+                <div className="memra-row-actions">
+                  <IconButton
+                    label="Rename"
+                    kind="ghost"
+                    size="lg"
+                    align="left"
+                    onClick={() => setRenaming(t)}
+                  >
+                    <Edit />
+                  </IconButton>
+                  <IconButton
+                    label="Delete"
+                    kind="ghost"
+                    size="lg"
+                    align="left"
+                    onClick={() => setDeleting(t)}
+                  >
+                    <TrashCan />
+                  </IconButton>
+                </div>
               }
             >
               {t.name}

@@ -227,6 +227,10 @@ $note-colours: (
   gap: $spacing-03;
 }
 
+.memra-row-actions {
+  display: flex;
+}
+
 .memra-form__inline {
   display: flex;
   align-items: flex-start;
