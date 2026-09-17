@@ -1,5 +1,5 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import type { Note } from "shared";
+import type { Folder, Note } from "shared";
 import { orpc } from "./api/orpc.ts";
 import { noteKeys } from "./queries.ts";
 
@@ -10,7 +10,13 @@ function useInvalidate() {
       void qc.invalidateQueries({ queryKey: noteKeys.all() });
       if (note) qc.setQueryData(noteKeys.note(note.id), note);
     },
-    folders: () => {
+    folders: (created?: Folder) => {
+      // Seed the list so a route to the new folder isn't bounced as unknown before the refetch.
+      if (created) {
+        qc.setQueryData<Folder[]>(orpc.folders.list.queryKey(), (list) =>
+          list && !list.some((f) => f.id === created.id) ? [...list, created] : list,
+        );
+      }
       void qc.invalidateQueries({ queryKey: noteKeys.folders() });
       void qc.invalidateQueries({ queryKey: noteKeys.all() });
     },
@@ -40,7 +46,7 @@ export function useRestoreNote() {
 
 export function useCreateFolder() {
   const inv = useInvalidate();
-  return useMutation(orpc.folders.create.mutationOptions({ onSuccess: inv.folders }));
+  return useMutation(orpc.folders.create.mutationOptions({ onSuccess: (f) => inv.folders(f) }));
 }
 export function useRenameFolder() {
   const inv = useInvalidate();
