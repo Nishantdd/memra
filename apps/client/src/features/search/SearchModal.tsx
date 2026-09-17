@@ -14,12 +14,14 @@ export function SearchModal({ open, folderId, onClose }: SearchModalProps) {
   const [q, setQ] = useState("");
   const [mode, setMode] = useState<SearchMode>("keyword");
   const status = useIndexStatus();
+  // Menus portal to <body>; anchoring inside the modal keeps a click from counting as outside.
+  const [menuTarget, setMenuTarget] = useState<HTMLDivElement | null>(null);
 
   return (
     <ComposedModal open={open} onClose={onClose} size="lg" selectorPrimaryFocus="#search-input">
       <ModalHeader label={folderId ? "This folder" : "All notes"} title="Search" />
       <ModalBody hasScrollingContent>
-        <div className="memra-search-row">
+        <div className="memra-search-row" ref={setMenuTarget}>
           <Search
             id="search-input"
             size="lg"
@@ -34,8 +36,9 @@ export function SearchModal({ open, folderId, onClose }: SearchModalProps) {
           <MenuButton
             label={mode === "semantic" ? "Semantic" : "Keyword"}
             kind="tertiary"
-            size="lg"
+            size="md"
             menuAlignment="bottom-end"
+            menuTarget={menuTarget ?? undefined}
             className="memra-search-row__mode"
           >
             <MenuItem label="Keyword" onClick={() => setMode("keyword")} />
