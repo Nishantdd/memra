@@ -140,6 +140,29 @@ a.cds--header__name {
   color: $text-secondary;
 }
 
+.memra-result {
+  cursor: pointer;
+}
+
+.memra-result--active .cds--contained-list-item__content {
+  background: $layer-hover-01;
+}
+
+.memra-result__title {
+  @include type-style("heading-compact-01");
+  margin-block-end: $spacing-02;
+}
+
+.memra-result__snippet {
+  @include type-style("body-compact-01");
+  color: $text-secondary;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  overflow: hidden;
+}
+
 .memra-result__snippet mark {
   background: $highlight;
   color: $text-primary;
@@ -147,7 +170,11 @@ a.cds--header__name {
 
 .memra-result__meta {
   @include type-style("label-01");
-  color: $text-secondary;
+  color: $text-helper;
+  display: flex;
+  align-items: center;
+  gap: $spacing-03;
+  margin-block-start: $spacing-03;
 }
 
 .memra-form {

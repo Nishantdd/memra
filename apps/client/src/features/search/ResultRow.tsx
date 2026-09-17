@@ -24,37 +24,19 @@ export function ResultRow({ result, index, active, id, onSelect, onHover }: Resu
       onClick={() => onSelect(result)}
       {...optionAttrs}
     >
-      <div className="memra-result__main">
-        <Tag type="outline" size="sm" className="memra-result__index">
-          {index + 1}
-        </Tag>
-        <div className="memra-result__text">
-          <div className="memra-result__title">
-            {result.displayTitle}
-            {result.color !== "none" && (
-              <span
-                className={`memra-result__dot cds--tag--${tagType(result.color)}`}
-                aria-hidden
-              />
-            )}
-          </div>
-          <div className="memra-result__snippet">
-            {result.snippet.map((seg, i) =>
-              seg.highlight ? <mark key={i}>{seg.text}</mark> : <span key={i}>{seg.text}</span>,
-            )}
-          </div>
-          {result.folderName && <div className="memra-result__folder">{result.folderName}</div>}
-        </div>
+      <div className="memra-result__title">{result.displayTitle}</div>
+      <div className="memra-result__snippet">
+        {result.snippet.map((seg, i) =>
+          seg.highlight ? <mark key={i}>{seg.text}</mark> : <span key={i}>{seg.text}</span>,
+        )}
       </div>
-      <div className="memra-result__relevance" title={`Relevance ${result.relevance}%`}>
-        <meter
-          className="memra-result__meter"
-          min={0}
-          max={100}
-          value={result.relevance}
-          aria-label="Relevance"
-        />
-        <span className="memra-result__pct">{result.relevance}%</span>
+      <div className="memra-result__meta">
+        {result.folderName && (
+          <Tag type={tagType(result.color)} size="sm">
+            {result.folderName}
+          </Tag>
+        )}
+        <span>{result.relevance}% match</span>
       </div>
     </ContainedListItem>
   );
