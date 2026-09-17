@@ -234,7 +234,7 @@ function EditorForm({ draft, onChange, folderId, title, onSave, children }: Edit
           />
         </div>
         <Tabs>
-          <TabList aria-label="Editor mode">
+          <TabList aria-label="Editor mode" contained>
             <Tab>Write</Tab>
             <Tab>Preview</Tab>
           </TabList>
