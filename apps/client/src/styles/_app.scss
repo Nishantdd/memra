@@ -5,11 +5,6 @@
 
 // Only layout rhythm lives here; component appearance is Carbon's.
 
-.memra-content {
-  min-block-size: 100vh;
-  background: $background;
-}
-
 // Product name padded evenly with the divider on its edge; folder tabs sit flush after it.
 a.cds--header__name {
   position: relative;

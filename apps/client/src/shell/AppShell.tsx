@@ -6,7 +6,7 @@ export function AppShell() {
   return (
     <>
       <AppHeader />
-      <Content id="main-content" className="memra-content">
+      <Content id="main-content">
         <Outlet />
       </Content>
     </>
