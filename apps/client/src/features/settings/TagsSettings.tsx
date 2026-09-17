@@ -1,10 +1,12 @@
-import { Add, Edit, TrashCan } from "@carbon/icons-react";
+import { Add } from "@carbon/icons-react";
 import {
   Button,
   ContainedList,
   ContainedListItem,
   Form,
   Modal,
+  OverflowMenu,
+  OverflowMenuItem,
   Stack,
   TextInput,
 } from "@carbon/react";
@@ -54,7 +56,7 @@ export function TagsSettings() {
             invalid={create.isError}
             invalidText={tagErrorText(create.error) ?? ""}
           />
-          <Button type="submit" renderIcon={Add} disabled={!trimmed || create.isPending}>
+          <Button type="submit" size="md" renderIcon={Add} disabled={!trimmed || create.isPending}>
             Add
           </Button>
         </div>
@@ -70,26 +72,15 @@ export function TagsSettings() {
             <ContainedListItem
               key={t.id}
               action={
-                <>
-                  <Button
-                    kind="ghost"
-                    size="sm"
-                    hasIconOnly
-                    iconDescription="Rename"
-                    renderIcon={Edit}
-                    tooltipPosition="left"
-                    onClick={() => setRenaming(t)}
-                  />
-                  <Button
-                    kind="ghost"
-                    size="sm"
-                    hasIconOnly
-                    iconDescription="Delete"
-                    renderIcon={TrashCan}
-                    tooltipPosition="left"
-                    onClick={() => setDeleting(t)}
-                  />
-                </>
+                <OverflowMenu
+                  aria-label="Tag actions"
+                  iconDescription="Tag actions"
+                  size="lg"
+                  flipped
+                >
+                  <OverflowMenuItem itemText="Rename" onClick={() => setRenaming(t)} />
+                  <OverflowMenuItem itemText="Delete" isDelete onClick={() => setDeleting(t)} />
+                </OverflowMenu>
               }
             >
               {t.name}
