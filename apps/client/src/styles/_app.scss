@@ -231,6 +231,41 @@ $note-colours: (
   margin-block: $spacing-06 $spacing-07;
 }
 
+.memra-editor-title {
+  display: flex;
+  align-items: flex-end;
+  gap: $spacing-03;
+
+  > .cds--form-item {
+    flex: 1;
+  }
+}
+
+.memra-note-view__head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: $spacing-04;
+}
+
+.memra-note-view__title {
+  @include type-style("heading-04");
+  overflow-wrap: anywhere;
+}
+
+.memra-note-view__meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: $spacing-04;
+  margin-block: $spacing-04 $spacing-07;
+}
+
+.memra-note-view__body {
+  @include type-style("body-01");
+  margin-block-end: $spacing-09;
+}
+
 .memra-editor-meta {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr));

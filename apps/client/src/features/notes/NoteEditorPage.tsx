@@ -1,9 +1,11 @@
+import { View } from "@carbon/icons-react";
 import {
   ActionableNotification,
   Breadcrumb,
   BreadcrumbItem,
   Column,
   Grid,
+  IconButton,
   Loading,
   Tab,
   TabList,
@@ -50,8 +52,8 @@ const isDirty = (d: Draft, n: Draft) =>
 export function NoteEditorPage() {
   const { noteId } = useParams();
   const [params] = useSearchParams();
-  if (noteId === "new") return <NewNote folderId={params.get("folder")} />;
-  return <ExistingNote id={noteId!} />;
+  if (!noteId) return <NewNote folderId={params.get("folder")} />;
+  return <ExistingNote id={noteId} />;
 }
 
 function ExistingNote({ id }: { id: string }) {
@@ -92,7 +94,7 @@ function NewNote({ folderId }: { folderId: string | null }) {
           pinned: false,
           sourceFilename: null,
         },
-        { onSuccess: (n) => void navigate(`/n/${n.id}`, { replace: true }) },
+        { onSuccess: (n) => void navigate(`/n/${n.id}/edit`, { replace: true }) },
       );
     }, AUTOSAVE_MS);
     return () => clearTimeout(t);
@@ -152,6 +154,7 @@ function NoteEditor({ note }: { note: Note }) {
       onChange={setDraft}
       folderId={note.folderId}
       title={note.displayTitle}
+      viewHref={`/n/${note.id}`}
       onSave={() => save()}
     >
       {conflict && (
@@ -184,11 +187,21 @@ interface EditorFormProps {
   onChange: (d: Draft) => void;
   folderId: string | null;
   title: string;
+  viewHref?: string;
   onSave?: () => void;
   children?: React.ReactNode;
 }
 
-function EditorForm({ draft, onChange, folderId, title, onSave, children }: EditorFormProps) {
+function EditorForm({
+  draft,
+  onChange,
+  folderId,
+  title,
+  viewHref,
+  onSave,
+  children,
+}: EditorFormProps) {
+  const navigate = useNavigate();
   const folders = useFolders() ?? [];
   const folder = folderId ? folders.find((f) => f.id === folderId) : undefined;
   const editorApi = useRef<EditorApi>(null);
@@ -209,15 +222,28 @@ function EditorForm({ draft, onChange, folderId, title, onSave, children }: Edit
           <BreadcrumbItem isCurrentPage>{title}</BreadcrumbItem>
         </Breadcrumb>
         {children}
-        <TextInput
-          id="note-title"
-          labelText="Title"
-          placeholder="Untitled"
-          size="lg"
-          maxLength={LIMITS.titleMax}
-          value={draft.title}
-          onChange={(e) => patch({ title: e.target.value })}
-        />
+        <div className="memra-editor-title">
+          <TextInput
+            id="note-title"
+            labelText="Title"
+            placeholder="Untitled"
+            size="lg"
+            maxLength={LIMITS.titleMax}
+            value={draft.title}
+            onChange={(e) => patch({ title: e.target.value })}
+          />
+          {viewHref && (
+            <IconButton
+              label="View note"
+              kind="ghost"
+              size="lg"
+              align="bottom-end"
+              onClick={() => void navigate(viewHref)}
+            >
+              <View />
+            </IconButton>
+          )}
+        </div>
         <div className="memra-editor-meta">
           <FolderField
             id="note-folder"
