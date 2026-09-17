@@ -1,6 +1,7 @@
 @use "@carbon/react/scss/spacing" as *;
 @use "@carbon/react/scss/theme" as *;
 @use "@carbon/react/scss/type" as *;
+@use "@carbon/react/scss/breakpoint" as *;
 @use "@carbon/react/scss/components/tag/tokens" as tag;
 
 // Only layout rhythm lives here; component appearance is Carbon's.
@@ -10,15 +11,18 @@ a.cds--header__name {
   position: relative;
   padding-inline: $spacing-05;
 
-  &::after {
-    content: "";
-    position: absolute;
-    inset-inline-end: 0;
-    inset-block-start: 50%;
-    transform: translateY(-50%);
-    inline-size: 1px;
-    block-size: $spacing-06;
-    background: $border-subtle-01;
+  // Divider only makes sense next to the inline folder tabs, which Carbon shows from lg up.
+  @include breakpoint("lg") {
+    &::after {
+      content: "";
+      position: absolute;
+      inset-inline-end: 0;
+      inset-block-start: 50%;
+      transform: translateY(-50%);
+      inline-size: 1px;
+      block-size: $spacing-06;
+      background: $border-subtle-01;
+    }
   }
 }
 
