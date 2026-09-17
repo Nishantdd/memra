@@ -50,7 +50,9 @@ a.cds--header__name {
   margin-block: $spacing-06 $spacing-07;
   display: flex;
   align-items: center;
+  flex-wrap: wrap;
   gap: $spacing-04;
+  overflow-wrap: anywhere;
 }
 
 .memra-page-title__actions {
@@ -71,8 +73,14 @@ a.cds--header__name {
 
 .memra-search-row {
   display: flex;
+  flex-wrap: wrap;
   gap: $spacing-05;
   margin-block-end: $spacing-06;
+
+  > .cds--search {
+    flex: 1;
+    min-inline-size: 12rem;
+  }
 }
 
 .memra-search-row__mode {
@@ -282,6 +290,7 @@ $note-colours: (
   display: flex;
   align-items: center;
   justify-content: space-between;
+  flex-wrap: wrap;
   gap: $spacing-04;
   margin-block: $spacing-04 $spacing-07;
 }
@@ -306,6 +315,7 @@ $note-colours: (
 // Toolbar is the top edge of the editor field, not a separate row.
 .memra-toolbar {
   display: flex;
+  flex-wrap: wrap;
   gap: $spacing-01;
   padding: $spacing-02;
   background: $field-01;
