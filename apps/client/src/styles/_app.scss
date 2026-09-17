@@ -236,6 +236,18 @@ $note-colours: (
   max-inline-size: 32rem;
 }
 
+// Carbon's slider track has a 200px floor; on phones let the number input drop to its own line.
+@include breakpoint-down("md") {
+  .memra-form .cds--slider-container {
+    flex-wrap: wrap;
+  }
+
+  .memra-form .cds--slider {
+    flex: 1;
+    min-inline-size: 0;
+  }
+}
+
 .memra-form__actions {
   display: flex;
   gap: $spacing-03;
