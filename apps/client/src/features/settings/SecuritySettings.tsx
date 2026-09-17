@@ -39,8 +39,8 @@ export function SecuritySettings() {
   const [next, setNext] = useState("");
   const [repeat, setRepeat] = useState("");
   const mismatch = repeat.length > 0 && next !== repeat;
-  const canSubmit =
-    current && next.length >= LIMITS.passwordMin && next === repeat && !change.isPending;
+  const tooShort = next.length > 0 && next.length < LIMITS.passwordMin;
+  const canSubmit = current && next.length > 0 && !tooShort && next === repeat && !change.isPending;
 
   const submit = (e: FormEvent) => {
     e.preventDefault();
@@ -69,7 +69,8 @@ export function SecuritySettings() {
         <PasswordInput
           id="pw-next"
           labelText="New password"
-          helperText={`At least ${LIMITS.passwordMin} characters.`}
+          invalid={tooShort}
+          invalidText={`Use at least ${LIMITS.passwordMin} characters.`}
           autoComplete="new-password"
           value={next}
           onChange={(e) => setNext(e.target.value)}
