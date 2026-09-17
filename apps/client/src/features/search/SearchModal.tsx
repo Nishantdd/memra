@@ -35,9 +35,10 @@ export function SearchModal({ open, folderId, onClose }: SearchModalProps) {
           />
           <MenuButton
             label={mode === "semantic" ? "Semantic" : "Keyword"}
-            kind="tertiary"
-            size="md"
-            menuAlignment="bottom-end"
+            kind="primary"
+            size="lg"
+            menuAlignment="bottom"
+            menuBackgroundToken="layer"
             menuTarget={menuTarget ?? undefined}
             className="memra-search-row__mode"
           >
