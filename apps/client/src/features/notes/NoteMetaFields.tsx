@@ -1,4 +1,4 @@
-import { ComboBox, DismissibleTag, Dropdown, Tag } from "@carbon/react";
+import { Dropdown, FilterableMultiSelect, Tag } from "@carbon/react";
 import { isDefinedError } from "@orpc/client";
 import { useState } from "react";
 import { NOTE_COLORS, type NoteColor, type Tag as TagEntity } from "shared";
@@ -74,31 +74,34 @@ interface TagsFieldProps {
   value: string[];
   onChange: (tagIds: string[]) => void;
   disabled?: boolean;
-  color: NoteColor;
+  size?: "sm" | "md" | "lg";
 }
 
-export function TagsField({ id, value, onChange, disabled, color }: TagsFieldProps) {
+const NEW_TAG_ID = "__new__";
+type TagOption = Pick<TagEntity, "id" | "name">;
+
+export function TagsField({ id, value, onChange, disabled, size = "sm" }: TagsFieldProps) {
   const tags = useTags() ?? [];
   const createTag = useCreateTag();
   const [error, setError] = useState<string | null>(null);
-  const selected = value
-    .map((tid) => tags.find((t) => t.id === tid))
-    .filter((t): t is TagEntity => !!t);
-  const available = tags.filter((t) => !value.includes(t.id));
+  const [typed, setTyped] = useState("");
 
-  const add = (tag: TagEntity | null, typed?: string) => {
+  const name = typed.trim();
+  const exists = tags.some((t) => t.name.toLowerCase() === name.toLowerCase());
+  const items: TagOption[] =
+    name && !exists ? [...tags, { id: NEW_TAG_ID, name: `Create \u201c${name}\u201d` }] : tags;
+  const selected = items.filter((t) => value.includes(t.id));
+
+  const apply = (picked: TagOption[]) => {
     setError(null);
-    if (tag) return onChange([...value, tag.id]);
-    const name = typed?.trim();
-    if (!name) return;
-    const existing = tags.find((t) => t.name.toLowerCase() === name.toLowerCase());
-    if (existing) return !value.includes(existing.id) && onChange([...value, existing.id]);
+    const ids = picked.filter((t) => t.id !== NEW_TAG_ID).map((t) => t.id);
+    if (!picked.some((t) => t.id === NEW_TAG_ID)) return onChange(ids);
     createTag.mutate(
       { name },
       {
-        onSuccess: (created) => onChange([...value, created.id]),
+        onSuccess: (created) => onChange([...ids, created.id]),
         onError: (e) => {
-          if (isDefinedError(e) && e.code === "CONFLICT") onChange([...value, e.data.existing.id]);
+          if (isDefinedError(e) && e.code === "CONFLICT") onChange([...ids, e.data.existing.id]);
           else setError("Couldn't create tag.");
         },
       },
@@ -106,43 +109,20 @@ export function TagsField({ id, value, onChange, disabled, color }: TagsFieldPro
   };
 
   return (
-    <div className="memra-tags-field">
-      <ComboBox
-        id={id}
-        titleText="Tags"
-        placeholder="Add tag"
-        size="sm"
-        disabled={disabled}
-        items={available}
-        itemToString={(t) => t?.name ?? ""}
-        selectedItem={null}
-        allowCustomValue
-        onChange={({ selectedItem, inputValue }) =>
-          add(selectedItem ?? null, inputValue ?? undefined)
-        }
-        invalid={error !== null}
-        invalidText={error ?? ""}
-      />
-      {selected.length > 0 && (
-        <div className="memra-tags-field__list">
-          {selected.map((t) =>
-            disabled ? (
-              <Tag key={t.id} type={tagType(color)} size="sm">
-                {t.name}
-              </Tag>
-            ) : (
-              <DismissibleTag
-                key={t.id}
-                type={tagType(color)}
-                size="sm"
-                text={t.name}
-                dismissTooltipLabel={`Remove ${t.name}`}
-                onClose={() => onChange(value.filter((id) => id !== t.id))}
-              />
-            ),
-          )}
-        </div>
-      )}
-    </div>
+    <FilterableMultiSelect
+      id={id}
+      titleText="Tags"
+      placeholder="Add tags"
+      size={size}
+      disabled={disabled}
+      items={items}
+      itemToString={(t) => t?.name ?? ""}
+      selectedItems={selected}
+      selectionFeedback="fixed"
+      onInputValueChange={({ inputValue }) => setTyped(inputValue ?? "")}
+      onChange={({ selectedItems }) => apply(selectedItems)}
+      invalid={error !== null}
+      invalidText={error ?? ""}
+    />
   );
 }

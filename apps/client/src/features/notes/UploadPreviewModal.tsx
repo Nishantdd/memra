@@ -168,7 +168,7 @@ function UploadPreview({
                 id="upload-tags"
                 value={draft.tagIds}
                 onChange={(tagIds) => patch({ tagIds })}
-                color={draft.color}
+                size="md"
               />
               {pendingTags.length > 0 && (
                 <p className="memra-upload__pending">

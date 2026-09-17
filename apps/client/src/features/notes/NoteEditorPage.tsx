@@ -230,7 +230,7 @@ function EditorForm({ draft, onChange, folderId, title, onSave, children }: Edit
             id="note-tags"
             value={draft.tagIds}
             onChange={(tagIds) => patch({ tagIds })}
-            color={draft.color}
+            size="md"
           />
         </div>
         <Tabs>
