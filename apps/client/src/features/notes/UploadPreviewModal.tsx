@@ -8,16 +8,17 @@ import {
   ModalFooter,
   ModalHeader,
   Tag,
+  TextArea,
   TextInput,
 } from "@carbon/react";
 import { isDefinedError } from "@orpc/client";
 import { useMutation } from "@tanstack/react-query";
 import { useEffect, useMemo, useState } from "react";
 import { LIMITS, type NoteColor, type ParsedMarkdown } from "shared";
+import { UPLOAD_ROWS } from "../../constants/index.ts";
 import { orpc } from "../../data/api/orpc.ts";
 import { useCreateNote } from "../../data/mutations.ts";
 import { useTags } from "../../data/queries.ts";
-import { MarkdownPreview } from "./MarkdownPreview.tsx";
 import { ColorField, FolderField, TagsField } from "./NoteMetaFields.tsx";
 
 interface UploadPreviewModalProps {
@@ -29,6 +30,7 @@ interface UploadPreviewModalProps {
 
 interface Draft {
   title: string;
+  bodyMd: string;
   folderId: string | null;
   color: NoteColor;
   tagIds: string[];
@@ -78,6 +80,7 @@ function UploadPreview({
     : [];
   const draft: Draft = {
     title: overrides.title ?? parsed?.title ?? "",
+    bodyMd: overrides.bodyMd ?? parsed?.bodyMd ?? "",
     folderId:
       overrides.folderId !== undefined ? overrides.folderId : (parsed?.folderId ?? defaultFolderId),
     color: overrides.color ?? parsed?.color ?? "none",
@@ -96,7 +99,7 @@ function UploadPreview({
     create.mutate(
       {
         title: draft.title.trim(),
-        bodyMd: parsed.bodyMd,
+        bodyMd: draft.bodyMd,
         folderId: draft.folderId,
         color: draft.color,
         pinned: parsed.pinned,
@@ -129,9 +132,13 @@ function UploadPreview({
         {parsed && (
           <Grid condensed className="memra-upload">
             <Column sm={4} md={4} lg={8}>
-              <MarkdownPreview
-                markdown={parsed.bodyMd || "*This file has no content.*"}
-                className="memra-upload__preview"
+              <TextArea
+                id="upload-body"
+                labelText="Content"
+                rows={UPLOAD_ROWS}
+                maxCount={LIMITS.bodyMax}
+                value={draft.bodyMd}
+                onChange={(e) => patch({ bodyMd: e.target.value })}
               />
             </Column>
             <Column sm={4} md={4} lg={8} className="memra-upload__fields">

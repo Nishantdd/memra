@@ -344,6 +344,21 @@ $note-colours: (
   text-align: start;
 }
 
+.memra-upload {
+  row-gap: $spacing-06;
+}
+
+.memra-upload__fields {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-06;
+}
+
+.memra-upload__pending {
+  @include type-style("helper-text-01");
+  color: $text-helper;
+}
+
 .memra-toasts {
   position: fixed;
   inset-block-end: $spacing-05;
