@@ -86,8 +86,11 @@ export function AiAnswer({
 
   return (
     <Tile className="memra-ai" decorator={label}>
-      {(cached || loading) && (
+      {(cached || loading || text) && (
         <div className="memra-ai__head">
+          {!loading && text && (
+            <span className="memra-ai__title">{extractive ? "From your notes" : "Answer"}</span>
+          )}
           {cached && (
             <Tag type="gray" size="sm">
               Cached

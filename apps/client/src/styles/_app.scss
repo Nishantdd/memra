@@ -358,6 +358,11 @@ $note-colours: (
   margin-block-end: $spacing-03;
 }
 
+.memra-ai__title {
+  @include type-style("heading-compact-01");
+  margin-inline-end: auto;
+}
+
 .memra-ai__citation {
   @include type-style("label-01");
   padding: 0 $spacing-02;
