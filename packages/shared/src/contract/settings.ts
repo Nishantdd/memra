@@ -1,6 +1,7 @@
 import { oc } from "@orpc/contract";
 import { z } from "zod";
 import { LIMITS } from "../constants/limits.ts";
+import { ProviderBaseUrl } from "../schemas/common.ts";
 import { AppSettings, AppSettingsPatch } from "../schemas/settings.ts";
 
 const Ok = z.object({ ok: z.literal(true) });
@@ -17,7 +18,7 @@ export const settingsContract = {
     .input(
       z.object({
         kind: z.enum(["embedding", "llm"]),
-        baseUrl: z.url(),
+        baseUrl: ProviderBaseUrl,
         model: z.string().min(1),
         apiKey: z.string().max(4096).optional(),
       }),

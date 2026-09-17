@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { ProviderBaseUrl } from "./common.ts";
 
 export const LOCAL_EMBEDDING_MODELS = [
   { id: "Xenova/bge-small-en-v1.5", label: "bge-small (fast, ~35 MB)", dims: 384 },
@@ -9,7 +10,7 @@ export const EmbeddingSettings = z.discriminatedUnion("provider", [
   z.object({ provider: z.literal("local"), model: z.string().min(1) }),
   z.object({
     provider: z.literal("openai-compatible"),
-    baseUrl: z.url(),
+    baseUrl: ProviderBaseUrl,
     model: z.string().min(1),
     dims: z.number().int().positive().nullable().default(null),
   }),
@@ -20,7 +21,7 @@ export const LlmSettings = z.discriminatedUnion("provider", [
   z.object({ provider: z.literal("none") }),
   z.object({
     provider: z.literal("openai-compatible"),
-    baseUrl: z.url(),
+    baseUrl: ProviderBaseUrl,
     model: z.string().min(1),
   }),
 ]);
