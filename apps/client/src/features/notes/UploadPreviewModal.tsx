@@ -130,8 +130,8 @@ function UploadPreview({
           />
         )}
         {parsed && (
-          <Grid condensed className="memra-upload">
-            <Column sm={4} md={4} lg={8}>
+          <Grid className="memra-upload">
+            <Column sm={4} md={4} lg={8} className="memra-upload__content">
               <TextArea
                 id="upload-body"
                 labelText="Content"

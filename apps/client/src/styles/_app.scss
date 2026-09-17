@@ -348,6 +348,20 @@ $note-colours: (
   row-gap: $spacing-06;
 }
 
+// Content textarea fills the column so it lines up with the stacked fields.
+.memra-upload__content,
+.memra-upload__content .cds--form-item,
+.memra-upload__content .cds--text-area__wrapper {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+.memra-upload__content .cds--text-area {
+  flex: 1;
+  resize: none;
+}
+
 .memra-upload__fields {
   display: flex;
   flex-direction: column;
