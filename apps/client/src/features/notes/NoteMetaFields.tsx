@@ -118,7 +118,6 @@ export function TagsField({ id, value, onChange, disabled, size = "sm" }: TagsFi
       items={items}
       itemToString={(t) => t?.name ?? ""}
       selectedItems={selected}
-      selectionFeedback="fixed"
       onInputValueChange={({ inputValue }) => setTyped(inputValue ?? "")}
       onChange={({ selectedItems }) => apply(selectedItems)}
       invalid={error !== null}
