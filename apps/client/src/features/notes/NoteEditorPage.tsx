@@ -56,7 +56,12 @@ export function NoteEditorPage() {
 
 function ExistingNote({ id }: { id: string }) {
   const note = useNote(id);
-  if (note.isPending) return <Loading small withOverlay={false} description="Loading note" />;
+  if (note.isPending)
+    return (
+      <div className="memra-loading">
+        <Loading small withOverlay={false} description="Loading note" />
+      </div>
+    );
   if (note.isError || !note.data) return <Navigate to="/" replace />;
   return <NoteEditor key={note.data.id} note={note.data} />;
 }
