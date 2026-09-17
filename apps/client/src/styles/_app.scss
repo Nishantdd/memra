@@ -240,6 +240,7 @@ $note-colours: (
 @include breakpoint-down("md") {
   .memra-form .cds--slider-container {
     flex-wrap: wrap;
+    inline-size: 100%;
   }
 
   .memra-form .cds--slider {
