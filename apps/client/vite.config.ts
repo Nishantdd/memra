@@ -5,7 +5,7 @@ export default defineConfig({
   plugins: lazyPlugins(() => [react()]),
   css: {
     preprocessorOptions: {
-      scss: { quietDeps: true, silenceDeprecations: ["mixed-decls", "import"] },
+      scss: { quietDeps: true, silenceDeprecations: ["import"] },
     },
   },
   server: {
