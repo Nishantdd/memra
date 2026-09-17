@@ -195,6 +195,11 @@ a.cds--header__name {
   margin-block: $spacing-06;
 }
 
+// Editor and preview sit flush under the contained tabs.
+.memra-tab-panel {
+  padding: 0;
+}
+
 // Toolbar is the top edge of the editor field, not a separate row.
 .memra-toolbar {
   display: flex;

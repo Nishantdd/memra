@@ -239,7 +239,7 @@ function EditorForm({ draft, onChange, folderId, title, onSave, children }: Edit
             <Tab>Preview</Tab>
           </TabList>
           <TabPanels>
-            <TabPanel>
+            <TabPanel className="memra-tab-panel">
               <div className="memra-editor-frame">
                 <EditorToolbar apiRef={editorApi} />
                 <Editor
@@ -254,7 +254,7 @@ function EditorForm({ draft, onChange, folderId, title, onSave, children }: Edit
                 />
               </div>
             </TabPanel>
-            <TabPanel>
+            <TabPanel className="memra-tab-panel">
               <MarkdownPreview
                 markdown={draft.bodyMd || "*Nothing to preview yet.*"}
                 className="memra-preview"
