@@ -1,9 +1,7 @@
-import { ColorPalette, FolderMoveTo, Pin, PinFilled, TrashCan } from "@carbon/icons-react";
-import { Link, Tag, Tile } from "@carbon/react";
+import { Link, OverflowMenu, OverflowMenuItem, Tag, Tile } from "@carbon/react";
 import type { Note } from "shared";
 import { Link as RouterLink } from "react-router";
 import { useTags } from "../../data/queries.ts";
-import { IconMenu, MenuItem, MenuItemDivider } from "../../lib/carbon.ts";
 import { formatAbsolute, formatRelative } from "../../lib/time.ts";
 import { COLOR_LABELS, tagType } from "./noteColors.ts";
 
@@ -27,26 +25,15 @@ export function NoteCard({ note, onTogglePin, onMove, onRecolor, onDelete }: Not
             {note.displayTitle}
           </Link>
         </h3>
-        <IconMenu label="Note actions" size="sm" menuAlignment="bottom-end">
-          <MenuItem
-            label={note.pinned ? "Unpin" : "Pin"}
-            renderIcon={note.pinned ? PinFilled : Pin}
+        <OverflowMenu aria-label="Note actions" iconDescription="Note actions" size="sm" flipped>
+          <OverflowMenuItem
+            itemText={note.pinned ? "Unpin" : "Pin"}
             onClick={() => onTogglePin(note)}
           />
-          <MenuItem label="Move to folder" renderIcon={FolderMoveTo} onClick={() => onMove(note)} />
-          <MenuItem
-            label="Change colour"
-            renderIcon={ColorPalette}
-            onClick={() => onRecolor(note)}
-          />
-          <MenuItemDivider />
-          <MenuItem
-            label="Delete"
-            kind="danger"
-            renderIcon={TrashCan}
-            onClick={() => onDelete(note)}
-          />
-        </IconMenu>
+          <OverflowMenuItem itemText="Move to folder" onClick={() => onMove(note)} />
+          <OverflowMenuItem itemText="Change colour" onClick={() => onRecolor(note)} />
+          <OverflowMenuItem itemText="Delete" hasDivider isDelete onClick={() => onDelete(note)} />
+        </OverflowMenu>
       </div>
       {note.excerpt && <p className="memra-note__excerpt">{note.excerpt}</p>}
       <div className="memra-note__foot">

@@ -1,11 +1,19 @@
-import { AddLarge, Edit, Search, TrashCan, Upload } from "@carbon/icons-react";
-import { Column, Grid, IconButton, SkeletonPlaceholder, Tag } from "@carbon/react";
+import { AddLarge, Search } from "@carbon/icons-react";
+import {
+  Column,
+  Grid,
+  IconButton,
+  OverflowMenu,
+  OverflowMenuItem,
+  SkeletonPlaceholder,
+  Tag,
+} from "@carbon/react";
 import { useEffect, useRef, useState } from "react";
 import { Navigate, useNavigate, useParams } from "react-router";
 import type { Note } from "shared";
 import { useUpdateNote } from "../../data/mutations.ts";
 import { useFolders, useNotes } from "../../data/queries.ts";
-import { IconMenu, MenuItem as IconMenuItem } from "../../lib/carbon.ts";
+
 import { DeleteFolderModal, RenameFolderModal } from "../folders/FolderDialogs.tsx";
 import { SearchModal } from "../search/SearchModal.tsx";
 import { NoteCard } from "./NoteCard.tsx";
@@ -84,32 +92,36 @@ export function NotesPage() {
             >
               <Search />
             </IconButton>
-            <IconMenu label="New" renderIcon={AddLarge} size="md" menuAlignment="bottom-end">
-              <IconMenuItem
-                label="Create new note"
-                renderIcon={AddLarge}
+            <OverflowMenu
+              aria-label="New"
+              iconDescription="New"
+              renderIcon={AddLarge}
+              size="md"
+              flipped
+            >
+              <OverflowMenuItem
+                itemText="Create new note"
                 onClick={() => void navigate(folder ? `/n/new?folder=${folder.id}` : "/n/new")}
               />
-              <IconMenuItem
-                label="Upload Markdown file"
-                renderIcon={Upload}
+              <OverflowMenuItem
+                itemText="Upload Markdown file"
                 onClick={() => fileInput.current?.click()}
               />
-            </IconMenu>
+            </OverflowMenu>
             {folder && (
-              <IconMenu label="Folder actions" size="md" menuAlignment="bottom-end">
-                <IconMenuItem
-                  label="Rename folder"
-                  renderIcon={Edit}
-                  onClick={() => setRenaming(true)}
-                />
-                <IconMenuItem
-                  label="Delete folder"
-                  kind="danger"
-                  renderIcon={TrashCan}
+              <OverflowMenu
+                aria-label="Folder actions"
+                iconDescription="Folder actions"
+                size="md"
+                flipped
+              >
+                <OverflowMenuItem itemText="Rename folder" onClick={() => setRenaming(true)} />
+                <OverflowMenuItem
+                  itemText="Delete folder"
+                  isDelete
                   onClick={() => setDeletingFolder(true)}
                 />
-              </IconMenu>
+              </OverflowMenu>
             )}
           </span>
         </h1>

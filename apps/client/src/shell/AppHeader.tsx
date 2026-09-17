@@ -1,4 +1,4 @@
-import { Add, Asleep, Light, Logout, Settings, UserAvatar } from "@carbon/icons-react";
+import { Add, Asleep, Light, UserAvatar } from "@carbon/icons-react";
 import {
   Header,
   HeaderContainer,
@@ -10,6 +10,8 @@ import {
   HeaderName,
   HeaderNavigation,
   HeaderSideNavItems,
+  OverflowMenu,
+  OverflowMenuItem,
   SideNav,
   SideNavItems,
   SkipToContent,
@@ -21,7 +23,7 @@ import { INLINE_FOLDER_TABS } from "../constants/index.ts";
 import { useFolders } from "../data/queries.ts";
 import { useLogout } from "../features/auth/useLogout.ts";
 import { CreateFolderModal } from "../features/folders/FolderDialogs.tsx";
-import { IconMenu, MenuItem } from "../lib/carbon.ts";
+
 import { isDarkTheme, setTheme, useTheme } from "../lib/theme.ts";
 import { StatusTag } from "./StatusTag.tsx";
 
@@ -104,21 +106,16 @@ export function AppHeader() {
               >
                 {isDarkTheme(theme) ? <Light size={20} /> : <Asleep size={20} />}
               </HeaderGlobalAction>
-              <IconMenu
-                label="Account"
+              <OverflowMenu
+                aria-label="Account"
+                iconDescription="Account"
                 renderIcon={UserAvatar}
                 size="lg"
-                menuAlignment="bottom-end"
-                tooltipAlignment="bottom-end"
+                flipped
               >
-                <MenuItem
-                  label="Settings"
-                  renderIcon={Settings}
-                  onClick={() => void navigate("/settings")}
-                />
-
-                <MenuItem label="Sign out" renderIcon={Logout} onClick={() => void logout()} />
-              </IconMenu>
+                <OverflowMenuItem itemText="Settings" onClick={() => void navigate("/settings")} />
+                <OverflowMenuItem itemText="Sign out" onClick={() => void logout()} />
+              </OverflowMenu>
             </HeaderGlobalBar>
             <SideNav
               aria-label="Folders"
