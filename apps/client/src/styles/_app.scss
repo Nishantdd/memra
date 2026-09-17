@@ -227,6 +227,16 @@ $note-colours: (
   gap: $spacing-03;
 }
 
+.memra-form__inline {
+  display: flex;
+  align-items: flex-start;
+  gap: $spacing-03;
+
+  > .cds--form-item {
+    flex: 1;
+  }
+}
+
 .memra-breadcrumb {
   margin-block: $spacing-06 $spacing-07;
 }

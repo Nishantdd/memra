@@ -61,3 +61,11 @@ export function useCreateTag() {
   const inv = useInvalidate();
   return useMutation(orpc.tags.create.mutationOptions({ onSuccess: inv.tags }));
 }
+export function useRenameTag() {
+  const inv = useInvalidate();
+  return useMutation(orpc.tags.rename.mutationOptions({ onSuccess: inv.tags }));
+}
+export function useDeleteTag() {
+  const inv = useInvalidate();
+  return useMutation(orpc.tags.delete.mutationOptions({ onSuccess: inv.tags }));
+}

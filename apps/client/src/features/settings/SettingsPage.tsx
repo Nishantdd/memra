@@ -4,9 +4,11 @@ import { AppearanceSection } from "./AppearanceSection.tsx";
 import { DataSettings } from "./DataSettings.tsx";
 import { SearchSettings } from "./SearchSettings.tsx";
 import { SecuritySettings } from "./SecuritySettings.tsx";
+import { TagsSettings } from "./TagsSettings.tsx";
 
 const TABS = [
   { id: "appearance", label: "Appearance", Component: AppearanceSection },
+  { id: "tags", label: "Tags", Component: TagsSettings },
   { id: "security", label: "Security", Component: SecuritySettings },
   { id: "search", label: "Search", Component: SearchSettings },
   { id: "data", label: "Data", Component: DataSettings },
