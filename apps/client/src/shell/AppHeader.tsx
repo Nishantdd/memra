@@ -13,6 +13,7 @@ import {
   OverflowMenu,
   OverflowMenuItem,
   SideNav,
+  SideNavDivider,
   SideNavItems,
   SkipToContent,
   Theme,
@@ -139,6 +140,7 @@ export function AppHeader() {
                       All notes
                     </HeaderMenuItem>
                     {items(folders, onClickSideNavExpand)}
+                    <SideNavDivider />
                     {newFolderItem(true, onClickSideNavExpand)}
                   </HeaderSideNavItems>
                 </SideNavItems>
