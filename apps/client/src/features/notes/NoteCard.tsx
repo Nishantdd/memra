@@ -3,7 +3,7 @@ import type { Note } from "shared";
 import { Link as RouterLink } from "react-router";
 import { useTags } from "../../data/queries.ts";
 import { formatAbsolute, formatRelative } from "../../lib/time.ts";
-import { COLOR_LABELS, tagType } from "./noteColors.ts";
+import { tagType } from "./noteColors.ts";
 
 interface NoteCardProps {
   note: Note;
@@ -18,7 +18,7 @@ export function NoteCard({ note, onTogglePin, onMove, onRecolor, onDelete }: Not
   const noteTags = note.tagIds.map((id) => tags.find((t) => t.id === id)).filter((t) => !!t);
 
   return (
-    <Tile className="memra-note">
+    <Tile className={`memra-note${note.color === "none" ? "" : ` memra-note--${note.color}`}`}>
       <div className="memra-note__head">
         <h3 className="memra-note__title">
           <Link as={RouterLink} to={`/n/${note.id}`}>
@@ -43,11 +43,6 @@ export function NoteCard({ note, onTogglePin, onMove, onRecolor, onDelete }: Not
               {t.name}
             </Tag>
           ))}
-          {noteTags.length === 0 && note.color !== "none" && (
-            <Tag type={tagType(note.color)} size="sm">
-              {COLOR_LABELS[note.color]}
-            </Tag>
-          )}
         </div>
         <time
           className="memra-note__time"

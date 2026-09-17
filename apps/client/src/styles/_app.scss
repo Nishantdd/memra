@@ -1,6 +1,7 @@
 @use "@carbon/react/scss/spacing" as *;
 @use "@carbon/react/scss/theme" as *;
 @use "@carbon/react/scss/type" as *;
+@use "@carbon/react/scss/components/tag/tokens" as tag;
 
 // Only layout rhythm lives here; component appearance is Carbon's.
 
@@ -86,6 +87,27 @@ a.cds--header__name {
   display: flex;
   flex-direction: column;
   gap: $spacing-04;
+  border-block-end: 2px solid transparent;
+}
+
+// Note colour shows as a bottom edge in the matching Carbon tag colour.
+$note-colours: (
+  "red": tag.$tag-color-red,
+  "magenta": tag.$tag-color-magenta,
+  "purple": tag.$tag-color-purple,
+  "blue": tag.$tag-color-blue,
+  "cyan": tag.$tag-color-cyan,
+  "teal": tag.$tag-color-teal,
+  "green": tag.$tag-color-green,
+  "gray": tag.$tag-color-gray,
+  "cool-gray": tag.$tag-color-cool-gray,
+  "warm-gray": tag.$tag-color-warm-gray,
+);
+
+@each $name, $colour in $note-colours {
+  .memra-note--#{$name} {
+    border-block-end-color: $colour;
+  }
 }
 
 .memra-note__head {
