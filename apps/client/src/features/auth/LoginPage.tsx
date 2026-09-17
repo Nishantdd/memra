@@ -13,8 +13,10 @@ import { type FormEvent, useEffect, useState } from "react";
 import { Navigate, useLocation } from "react-router";
 import { orpc } from "../../data/api/orpc.ts";
 import { sessionStore, useSession } from "../../data/session.ts";
+import { usePageTitle } from "../../lib/usePageTitle.ts";
 
 export function LoginPage() {
+  usePageTitle("Sign in");
   const session = useSession();
   const location = useLocation();
   const setup = useQuery(orpc.setup.status.queryOptions({ staleTime: 0 }));

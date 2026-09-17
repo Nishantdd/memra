@@ -13,6 +13,7 @@ import { Navigate, useNavigate, useParams } from "react-router";
 import type { Note } from "shared";
 import { useUpdateNote } from "../../data/mutations.ts";
 import { useFolders, useNotes } from "../../data/queries.ts";
+import { usePageTitle } from "../../lib/usePageTitle.ts";
 
 import { DeleteFolderModal, RenameFolderModal } from "../folders/FolderDialogs.tsx";
 import { SearchModal } from "../search/SearchModal.tsx";
@@ -48,6 +49,7 @@ export function NotesPage() {
   }, []);
 
   const folder = folderId ? folders?.find((f) => f.id === folderId) : undefined;
+  usePageTitle(folder?.name ?? "All Notes");
   if (folderId && folders && !folder) return <Navigate to="/" replace />;
 
   const items = notes.data?.items ?? [];

@@ -26,6 +26,7 @@ import { Editor, type EditorApi } from "./editor/Editor.tsx";
 import { EditorToolbar } from "./editor/EditorToolbar.tsx";
 import { MarkdownPreview } from "./MarkdownPreview.tsx";
 import { ColorField, FolderField, TagsField } from "./NoteMetaFields.tsx";
+import { usePageTitle } from "../../lib/usePageTitle.ts";
 
 interface Draft {
   title: string;
@@ -71,6 +72,7 @@ function ExistingNote({ id }: { id: string }) {
 function NewNote({ folderId }: { folderId: string | null }) {
   const create = useCreateNote();
   const navigate = useNavigate();
+  usePageTitle("New Note");
   const [draft, setDraft] = useState<Draft>({
     title: "",
     bodyMd: "",
@@ -115,6 +117,7 @@ function NoteEditor({ note }: { note: Note }) {
   const [baseVersion, setBaseVersion] = useState(note.version);
   const [conflict, setConflict] = useState<Note | null>(null);
   const dirty = isDirty(draft, toDraft(note));
+  usePageTitle(`Edit · ${note.displayTitle}`);
   useReportSaveStatus(
     `note:${note.id}`,
     update.isPending

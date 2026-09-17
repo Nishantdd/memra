@@ -2,6 +2,7 @@ import { Edit } from "@carbon/icons-react";
 import { Breadcrumb, BreadcrumbItem, Column, Grid, IconButton, Loading } from "@carbon/react";
 import { Link, Navigate, useNavigate, useParams } from "react-router";
 import { useFolders, useNote, useTags } from "../../data/queries.ts";
+import { usePageTitle } from "../../lib/usePageTitle.ts";
 import { formatAbsolute, formatRelative } from "../../lib/time.ts";
 import { MarkdownPreview } from "./MarkdownPreview.tsx";
 import { NoteTags } from "./NoteTags.tsx";
@@ -12,6 +13,7 @@ export function NotePage() {
   const note = useNote(noteId!);
   const folders = useFolders() ?? [];
   const tags = useTags() ?? [];
+  usePageTitle(note.data?.displayTitle);
 
   if (note.isPending)
     return (

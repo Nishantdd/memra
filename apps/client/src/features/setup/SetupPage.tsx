@@ -19,8 +19,10 @@ import {
   type LlmDraft,
   LlmFields,
 } from "../settings/ProviderFields.tsx";
+import { usePageTitle } from "../../lib/usePageTitle.ts";
 
 export function SetupPage() {
+  usePageTitle("Setup");
   const status = useQuery(orpc.setup.status.queryOptions({ staleTime: 0 }));
   const complete = useMutation(orpc.setup.complete.mutationOptions());
   const [password, setPassword] = useState("");

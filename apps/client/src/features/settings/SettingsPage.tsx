@@ -5,6 +5,7 @@ import { DataSettings } from "./DataSettings.tsx";
 import { SearchSettings } from "./SearchSettings.tsx";
 import { SecuritySettings } from "./SecuritySettings.tsx";
 import { TagsSettings } from "./TagsSettings.tsx";
+import { usePageTitle } from "../../lib/usePageTitle.ts";
 
 const TABS = [
   { id: "appearance", label: "Appearance", Component: AppearanceSection },
@@ -15,6 +16,7 @@ const TABS = [
 ] as const;
 
 export function SettingsPage() {
+  usePageTitle("Settings");
   const { tab } = useParams();
   const navigate = useNavigate();
   const index = TABS.findIndex((t) => t.id === tab);
