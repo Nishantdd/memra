@@ -6,7 +6,8 @@ export function RequireAuth() {
   const session = useSession();
   const location = useLocation();
 
-  if (session.status === "unknown") return <Loading withOverlay description="Loading Memra" />;
+  if (session.status === "unknown")
+    return <Loading small withOverlay={false} description="Loading Memra" />;
   if (session.status === "anonymous") {
     return <Navigate to="/login" replace state={{ from: location.pathname + location.search }} />;
   }
