@@ -34,6 +34,43 @@ Then open the site once to complete setup.
 
 Put Caddy (or similar) in front — see `deploy/Caddyfile`. Set `MEMRA_PUBLIC_ORIGIN` to the public URL so cross-site requests are rejected.
 
+### systemd
+
+To start Memra on boot, create a unit file (adjust paths to match your setup):
+
+````ini
+# /etc/systemd/system/memra.service
+[Unit]
+Description=Memra
+After=network.target
+
+[Service]
+Type=simple
+# Set to the user who owns the repository/directory (e.g., ubuntu or a dedicated service account)
+User=ubuntu
+# Point directly to the server app directory so relative paths and .env resolve properly
+WorkingDirectory=/home/ubuntu/Development/memra/apps/server
+# Use the full path to your active Node binary (find it with `which node`)
+ExecStart=/home/ubuntu/.nvm/versions/node/v26.9.0/bin/node --env-file-if-exists=.env dist/index.mjs
+Restart=on-failure
+RestartSec=5
+
+# Optional: Provide standard PATH so child processes and native binaries locate libraries
+Environment=NODE_ENV=production
+Environment=PATH=/home/ubuntu/.nvm/versions/node/v26.9.0/bin:/usr/local/bin:/usr/bin:/bin
+
+[Install]
+WantedBy=multi-user.target```
+
+Then enable and start it:
+
+```bash
+sudo systemctl daemon-reload
+sudo systemctl enable --now memra
+````
+
+Check status with `systemctl status memra` and logs with `journalctl -u memra -f`.
+
 ### Docker
 
 ```bash
