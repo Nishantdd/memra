@@ -47,12 +47,16 @@ const baseComponents: Components = {
     const text = raw.replace(/\n$/, "");
     if (className?.startsWith("language-") || text.includes("\n")) {
       return (
-        <CodeSnippet type="multi" feedback="Copied" hideCopyButton wrapText>
+        <CodeSnippet type="multi" feedback="Copied" wrapText>
           {text}
         </CodeSnippet>
       );
     }
-    return <code>{children}</code>;
+    return (
+      <CodeSnippet type="inline" feedback="Copied">
+        {text}
+      </CodeSnippet>
+    );
   },
   input: ({ checked }) => (
     <input

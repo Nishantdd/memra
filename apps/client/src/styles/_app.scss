@@ -331,12 +331,6 @@ $note-colours: (
   color: $text-secondary;
 }
 
-.memra-markdown code {
-  @include type-style("code-01");
-  background: $layer-accent-01;
-  padding-inline: $spacing-02;
-}
-
 .memra-markdown table {
   border-collapse: collapse;
   inline-size: 100%;
