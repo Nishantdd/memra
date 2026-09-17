@@ -7,7 +7,6 @@
     "dev": "vp dev",
     "build": "vp build",
     "preview": "vp preview",
-    "start": "vp preview",
     "check": "vp check"
   },
   "dependencies": {
