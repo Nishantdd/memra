@@ -71,12 +71,14 @@ export function NoteTags({ tags, color }: NoteTagsProps) {
             aria-label={`Show ${hidden.length} more tags`}
             onClick={() => setOpen((o) => !o)}
           />
-          <PopoverContent className="memra-note__tags-all">
-            {hidden.map((t) => (
-              <Tag key={t.id} type={type} size="sm">
-                {t.name}
-              </Tag>
-            ))}
+          <PopoverContent>
+            <div className="memra-note__tags-all">
+              {hidden.map((t) => (
+                <Tag key={t.id} type={type} size="sm">
+                  {t.name}
+                </Tag>
+              ))}
+            </div>
           </PopoverContent>
         </Popover>
       )}
