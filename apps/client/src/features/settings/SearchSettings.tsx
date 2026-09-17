@@ -75,12 +75,12 @@ function SearchSettingsForm({ initial }: { initial: AppSettings }) {
       <Slider
         id="min-sim"
         labelText="Minimum similarity for semantic matches"
-        min={0.1}
-        max={0.7}
-        step={0.05}
-        value={minSimilarity}
-        onChange={({ value }) => setMinSimilarity(value)}
-        formatLabel={(v) => v.toFixed(2)}
+        min={10}
+        max={70}
+        step={5}
+        value={Math.round(minSimilarity * 100)}
+        onChange={({ value }) => setMinSimilarity(value / 100)}
+        formatLabel={(v) => (v / 100).toFixed(2)}
       />
       {embeddingChanged && (
         <InlineNotification
