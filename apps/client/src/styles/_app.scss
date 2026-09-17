@@ -227,9 +227,13 @@ $note-colours: (
   gap: $spacing-03;
 }
 
+// Carbon reserves room for one action per row; these rows carry two.
 .memra-row-actions {
   display: flex;
-  margin-inline-start: $spacing-05;
+}
+
+.memra-tag-list .cds--contained-list-item--with-action .cds--contained-list-item__content {
+  padding-inline-end: calc(2 * #{$spacing-10} + #{$spacing-05});
 }
 
 .memra-form__inline {

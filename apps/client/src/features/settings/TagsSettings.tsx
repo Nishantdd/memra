@@ -61,7 +61,7 @@ export function TagsSettings() {
         </div>
       </Form>
 
-      <div className="memra-form">
+      <div className="memra-form memra-tag-list">
         <ContainedList
           label={`${tags.length} ${tags.length === 1 ? "tag" : "tags"}`}
           kind="on-page"
