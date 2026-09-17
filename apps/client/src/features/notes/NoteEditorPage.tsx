@@ -3,10 +3,13 @@ import {
   Breadcrumb,
   BreadcrumbItem,
   Column,
-  ContentSwitcher,
   Grid,
   Loading,
-  Switch,
+  Tab,
+  TabList,
+  TabPanel,
+  TabPanels,
+  Tabs,
   TextInput,
 } from "@carbon/react";
 import { isDefinedError } from "@orpc/client";
@@ -183,7 +186,6 @@ interface EditorFormProps {
 function EditorForm({ draft, onChange, folderId, title, onSave, children }: EditorFormProps) {
   const folders = useFolders() ?? [];
   const folder = folderId ? folders.find((f) => f.id === folderId) : undefined;
-  const [mode, setMode] = useState<"write" | "preview">("write");
   const editorApi = useRef<EditorApi>(null);
   const patch = (p: Partial<Draft>) => onChange({ ...draft, ...p });
 
@@ -231,35 +233,35 @@ function EditorForm({ draft, onChange, folderId, title, onSave, children }: Edit
             color={draft.color}
           />
         </div>
-        <ContentSwitcher
-          size="sm"
-          selectedIndex={mode === "write" ? 0 : 1}
-          onChange={({ index }) => setMode(index === 0 ? "write" : "preview")}
-          className="memra-editor-mode"
-        >
-          <Switch name="write" text="Write" />
-          <Switch name="preview" text="Preview" />
-        </ContentSwitcher>
-        {mode === "write" ? (
-          <>
-            <EditorToolbar apiRef={editorApi} />
-            <Editor
-              id="note-body"
-              ariaLabel="Note body"
-              value={draft.bodyMd}
-              onChange={(bodyMd) => patch({ bodyMd })}
-              onSave={onSave}
-              maxLength={LIMITS.bodyMax}
-              apiRef={editorApi}
-              rows={EDITOR_ROWS}
-            />
-          </>
-        ) : (
-          <MarkdownPreview
-            markdown={draft.bodyMd || "*Nothing to preview yet.*"}
-            className="memra-preview"
-          />
-        )}
+        <Tabs>
+          <TabList aria-label="Editor mode">
+            <Tab>Write</Tab>
+            <Tab>Preview</Tab>
+          </TabList>
+          <TabPanels>
+            <TabPanel>
+              <div className="memra-editor-frame">
+                <EditorToolbar apiRef={editorApi} />
+                <Editor
+                  id="note-body"
+                  ariaLabel="Note body"
+                  value={draft.bodyMd}
+                  onChange={(bodyMd) => patch({ bodyMd })}
+                  onSave={onSave}
+                  maxLength={LIMITS.bodyMax}
+                  apiRef={editorApi}
+                  rows={EDITOR_ROWS}
+                />
+              </div>
+            </TabPanel>
+            <TabPanel>
+              <MarkdownPreview
+                markdown={draft.bodyMd || "*Nothing to preview yet.*"}
+                className="memra-preview"
+              />
+            </TabPanel>
+          </TabPanels>
+        </Tabs>
       </Column>
     </Grid>
   );
