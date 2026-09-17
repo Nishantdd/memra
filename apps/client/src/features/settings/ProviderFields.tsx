@@ -124,6 +124,7 @@ export function EmbeddingFields({
             id="emb-url"
             labelText="Base URL"
             placeholder="https://api.openai.com/v1"
+            helperText="Up to and including /v1; /embeddings is added automatically."
             value={s.baseUrl}
             onChange={(e) => onChange({ ...value, settings: { ...s, baseUrl: e.target.value } })}
           />
@@ -193,14 +194,15 @@ export function LlmFields({
           <TextInput
             id="llm-url"
             labelText="Base URL"
-            placeholder="http://127.0.0.1:11434/v1"
+            placeholder="https://api.groq.com/openai/v1"
+            helperText="Up to and including /v1; /chat/completions is added automatically."
             value={s.baseUrl}
             onChange={(e) => onChange({ ...value, settings: { ...s, baseUrl: e.target.value } })}
           />
           <TextInput
             id="llm-model"
             labelText="Model"
-            placeholder="llama3.1:8b"
+            placeholder="llama-3.3-70b-versatile"
             value={s.model}
             onChange={(e) => onChange({ ...value, settings: { ...s, model: e.target.value } })}
           />
