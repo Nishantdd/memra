@@ -6,15 +6,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="color-scheme" content="light dark" />
     <title>Memra</title>
-    <script>
-      (function () {
-        var stored = localStorage.getItem("memra-theme");
-        var dark = window.matchMedia("(prefers-color-scheme: dark)").matches;
-        var theme = stored || (dark ? "g100" : "g10");
-        document.documentElement.className = "cds--" + theme;
-        document.documentElement.dataset.theme = theme;
-      })();
-    </script>
   </head>
   <body>
     <div id="root"></div>
