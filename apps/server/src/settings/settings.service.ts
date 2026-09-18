@@ -1,5 +1,6 @@
 import { EventEmitter } from "node:events";
 import {
+  AppearanceSettings,
   AppSettings,
   type AppSettingsPatch,
   DEFAULT_SETTINGS,
@@ -17,6 +18,7 @@ export interface ResolvedSettings extends AppSettings {
 }
 
 const KEYS = {
+  appearance: "appearance",
   embedding: "embedding",
   embeddingApiKey: "embedding_api_key",
   llm: "llm",
@@ -57,6 +59,7 @@ export class SettingsService extends EventEmitter<{ changed: [ResolvedSettings] 
     const embeddingApiKey = rows.get(KEYS.embeddingApiKey) ?? null;
     const llmApiKey = rows.get(KEYS.llmApiKey) ?? null;
     this.#cache = {
+      appearance: parse(KEYS.appearance, AppearanceSettings, DEFAULT_SETTINGS.appearance),
       embedding: parse(KEYS.embedding, EmbeddingSettings, DEFAULT_SETTINGS.embedding),
       embeddingApiKeySet: !!embeddingApiKey,
       embeddingApiKey,
@@ -76,6 +79,12 @@ export class SettingsService extends EventEmitter<{ changed: [ResolvedSettings] 
   update(patch: AppSettingsPatch): AppSettings {
     const before = this.resolved();
     this.#db.transaction(() => {
+      if (patch.appearance)
+        this.put(
+          KEYS.appearance,
+          JSON.stringify({ ...before.appearance, ...patch.appearance }),
+          false,
+        );
       if (patch.embedding) this.put(KEYS.embedding, JSON.stringify(patch.embedding), false);
       if (patch.llm) this.put(KEYS.llm, JSON.stringify(patch.llm), false);
       if (patch.search)

@@ -1,7 +1,8 @@
 import { useSyncExternalStore } from "react";
+import type { ContentTheme } from "shared";
 import { THEME_STORAGE_KEY } from "../constants/index.ts";
 
-export type ContentTheme = "white" | "g10" | "g90" | "g100";
+export type { ContentTheme };
 const listeners = new Set<() => void>();
 
 export function getTheme(): ContentTheme {
@@ -28,6 +29,19 @@ export function useTheme(): ContentTheme {
     getTheme,
     getTheme,
   );
+}
+
+export function isFollowingSystem(): boolean {
+  return localStorage.getItem(THEME_STORAGE_KEY) === null;
+}
+
+export function applyServerTheme(serverTheme: ContentTheme | null): void {
+  if (serverTheme) {
+    setTheme(serverTheme, true);
+  } else {
+    localStorage.removeItem(THEME_STORAGE_KEY);
+    setTheme(window.matchMedia("(prefers-color-scheme: dark)").matches ? "g100" : "g10", false);
+  }
 }
 
 export function followSystemTheme(): () => void {

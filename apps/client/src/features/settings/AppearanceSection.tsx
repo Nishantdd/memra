@@ -1,6 +1,8 @@
-import { Button, RadioButton, RadioButtonGroup, Stack } from "@carbon/react";
-import { THEME_STORAGE_KEY } from "../../constants/index.ts";
-import { type ContentTheme, setTheme, useTheme } from "../../lib/theme.ts";
+import { Button, InlineNotification, RadioButton, RadioButtonGroup, Stack } from "@carbon/react";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import type { ContentTheme } from "shared";
+import { orpc } from "../../data/api/orpc.ts";
+import { applyServerTheme, isFollowingSystem, setTheme, useTheme } from "../../lib/theme.ts";
 
 const THEMES: { value: ContentTheme; label: string }[] = [
   { value: "white", label: "Light (white)" },
@@ -11,11 +13,23 @@ const THEMES: { value: ContentTheme; label: string }[] = [
 
 export function AppearanceSection() {
   const theme = useTheme();
-  const followsSystem = localStorage.getItem(THEME_STORAGE_KEY) === null;
+  const followsSystem = isFollowingSystem();
+  const qc = useQueryClient();
+
+  const update = useMutation(
+    orpc.settings.update.mutationOptions({
+      onSuccess: () => qc.invalidateQueries({ queryKey: orpc.settings.key() }),
+    }),
+  );
+
+  const selectTheme = (value: ContentTheme) => {
+    setTheme(value);
+    update.mutate({ appearance: { theme: value } });
+  };
 
   const useSystem = () => {
-    localStorage.removeItem(THEME_STORAGE_KEY);
-    setTheme(window.matchMedia("(prefers-color-scheme: dark)").matches ? "g100" : "g10", false);
+    applyServerTheme(null);
+    update.mutate({ appearance: { theme: null } });
   };
 
   return (
@@ -25,7 +39,7 @@ export function AppearanceSection() {
         name="theme"
         orientation="vertical"
         valueSelected={theme}
-        onChange={(value) => setTheme(value as ContentTheme)}
+        onChange={(value) => selectTheme(value as ContentTheme)}
       >
         {THEMES.map((t) => (
           <RadioButton key={t.value} id={`theme-${t.value}`} value={t.value} labelText={t.label} />
@@ -36,6 +50,14 @@ export function AppearanceSection() {
           {followsSystem ? "Following system preference" : "Follow system preference"}
         </Button>
       </div>
+      {update.isError && (
+        <InlineNotification
+          kind="error"
+          lowContrast
+          hideCloseButton
+          title="Couldn't save appearance."
+        />
+      )}
     </Stack>
   );
 }

@@ -2,9 +2,25 @@ import { z } from "zod";
 import { ProviderBaseUrl } from "./common.ts";
 
 export const LOCAL_EMBEDDING_MODELS = [
-  { id: "Xenova/bge-small-en-v1.5", label: "bge-small (fast, ~35 MB)", dims: 384 },
-  { id: "Xenova/bge-base-en-v1.5", label: "bge-base (better recall, ~110 MB)", dims: 768 },
+  {
+    id: "Xenova/bge-small-en-v1.5",
+    label: "bge-small (fast, ~35 MB)",
+    dims: 384,
+  },
+  {
+    id: "Xenova/bge-base-en-v1.5",
+    label: "bge-base (better recall, ~110 MB)",
+    dims: 768,
+  },
 ] as const;
+
+export const ContentTheme = z.enum(["white", "g10", "g90", "g100"]);
+export type ContentTheme = z.infer<typeof ContentTheme>;
+
+export const AppearanceSettings = z.object({
+  theme: ContentTheme.nullable().default(null),
+});
+export type AppearanceSettings = z.infer<typeof AppearanceSettings>;
 
 export const EmbeddingSettings = z.discriminatedUnion("provider", [
   z.object({ provider: z.literal("local"), model: z.string().min(1) }),
@@ -34,6 +50,7 @@ export type SearchSettings = z.infer<typeof SearchSettings>;
 
 /** Settings as stored and returned; secrets are never included, only whether they are set. */
 export const AppSettings = z.object({
+  appearance: AppearanceSettings,
   embedding: EmbeddingSettings,
   embeddingApiKeySet: z.boolean(),
   llm: LlmSettings,
@@ -44,6 +61,7 @@ export type AppSettings = z.infer<typeof AppSettings>;
 
 /** Patch payload: omitted keys keep their value; an empty-string key clears the secret. */
 export const AppSettingsPatch = z.object({
+  appearance: AppearanceSettings.partial().optional(),
   embedding: EmbeddingSettings.optional(),
   embeddingApiKey: z.string().max(4096).optional(),
   llm: LlmSettings.optional(),
@@ -53,6 +71,7 @@ export const AppSettingsPatch = z.object({
 export type AppSettingsPatch = z.infer<typeof AppSettingsPatch>;
 
 export const DEFAULT_SETTINGS: AppSettings = {
+  appearance: { theme: null },
   embedding: { provider: "local", model: LOCAL_EMBEDDING_MODELS[0].id },
   embeddingApiKeySet: false,
   llm: { provider: "none" },
